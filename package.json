@@ -1,0 +1,19 @@
+{
+  "name": "rss-o-bot",
+  "version": "0.1.0",
+  "description": "A FOSS RSSBot clone",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kriegslustig <npm@ls7.ch>",
+  "license": "MIT",
+  "dependencies": {
+    "feedparser": "^1.1.4",
+    "request": "^2.72.0",
+    "rx": "^4.1.0",
+    "sequelize": "^3.23.3",
+    "sqlite3": "^3.1.4",
+    "tg-yarl": "^1.2.0"
+  }
+}
