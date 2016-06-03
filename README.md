@@ -1,4 +1,4 @@
-# RSS-o-Bot 0.3.1
+# RSS-o-Bot 0.3.2
 
 A super simple RSS client.
 
