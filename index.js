@@ -11,16 +11,19 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(
     getFeeds()
       .flatMap((feeds) => Rx.Observable.combineLatest(
         ...feeds.map(feed =>
-          poll(feed.get('url'))
-            .retry(2)
-            .filter(({latestLink}) =>
-              latestLink !== feed.get('latestLink')
-            )
-            .flatMap(({ blog, latestLink }) =>
-              Rx.Observable.forkJoin(
-                notify(blog, latestLink),
-                updateLatestLink(feed.get('id'), latestLink)
-              )
+          Rx.Observable.fromPromise(feed.getFilters())
+            .flatMap(filters =>
+              poll(feed.get('url'), filters.map(f => [f.get('keyword'), f.get('kind')]))
+                .retry(2)
+                .filter(({latestLink}) =>
+                  latestLink !== feed.get('latestLink')
+                )
+                .flatMap(({ blog, latestLink }) =>
+                  Rx.Observable.forkJoin(
+                    notify(blog, latestLink),
+                    updateLatestLink(feed.get('id'), latestLink)
+                  )
+                )
             )
         )
       ))

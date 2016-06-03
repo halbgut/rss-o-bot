@@ -38,6 +38,7 @@ rss-o-bot -h
 
 ## TODO
 
-* Implement Filters
+* Document the demonization
 * Multi-threading
+* Clean up the output
 

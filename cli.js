@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 const Rx = require('rx')
-const {getConfig} = require('./lib/helpers')
+const O = Rx.Observable
+const { getConfig, transformFilter } = require('./lib/helpers')
 const Tg = require('tg-yarl')
 const config = getConfig()
 const initStore = require('./lib/store')
@@ -10,25 +11,37 @@ const notify = require('./lib/notify')(config)
 const help = `usage: rss-o-bot [flag | action [arguments]]
 
 Flags:
-  -h, --help          Displays this dialogue
+  -h, --help             Displays this dialogue
 
 Actions:
-  add                 Add a Feed-URL to the database
-  rm                  Remove a Feed-URL from the database
-  list                List all Feed-URLs
-  test-notification   Send a test notification over the
-                      channels defined in config.json
-  poll-telegram       Continuously checks telegram for new
-                      messages and outputs senders userIds.
+  add url [...filters]   Add a Feed-URL to the database
+  rm id                  Remove a Feed-URL from the database
+  list                   List all Feed-URLs
+  test-notification      Send a test notification over the
+                         channels defined in config.json
+  poll-telegram          Continuously checks telegram for new
+                         messages and outputs senders userIds.
+
+Arguments:
+  url                    A URL of an RSS or Atom feed
+  id                     The \`id\` of a Feed-URL inside the DB.
+                         \`id\`s can be displayed using \`rss-o-bot list\`
+  ...                    A space sperated list of something
+  filters                Keywords to search for in titles of items inside
+                         feeds. When filters are passed, only notifications
+                         for items containing that word in their title
+                         will be sent. If a filter is prefixed with '!',
+                         you will only be notified about items without
+                         that word in their titles.
 `
 
 const action = process.argv[2]
 const args = process.argv.slice(3)
 
 if (action === 'add' && args[0]) {
-  const [url] = args
+  const [url, ...filters] = args
   initStore(config)
-    .flatMap(({ insertFeed }) => insertFeed(url))
+    .flatMap(({ insertFeed }) => insertFeed(url, filters.map(transformFilter)))
     .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'rm' && args[0]) {
   const [id] = args
@@ -38,7 +51,12 @@ if (action === 'add' && args[0]) {
 } else if (action === 'list') {
   initStore(config)
     .flatMap(({ listFeeds }) => listFeeds())
-    .map(feeds => feeds.map(f => [f.get('id'), f.get('url')]))
+    .flatMap(feeds =>
+      O.forkJoin(feeds.map(f => f.getFilters()))
+        .map((filters) => feeds.map((f, i) =>
+          [f.get('id'), f.get('url'), ...filters[i].map(filter => [filter.get('keyword'), filter.get('kind')])]
+        ))
+    )
     .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'test-notification' && args[0]) {
   const [url] = args
@@ -46,8 +64,8 @@ if (action === 'add' && args[0]) {
     .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'poll-telegram') {
   const tg = Tg(config['telegram-api-token'])
-  Rx.Observable.interval(1000).startWith(0)
-    .flatMap(() => Rx.Observable.fromPromise(tg.getUpdates()))
+  O.interval(1000).startWith(0)
+    .flatMap(() => O.fromPromise(tg.getUpdates()))
     .map(res => res.body.ok
       ? res.body.result.slice(-1)[0]
       : null
