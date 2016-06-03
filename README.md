@@ -34,9 +34,19 @@ Your RSS-o-Bot, will search for a configuration file in ~/.rss-o-bot. Here's an 
 rss-o-bot -h
 ```
 
+## Daemonizing
+
+If you're using linux you'll probably want to go with systemd. Figure it out yourself.
+
+If not, you probably want to use pm2. It provides a really powerful, yet simple to use system for process-daemonization (LOL).
+
+```js
+npm i -g pm2
+pm2 start rss-o-bot
+```
+
 ## TODO
 
-* Document the demonization
 * Multi-threading
 * Clean up the output
 
