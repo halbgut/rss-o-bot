@@ -1,7 +1,7 @@
 {
   "name": "rss-o-bot",
-  "version": "0.1.0",
-  "description": "A FOSS RSSBot clone",
+  "version": "0.2.0",
+  "description": "A FOSS RSSBot alternative",
   "main": "index.js",
   "bin": "cli.js",
   "scripts": {

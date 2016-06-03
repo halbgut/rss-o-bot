@@ -1,8 +1,6 @@
-# RSS-o-Bot
+# RSS-o-Bot 0.2.0
 
 A super simple RSS client.
-
-**Unteseted on windows.**
 
 ## Installation
 
