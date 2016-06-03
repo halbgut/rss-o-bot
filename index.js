@@ -11,6 +11,7 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(
       .flatMap((feeds) => Rx.Observable.combineLatest(
         ...feeds.map(feed =>
           poll(feed.get('url'))
+            .retry(2)
             .filter(({latestLink}) =>
               latestLink !== feed.get('latestLink')
             )
@@ -22,7 +23,7 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(
             )
         )
       ))
-  )
+  ).retry()
 )
   .subscribe(
     console.log,
