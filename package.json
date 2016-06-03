@@ -2,9 +2,11 @@
   "name": "rss-o-bot",
   "version": "0.2.0",
   "description": "A FOSS RSSBot alternative",
-  "main": "index.js",
-  "bin": "cli.js",
+  "main": "dist",
+  "bin": "dist/cli.js",
   "scripts": {
+    "build": "babel --presets babel-preset-es2015 src --out-dir dist",
+    "watch-build": "watch 'npm run build -- --source-maps' src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "https://github.com/Kriegslustig/rss-o-bot.git",
@@ -18,5 +20,10 @@
     "sequelize": "^3.23.3",
     "sqlite3": "^3.1.4",
     "tg-yarl": "^1.2.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.9.1",
+    "babel-preset-es2015": "^6.9.0",
+    "watch": "^0.18.0"
   }
 }
