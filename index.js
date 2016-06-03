@@ -1,9 +1,34 @@
 const Rx = require('rx')
 
-const config = require('./config')
+const locations = [
+  `${process.env.HOME}/.rss-o-bot`,
+  '/etc/.rss-o-bot',
+  `${__dirname}/config.json`
+]
+const fs = require('fs')
+const config =
+  locations
+    .filter(l => {
+      try {
+        return fs.statSync(l).isFile()
+      } catch (e) {
+        return false
+      }
+    })
+    .slice(0, 1)
+    .map(l => fs.readFileSync(l))
+    .map(c => JSON.parse(c))[0]
+
+if (!config) {
+  throw new Error(`No config file found!
+RTFM and put one in one of these locations:
+${locations.join(', ')}
+`)
+}
+
 const notify = require('./lib/notify')(config)
-const poll = require('./lib/poll.js')
-const initStore = require('./lib/store.js')
+const poll = require('./lib/poll')
+const initStore = require('./lib/store')
 
 Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(
   initStore(config).flatMap(({getFeeds, insertFeed, updateLatestLink}) =>
