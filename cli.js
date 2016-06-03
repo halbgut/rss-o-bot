@@ -14,6 +14,7 @@ Flags:
   -h, --help             Displays this dialogue
 
 Actions:
+  run                    Run the deamon process in the foreground
   add url [...filters]   Add a Feed-URL to the database
   rm id                  Remove a Feed-URL from the database
   list                   List all Feed-URLs
@@ -73,6 +74,10 @@ if (action === 'add' && args[0]) {
     .distinctUntilChanged(update => update ? update.update_id : null)
     .map(update => update ? update.message.from.id : null)
     .subscribe(console.log, console.error, () => process.exit())
+} else if (action === 'run') {
+  require('.')
+} else if (action === '-h' && action === '--help' && action === 'help') {
+  process.stdout.write(help)
 } else {
   process.stderr.write(`Unrecognized action: ${action}\n ${help}`)
   process.exit(1)
