@@ -27,7 +27,9 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(
             )
         )
       ))
-  ).retry()
+  )
+  .retry()
+  .filter(() => false)
 )
   .subscribe(
     console.log,
