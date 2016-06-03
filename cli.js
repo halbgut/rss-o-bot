@@ -14,6 +14,8 @@ Flags:
 
 Actions:
   add                 Add a Feed-URL to the database
+  rm                  Remove a Feed-URL from the database
+  list                List all Feed-URLs
   test-notification   Send a test notification over the
                       channels defined in config.json
   poll-telegram       Continuously checks telegram for new
@@ -27,6 +29,16 @@ if (action === 'add' && args[0]) {
   const [url] = args
   initStore(config)
     .flatMap(({ insertFeed }) => insertFeed(url))
+    .subscribe(console.log, console.error, () => process.exit())
+} else if (action === 'rm' && args[0]) {
+  const [id] = args
+  initStore(config)
+    .flatMap(({ removeFeed }) => removeFeed(id))
+    .subscribe(console.log, console.error, () => process.exit())
+} else if (action === 'list') {
+  initStore(config)
+    .flatMap(({ listFeeds }) => listFeeds())
+    .map(feeds => feeds.map(f => [f.get('id'), f.get('url')]))
     .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'test-notification' && args[0]) {
   const [url] = args
