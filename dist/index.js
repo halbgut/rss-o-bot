@@ -40,4 +40,3 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(initStore(co
 })).subscribe(console.log, console.error, function () {
   return console.log('Complete');
 });
-//# sourceMappingURL=index.js.map

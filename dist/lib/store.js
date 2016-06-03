@@ -99,4 +99,3 @@ module.exports = function initStore(config) {
     };
   });
 };
-//# sourceMappingURL=store.js.map

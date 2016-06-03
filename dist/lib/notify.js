@@ -33,4 +33,3 @@ function desktop(config) {
     }).takeUntilWithTime(1000);
   }; // Time out gracefully if nothing happens
 }
-//# sourceMappingURL=notify.js.map

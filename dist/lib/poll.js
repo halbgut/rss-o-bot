@@ -65,4 +65,3 @@ module.exports = function poll(url, filters) {
     };
   });
 };
-//# sourceMappingURL=poll.js.map

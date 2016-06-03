@@ -74,7 +74,7 @@ if (action === 'add' && args[0]) {
     .distinctUntilChanged(update => update ? update.update_id : null)
     .map(update => update ? update.message.from.id : null)
     .subscribe(console.log, console.error, () => process.exit())
-} else if (action === 'run') {
+} else if (action === 'run' || !action) {
   require('.')
 } else if (action === '-h' && action === '--help' && action === 'help') {
   process.stdout.write(help)

@@ -93,7 +93,7 @@ if (action === 'add' && args[0]) {
       return process.exit();
     });
   })();
-} else if (action === 'run') {
+} else if (action === 'run' || !action) {
   require('.');
 } else if (action === '-h' && action === '--help' && action === 'help') {
   process.stdout.write(help);
@@ -101,4 +101,3 @@ if (action === 'add' && args[0]) {
   process.stderr.write('Unrecognized action: ' + action + '\n ' + help);
   process.exit(1);
 }
-//# sourceMappingURL=cli.js.map
