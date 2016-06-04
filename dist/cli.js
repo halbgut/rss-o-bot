@@ -100,18 +100,19 @@ if (action === 'add' && args[0]) {
 function printFeeds(feeds) {
   Promise.all(feeds.map(function (feed) {
     return feed.getFilters().then(function (filters) {
-      return [feed.get('url'), filters.map(function (f) {
+      return [feed.get('id'), feed.get('url'), filters.map(function (f) {
         return f.get('kind') ? f.get('keyword') : '!' + f.get('keyword');
       }).join(', ')];
     });
   })).then(function (feeds) {
     feeds.forEach(function (_ref4) {
-      var _ref5 = _slicedToArray(_ref4, 2);
+      var _ref5 = _slicedToArray(_ref4, 3);
 
-      var url = _ref5[0];
-      var filters = _ref5[1];
+      var id = _ref5[0];
+      var url = _ref5[1];
+      var filters = _ref5[2];
 
-      process.stdout.write(url + '  ' + filters + '\n');
+      process.stdout.write(id + ': ' + url + '  ' + filters + '\n');
     });
     process.stdout.write('\n');
   });

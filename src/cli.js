@@ -116,6 +116,7 @@ function printFeeds (feeds) {
   Promise.all(
     feeds.map(feed => feed.getFilters()
       .then(filters => [
+        feed.get('id'),
         feed.get('url'),
         filters.map(f =>
           f.get('kind')
@@ -126,8 +127,8 @@ function printFeeds (feeds) {
     )
   )
     .then(feeds => {
-      feeds.forEach(([url, filters]) => {
-        process.stdout.write(`${url}  ${filters}\n`)
+      feeds.forEach(([id, url, filters]) => {
+        process.stdout.write(`${id}: ${url}  ${filters}\n`)
       })
       process.stdout.write(`\n`)
     })
