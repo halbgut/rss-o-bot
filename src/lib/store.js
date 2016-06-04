@@ -49,6 +49,10 @@ const genUpdateLatestLink = Feed => (id, latestLink) =>
 
 const genRemoveFeed = Feed => id => O.fromPromise(
   Feed.findById(id)
+    .then(feed => {
+      if (!feed) throw new Error('Item doesn\'t exist.')
+      return feed
+    })
     .then(feed => feed.getFilters())
     .then(filters => Promise.all(
       filters.map(filter => filter.destroy)

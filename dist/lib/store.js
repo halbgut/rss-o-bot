@@ -55,6 +55,9 @@ var genUpdateLatestLink = function genUpdateLatestLink(Feed) {
 var genRemoveFeed = function genRemoveFeed(Feed) {
   return function (id) {
     return O.fromPromise(Feed.findById(id).then(function (feed) {
+      if (!feed) throw new Error('Item doesn\'t exist.');
+      return feed;
+    }).then(function (feed) {
       return feed.getFilters();
     }).then(function (filters) {
       return Promise.all(filters.map(function (filter) {
