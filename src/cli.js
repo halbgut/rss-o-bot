@@ -53,13 +53,10 @@ if (action === 'add' && args[0]) {
 } else if (action === 'list') {
   initStore(config)
     .flatMap(({ listFeeds }) => listFeeds())
-    .flatMap(feeds =>
-      O.forkJoin(feeds.map(f => f.getFilters()))
-        .map((filters) => feeds.map((f, i) =>
-          [f.get('id'), f.get('url'), ...filters[i].map(filter => [filter.get('keyword'), filter.get('kind')])]
-        ))
+    .subscribe(
+      printFeeds,
+      console.error
     )
-    .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'test-notification' && args[0]) {
   const [url] = args
   notify('Test', url)
@@ -80,9 +77,8 @@ if (action === 'add' && args[0]) {
   initStore(config)
     .flatMap(opml.import(file))
     .subscribe(
-      feeds => process.stdout.write(feeds.map(f => f.get('url')).join('\n') + '\n'),
-      console.error,
-      () => process.exit()
+      printFeeds,
+      console.error
     )
 } else if (action === 'run' || !action) {
   require('.')
@@ -91,5 +87,26 @@ if (action === 'add' && args[0]) {
 } else {
   process.stderr.write(`Unrecognized action: ${action}\n ${help}`)
   process.exit(1)
+}
+
+function printFeeds (feeds) {
+  Promise.all(
+    feeds.map(feed => feed.getFilters()
+      .then(filters => [
+        feed.get('url'),
+        filters.map(f =>
+          f.get('kind')
+            ? f.get('keyword')
+            : `!${f.get('keyword')}`
+        ).join(', ')
+      ])
+    )
+  )
+    .then(feeds => {
+      feeds.forEach(([url, filters]) => {
+        process.stdout.write(`${url}  ${filters}\n`)
+      })
+      process.stdout.write(`\n`)
+    })
 }
 
