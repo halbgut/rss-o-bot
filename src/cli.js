@@ -12,45 +12,48 @@ const opml = require('./lib/opml')
 const help = `usage: rss-o-bot [flag | action [arguments]]
 
 Flags:
-  -h, --help             Displays this dialogue
+  -h, --help                Displays this dialogue
 
 Actions:
-  run                    Run the deamon process in the foreground
+  [run]                     Run the deamon process in the foreground
 
-  add url [...filters]   Add a Feed-URL to the database
+  add url [...filters]      Add a Feed-URL to the database
 
-  rm id                  Remove a Feed-URL from the database
+  rm id                     Remove a Feed-URL from the database
 
-  list                   List all Feed-URLs
+  list                      List all Feed-URLs
 
-  test-notification      Send a test notification over the
+  test-notification [url]   Send a test notification over the
 
-                         channels defined in config.json
-  poll-telegram          Continuously checks telegram for new
-                         messages and outputs senders userIds.
+                            channels defined in config.json
+  poll-telegram             Continuously checks telegram for new
+                            messages and outputs senders userIds.
 
-  import file            OPML import. Takes a path to an XML-file
-                         As a parameter and scanns it for outline
-                         elements. It's standard for RSS clients
-                         to provide an OPML import. These contain
-                         outline tags which the importer searches
-                         for. From those tags, the xmlUrl or Url
-                         Attributes are read as feed-URLs>
+  import file               OPML import. Takes a path to an XML-file
+                            As a parameter and scanns it for outline
+                            elements. It's standard for RSS clients
+                            to provide an OPML import. These contain
+                            outline tags which the importer searches
+                            for. From those tags, the xmlUrl or Url
+                            Attributes are read as feed-URLs>
 
-  export                 Exports the RSS feeds as OPML. This does
-                         not export the filters.
+  export                    Exports the RSS feeds as OPML. This does
+                            not export the filters.
 
 Arguments:
-  url                    A URL of an RSS or Atom feed
-  id                     The \`id\` of a Feed-URL inside the DB.
-                         \`id\`s can be displayed using \`rss-o-bot list\`
-  ...                    A space sperated list of something
-  filters                Keywords to search for in titles of items inside
-                         feeds. When filters are passed, only notifications
-                         for items containing that word in their title
-                         will be sent. If a filter is prefixed with '!',
-                         you will only be notified about items without
-                         that word in their titles.
+  url                       A URL of an RSS or Atom feed
+
+  id                        The \`id\` of a Feed-URL inside the DB.
+                            \`id\`s can be displayed using \`rss-o-bot list\`
+
+  ...                       A space sperated list of something
+
+  filters                   Keywords to search for in titles of items inside
+                            feeds. When filters are passed, only notifications
+                            for items containing that word in their title
+                            will be sent. If a filter is prefixed with '!',
+                            you will only be notified about items without
+                            that word in their titles.
 `
 
 const action = process.argv[2]
@@ -60,12 +63,19 @@ if (action === 'add' && args[0]) {
   const [url, ...filters] = args
   initStore(config)
     .flatMap(({ insertFeed }) => insertFeed(url, filters.map(transformFilter)))
-    .subscribe(console.log, console.error, () => process.exit())
+    .subscribe(
+      f => console.log(`Added ${f.get('url')}`),
+      console.error,
+      () => process.exit()
+    )
 } else if (action === 'rm' && args[0]) {
   const [id] = args
   initStore(config)
     .flatMap(({ removeFeed }) => removeFeed(id))
-    .subscribe(console.log, console.error, () => process.exit())
+    .subscribe(
+      () => console.log('Removed.'),
+      console.error,
+      () => process.exit())
 } else if (action === 'list') {
   initStore(config)
     .flatMap(({ listFeeds }) => listFeeds())
@@ -73,8 +83,8 @@ if (action === 'add' && args[0]) {
       printFeeds,
       console.error
     )
-} else if (action === 'test-notification' && args[0]) {
-  const [url] = args
+} else if (action === 'test-notification') {
+  const url = args[0] || 'test'
   notify('Test', url)
     .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'poll-telegram') {

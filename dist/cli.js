@@ -19,7 +19,7 @@ var initStore = require('./lib/store');
 var notify = require('./lib/notify')(config);
 var opml = require('./lib/opml');
 
-var help = 'usage: rss-o-bot [flag | action [arguments]]\n\nFlags:\n  -h, --help             Displays this dialogue\n\nActions:\n  run                    Run the deamon process in the foreground\n\n  add url [...filters]   Add a Feed-URL to the database\n\n  rm id                  Remove a Feed-URL from the database\n\n  list                   List all Feed-URLs\n\n  test-notification      Send a test notification over the\n\n                         channels defined in config.json\n  poll-telegram          Continuously checks telegram for new\n                         messages and outputs senders userIds.\n\n  import file            OPML import. Takes a path to an XML-file\n                         As a parameter and scanns it for outline\n                         elements. It\'s standard for RSS clients\n                         to provide an OPML import. These contain\n                         outline tags which the importer searches\n                         for. From those tags, the xmlUrl or Url\n                         Attributes are read as feed-URLs>\n\n  export                 Exports the RSS feeds as OPML. This does\n                         not export the filters.\n\nArguments:\n  url                    A URL of an RSS or Atom feed\n  id                     The `id` of a Feed-URL inside the DB.\n                         `id`s can be displayed using `rss-o-bot list`\n  ...                    A space sperated list of something\n  filters                Keywords to search for in titles of items inside\n                         feeds. When filters are passed, only notifications\n                         for items containing that word in their title\n                         will be sent. If a filter is prefixed with \'!\',\n                         you will only be notified about items without\n                         that word in their titles.\n';
+var help = 'usage: rss-o-bot [flag | action [arguments]]\n\nFlags:\n  -h, --help                Displays this dialogue\n\nActions:\n  [run]                     Run the deamon process in the foreground\n\n  add url [...filters]      Add a Feed-URL to the database\n\n  rm id                     Remove a Feed-URL from the database\n\n  list                      List all Feed-URLs\n\n  test-notification [url]   Send a test notification over the\n\n                            channels defined in config.json\n  poll-telegram             Continuously checks telegram for new\n                            messages and outputs senders userIds.\n\n  import file               OPML import. Takes a path to an XML-file\n                            As a parameter and scanns it for outline\n                            elements. It\'s standard for RSS clients\n                            to provide an OPML import. These contain\n                            outline tags which the importer searches\n                            for. From those tags, the xmlUrl or Url\n                            Attributes are read as feed-URLs>\n\n  export                    Exports the RSS feeds as OPML. This does\n                            not export the filters.\n\nArguments:\n  url                       A URL of an RSS or Atom feed\n\n  id                        The `id` of a Feed-URL inside the DB.\n                            `id`s can be displayed using `rss-o-bot list`\n\n  ...                       A space sperated list of something\n\n  filters                   Keywords to search for in titles of items inside\n                            feeds. When filters are passed, only notifications\n                            for items containing that word in their title\n                            will be sent. If a filter is prefixed with \'!\',\n                            you will only be notified about items without\n                            that word in their titles.\n';
 
 var action = process.argv[2];
 var args = process.argv.slice(3);
@@ -35,7 +35,9 @@ if (action === 'add' && args[0]) {
     initStore(config).flatMap(function (_ref) {
       var insertFeed = _ref.insertFeed;
       return insertFeed(url, filters.map(transformFilter));
-    }).subscribe(console.log, console.error, function () {
+    }).subscribe(function (f) {
+      return console.log('Added ' + f.get('url'));
+    }, console.error, function () {
       return process.exit();
     });
   })();
@@ -48,7 +50,9 @@ if (action === 'add' && args[0]) {
     initStore(config).flatMap(function (_ref2) {
       var removeFeed = _ref2.removeFeed;
       return removeFeed(id);
-    }).subscribe(console.log, console.error, function () {
+    }).subscribe(function () {
+      return console.log('Removed.');
+    }, console.error, function () {
       return process.exit();
     });
   })();
@@ -57,11 +61,8 @@ if (action === 'add' && args[0]) {
     var listFeeds = _ref3.listFeeds;
     return listFeeds();
   }).subscribe(printFeeds, console.error);
-} else if (action === 'test-notification' && args[0]) {
-  var _args3 = _slicedToArray(args, 1);
-
-  var _url = _args3[0];
-
+} else if (action === 'test-notification') {
+  var _url = args[0] || 'test';
   notify('Test', _url).subscribe(console.log, console.error, function () {
     return process.exit();
   });
@@ -81,9 +82,9 @@ if (action === 'add' && args[0]) {
     });
   })();
 } else if (action === 'import' && args[0]) {
-  var _args4 = _slicedToArray(args, 1);
+  var _args3 = _slicedToArray(args, 1);
 
-  var file = _args4[0];
+  var file = _args3[0];
 
   initStore(config).flatMap(opml.import(file)).subscribe(printFeeds, console.error);
 } else if (action === 'export') {

@@ -48,5 +48,4 @@ pm2 start rss-o-bot
 ## TODO
 
 * Multi-threading
-* Clean up the output
 
