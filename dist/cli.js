@@ -3,8 +3,6 @@
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
 
 var Rx = require('rx');
@@ -21,7 +19,7 @@ var initStore = require('./lib/store');
 var notify = require('./lib/notify')(config);
 var opml = require('./lib/opml');
 
-var help = 'usage: rss-o-bot [flag | action [arguments]]\n\nFlags:\n  -h, --help             Displays this dialogue\n\nActions:\n  run                    Run the deamon process in the foreground\n  add url [...filters]   Add a Feed-URL to the database\n  rm id                  Remove a Feed-URL from the database\n  list                   List all Feed-URLs\n  test-notification      Send a test notification over the\n                         channels defined in config.json\n  poll-telegram          Continuously checks telegram for new\n                         messages and outputs senders userIds.\n\nArguments:\n  url                    A URL of an RSS or Atom feed\n  id                     The `id` of a Feed-URL inside the DB.\n                         `id`s can be displayed using `rss-o-bot list`\n  ...                    A space sperated list of something\n  filters                Keywords to search for in titles of items inside\n                         feeds. When filters are passed, only notifications\n                         for items containing that word in their title\n                         will be sent. If a filter is prefixed with \'!\',\n                         you will only be notified about items without\n                         that word in their titles.\n';
+var help = 'usage: rss-o-bot [flag | action [arguments]]\n\nFlags:\n  -h, --help             Displays this dialogue\n\nActions:\n  run                    Run the deamon process in the foreground\n\n  add url [...filters]   Add a Feed-URL to the database\n\n  rm id                  Remove a Feed-URL from the database\n\n  list                   List all Feed-URLs\n\n  test-notification      Send a test notification over the\n\n                         channels defined in config.json\n  poll-telegram          Continuously checks telegram for new\n                         messages and outputs senders userIds.\n\n  import file            OPML import. Takes a path to an XML-file\n                         As a parameter and scanns it for outline\n                         elements. It\'s standard for RSS clients\n                         to provide an OPML import. These contain\n                         outline tags which the importer searches\n                         for. From those tags, the xmlUrl or Url\n                         Attributes are read as feed-URLs>\n\n  export                 Exports the RSS feeds as OPML. This does\n                         not export the filters.\n\nArguments:\n  url                    A URL of an RSS or Atom feed\n  id                     The `id` of a Feed-URL inside the DB.\n                         `id`s can be displayed using `rss-o-bot list`\n  ...                    A space sperated list of something\n  filters                Keywords to search for in titles of items inside\n                         feeds. When filters are passed, only notifications\n                         for items containing that word in their title\n                         will be sent. If a filter is prefixed with \'!\',\n                         you will only be notified about items without\n                         that word in their titles.\n';
 
 var action = process.argv[2];
 var args = process.argv.slice(3);
@@ -58,19 +56,7 @@ if (action === 'add' && args[0]) {
   initStore(config).flatMap(function (_ref3) {
     var listFeeds = _ref3.listFeeds;
     return listFeeds();
-  }).flatMap(function (feeds) {
-    return O.forkJoin(feeds.map(function (f) {
-      return f.getFilters();
-    })).map(function (filters) {
-      return feeds.map(function (f, i) {
-        return [f.get('id'), f.get('url')].concat(_toConsumableArray(filters[i].map(function (filter) {
-          return [filter.get('keyword'), filter.get('kind')];
-        })));
-      });
-    });
-  }).subscribe(console.log, console.error, function () {
-    return process.exit();
-  });
+  }).subscribe(printFeeds, console.error);
 } else if (action === 'test-notification' && args[0]) {
   var _args3 = _slicedToArray(args, 1);
 
@@ -99,13 +85,9 @@ if (action === 'add' && args[0]) {
 
   var file = _args4[0];
 
-  initStore(config).flatMap(opml.import(file)).subscribe(function (feeds) {
-    return process.stdout.write(feeds.map(function (f) {
-      return f.get('url');
-    }).join('\n') + '\n');
-  }, console.error, function () {
-    return process.exit();
-  });
+  initStore(config).flatMap(opml.import(file)).subscribe(printFeeds, console.error);
+} else if (action === 'export') {
+  initStore(config).flatMap(opml.export).subscribe(console.log, console.error);
 } else if (action === 'run' || !action) {
   require('.');
 } else if (action === '-h' && action === '--help' && action === 'help') {
@@ -113,4 +95,24 @@ if (action === 'add' && args[0]) {
 } else {
   process.stderr.write('Unrecognized action: ' + action + '\n ' + help);
   process.exit(1);
+}
+
+function printFeeds(feeds) {
+  Promise.all(feeds.map(function (feed) {
+    return feed.getFilters().then(function (filters) {
+      return [feed.get('url'), filters.map(function (f) {
+        return f.get('kind') ? f.get('keyword') : '!' + f.get('keyword');
+      }).join(', ')];
+    });
+  })).then(function (feeds) {
+    feeds.forEach(function (_ref4) {
+      var _ref5 = _slicedToArray(_ref4, 2);
+
+      var url = _ref5[0];
+      var filters = _ref5[1];
+
+      process.stdout.write(url + '  ' + filters + '\n');
+    });
+    process.stdout.write('\n');
+  });
 }

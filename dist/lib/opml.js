@@ -2,6 +2,8 @@
 
 var sax = require('sax');
 var fs = require('fs');
+var xml = require('xml');
+var moment = require('moment');
 var Rx = require('rx');
 var O = Rx.Observable;
 
@@ -31,5 +33,16 @@ module.exports = {
         });
       });
     };
+  },
+  export: function _export(_ref2) {
+    var listFeeds = _ref2.listFeeds;
+
+    return listFeeds().map(function (feeds) {
+      return xml({
+        opml: [{ _attr: { version: '1.1' } }, { head: [{ title: 'RSS-o-Bot' }, { dateCreated: moment().utc().format('dd D YYYY at HH:MM:SS UTC') }] }, { body: feeds.map(function (f) {
+            return { outline: [{ _attr: { xmlUrl: f.get('url') } }] };
+          }) }]
+      }, { declaration: true });
+    });
   }
 };

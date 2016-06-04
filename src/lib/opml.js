@@ -1,5 +1,7 @@
 const sax = require('sax')
 const fs = require('fs')
+const xml = require('xml')
+const moment = require('moment')
 const Rx = require('rx')
 const O = Rx.Observable
 
@@ -25,6 +27,23 @@ module.exports = {
         )
         saxStream.on('error', err => o.onError(err))
       })
+  },
+  export ({ listFeeds }) {
+    return (
+      listFeeds()
+        .map(feeds => xml({
+          opml: [
+            {_attr: { version: '1.1' }},
+            {head: [
+              {title: 'RSS-o-Bot'},
+              {dateCreated: moment().utc().format('dd D YYYY at HH:MM:SS UTC')}
+            ]},
+            {body: feeds.map(f =>
+              ({ outline: [{ _attr: { xmlUrl: f.get('url') } }] })
+            )}
+          ]
+        }, {declaration: true}))
+    )
   }
 }
 

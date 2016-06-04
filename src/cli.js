@@ -37,6 +37,9 @@ Actions:
                          for. From those tags, the xmlUrl or Url
                          Attributes are read as feed-URLs>
 
+  export                 Exports the RSS feeds as OPML. This does
+                         not export the filters.
+
 Arguments:
   url                    A URL of an RSS or Atom feed
   id                     The \`id\` of a Feed-URL inside the DB.
@@ -91,6 +94,13 @@ if (action === 'add' && args[0]) {
     .flatMap(opml.import(file))
     .subscribe(
       printFeeds,
+      console.error
+    )
+} else if (action === 'export') {
+  initStore(config)
+    .flatMap(opml.export)
+    .subscribe(
+      console.log,
       console.error
     )
 } else if (action === 'run' || !action) {
