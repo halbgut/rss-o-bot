@@ -16,13 +16,26 @@ Flags:
 
 Actions:
   run                    Run the deamon process in the foreground
+
   add url [...filters]   Add a Feed-URL to the database
+
   rm id                  Remove a Feed-URL from the database
+
   list                   List all Feed-URLs
+
   test-notification      Send a test notification over the
+
                          channels defined in config.json
   poll-telegram          Continuously checks telegram for new
                          messages and outputs senders userIds.
+
+  import file            OPML import. Takes a path to an XML-file
+                         As a parameter and scanns it for outline
+                         elements. It's standard for RSS clients
+                         to provide an OPML import. These contain
+                         outline tags which the importer searches
+                         for. From those tags, the xmlUrl or Url
+                         Attributes are read as feed-URLs>
 
 Arguments:
   url                    A URL of an RSS or Atom feed
