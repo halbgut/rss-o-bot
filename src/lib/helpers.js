@@ -2,12 +2,11 @@ const fs = require('fs')
 const path = require('path')
 
 const locations = [
+  `${__dirname}/../../config.json`,
   process.platform === 'win32'
     ? `${process.env.USERPROFILE}/.rss-o-bot`
     : `${process.env.HOME}/.rss-o-bot`,
-  '/etc/.rss-o-bot',
-  `${__dirname}/../config.json`
-
+  '/etc/.rss-o-bot'
 ].map(l => path.normalize(l))
 
 const configError = `No config file found!

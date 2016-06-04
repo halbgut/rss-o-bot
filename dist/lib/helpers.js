@@ -3,7 +3,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var locations = [process.platform === 'win32' ? process.env.USERPROFILE + '/.rss-o-bot' : process.env.HOME + '/.rss-o-bot', '/etc/.rss-o-bot', __dirname + '/../config.json'].map(function (l) {
+var locations = [__dirname + '/../../config.json', process.platform === 'win32' ? process.env.USERPROFILE + '/.rss-o-bot' : process.env.HOME + '/.rss-o-bot', '/etc/.rss-o-bot'].map(function (l) {
   return path.normalize(l);
 });
 
