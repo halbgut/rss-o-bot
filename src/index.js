@@ -15,14 +15,14 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(
             .flatMap(filters =>
               poll(feed.get('url'), filters.map(f => [f.get('keyword'), f.get('kind')]))
                 .retry(2)
+                .flatMap((info) =>
+                  updateLatestLink(feed.get('id'), info.latestLink).map(info)
+                )
                 .filter(({latestLink}) =>
-                  latestLink !== feed.get('latestLink')
+                  latestLink && latestLink !== feed.get('latestLink')
                 )
                 .flatMap(({ blog, latestLink }) =>
-                  Rx.Observable.forkJoin(
-                    notify(blog, latestLink),
-                    updateLatestLink(feed.get('id'), latestLink)
-                  )
+                  notify(blog, latestLink)
                 )
             )
         )

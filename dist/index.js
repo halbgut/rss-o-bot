@@ -24,13 +24,15 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(initStore(co
       return Rx.Observable.fromPromise(feed.getFilters()).flatMap(function (filters) {
         return poll(feed.get('url'), filters.map(function (f) {
           return [f.get('keyword'), f.get('kind')];
-        })).retry(2).filter(function (_ref2) {
+        })).retry(2).flatMap(function (info) {
+          return updateLatestLink(feed.get('id'), info.latestLink).map(info);
+        }).filter(function (_ref2) {
           var latestLink = _ref2.latestLink;
-          return latestLink !== feed.get('latestLink');
+          return latestLink && latestLink !== feed.get('latestLink');
         }).flatMap(function (_ref3) {
           var blog = _ref3.blog;
           var latestLink = _ref3.latestLink;
-          return Rx.Observable.forkJoin(notify(blog, latestLink), updateLatestLink(feed.get('id'), latestLink));
+          return notify(blog, latestLink);
         });
       });
     })));
