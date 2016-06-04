@@ -28,7 +28,7 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(initStore(co
           return updateLatestLink(feed.get('id'), info.latestLink).map(info);
         }).filter(function (_ref2) {
           var latestLink = _ref2.latestLink;
-          return latestLink && latestLink !== feed.get('latestLink');
+          return feed.get('latestLink') && latestLink !== feed.get('latestLink');
         }).flatMap(function (_ref3) {
           var blog = _ref3.blog;
           var latestLink = _ref3.latestLink;

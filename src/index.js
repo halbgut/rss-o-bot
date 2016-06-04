@@ -19,7 +19,7 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(
                   updateLatestLink(feed.get('id'), info.latestLink).map(info)
                 )
                 .filter(({latestLink}) =>
-                  latestLink && latestLink !== feed.get('latestLink')
+                  feed.get('latestLink') && latestLink !== feed.get('latestLink')
                 )
                 .flatMap(({ blog, latestLink }) =>
                   notify(blog, latestLink)
