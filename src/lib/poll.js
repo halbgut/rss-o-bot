@@ -2,6 +2,8 @@ const request = require('request')
 const Feedparser = require('feedparser')
 const Rx = require('rx')
 
+const {isAbsoluteUrl, getBaseUrl} = require('./helpers')
+
 const get = url => Rx.Observable.create(o => {
   request(url, (err, res, body) => {
     if (err || res.statusCode !== 200) o.onError(err || res)
@@ -44,7 +46,9 @@ module.exports =
         .map(([stream, meta]) => ({
           blog: meta.title,
           latestTitle: stream[0].title,
-          latestLink: stream[0].link
+          latestLink: isAbsoluteUrl(stream[0].link)
+            ? stream[0].link
+            : getBaseUrl(url) + stream[0].link
         }))
     )
   }

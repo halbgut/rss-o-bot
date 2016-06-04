@@ -9,6 +9,9 @@ var locations = [__dirname + '/../../config.json', process.platform === 'win32' 
 
 var configError = 'No config file found!\nRTFM and put one in one of these locations:\n' + locations.join(', ') + '\n';
 
+var domainRegex = '([\\w\\d-]+\\.)+\\w{2,}';
+var protoRegex = '\\w+:\\/\\/';
+
 module.exports = {
   getTime: function getTime() {
     var mod = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
@@ -35,5 +38,13 @@ module.exports = {
   },
   transformFilter: function transformFilter(filter) {
     return filter[0] === '!' ? { keyword: filter.substr(1), kind: false } : { keyword: filter, kind: true };
+  },
+  isAbsoluteUrl: function isAbsoluteUrl(str) {
+    return !!str.match(new RegExp('^' + protoRegex + '|' + domainRegex));
+  },
+  getBaseUrl: function getBaseUrl(url) {
+    var match = url.match(new RegExp('(' + protoRegex + ')?' + domainRegex));
+    if (!match) return '';
+    return match[0];
   }
 };

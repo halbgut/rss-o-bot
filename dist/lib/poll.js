@@ -6,6 +6,12 @@ var request = require('request');
 var Feedparser = require('feedparser');
 var Rx = require('rx');
 
+var _require = require('./helpers');
+
+var isAbsoluteUrl = _require.isAbsoluteUrl;
+var getBaseUrl = _require.getBaseUrl;
+
+
 var get = function get(url) {
   return Rx.Observable.create(function (o) {
     request(url, function (err, res, body) {
@@ -61,7 +67,7 @@ module.exports = function poll(url, filters) {
     return {
       blog: meta.title,
       latestTitle: stream[0].title,
-      latestLink: stream[0].link
+      latestLink: isAbsoluteUrl(stream[0].link) ? stream[0].link : getBaseUrl(url) + stream[0].link
     };
   });
 };

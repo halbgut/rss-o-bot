@@ -14,6 +14,9 @@ RTFM and put one in one of these locations:
 ${locations.join(', ')}
 `
 
+const domainRegex = '([\\w\\d-]+\\.)+\\w{2,}'
+const protoRegex = '\\w+:\\/\\/'
+
 module.exports = {
   getTime (mod = 0) {
     return Math.round(((new Date()).getTime() + mod) / 1000)
@@ -43,5 +46,14 @@ module.exports = {
         ? {keyword: filter.substr(1), kind: false}
         : {keyword: filter, kind: true}
     )
+  },
+  isAbsoluteUrl (str) {
+    return !!str.match(new RegExp(`^${protoRegex}|${domainRegex}`))
+  },
+  getBaseUrl (url) {
+    const match = url.match(new RegExp(`(${protoRegex})?${domainRegex}`))
+    if (!match) return ''
+    return match[0]
   }
 }
+
