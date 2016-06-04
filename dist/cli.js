@@ -19,6 +19,7 @@ var Tg = require('tg-yarl');
 var config = getConfig();
 var initStore = require('./lib/store');
 var notify = require('./lib/notify')(config);
+var opml = require('./lib/opml');
 
 var help = 'usage: rss-o-bot [flag | action [arguments]]\n\nFlags:\n  -h, --help             Displays this dialogue\n\nActions:\n  run                    Run the deamon process in the foreground\n  add url [...filters]   Add a Feed-URL to the database\n  rm id                  Remove a Feed-URL from the database\n  list                   List all Feed-URLs\n  test-notification      Send a test notification over the\n                         channels defined in config.json\n  poll-telegram          Continuously checks telegram for new\n                         messages and outputs senders userIds.\n\nArguments:\n  url                    A URL of an RSS or Atom feed\n  id                     The `id` of a Feed-URL inside the DB.\n                         `id`s can be displayed using `rss-o-bot list`\n  ...                    A space sperated list of something\n  filters                Keywords to search for in titles of items inside\n                         feeds. When filters are passed, only notifications\n                         for items containing that word in their title\n                         will be sent. If a filter is prefixed with \'!\',\n                         you will only be notified about items without\n                         that word in their titles.\n';
 
@@ -93,6 +94,18 @@ if (action === 'add' && args[0]) {
       return process.exit();
     });
   })();
+} else if (action === 'import' && args[0]) {
+  var _args4 = _slicedToArray(args, 1);
+
+  var file = _args4[0];
+
+  initStore(config).flatMap(opml.import(file)).subscribe(function (feeds) {
+    return process.stdout.write(feeds.map(function (f) {
+      return f.get('url');
+    }).join('\n') + '\n');
+  }, console.error, function () {
+    return process.exit();
+  });
 } else if (action === 'run' || !action) {
   require('.');
 } else if (action === '-h' && action === '--help' && action === 'help') {

@@ -7,6 +7,7 @@ const Tg = require('tg-yarl')
 const config = getConfig()
 const initStore = require('./lib/store')
 const notify = require('./lib/notify')(config)
+const opml = require('./lib/opml')
 
 const help = `usage: rss-o-bot [flag | action [arguments]]
 
@@ -74,6 +75,15 @@ if (action === 'add' && args[0]) {
     .distinctUntilChanged(update => update ? update.update_id : null)
     .map(update => update ? update.message.from.id : null)
     .subscribe(console.log, console.error, () => process.exit())
+} else if (action === 'import' && args[0]) {
+  const [file] = args
+  initStore(config)
+    .flatMap(opml.import(file))
+    .subscribe(
+      feeds => process.stdout.write(feeds.map(f => f.get('url')).join('\n') + '\n'),
+      console.error,
+      () => process.exit()
+    )
 } else if (action === 'run' || !action) {
   require('.')
 } else if (action === '-h' && action === '--help' && action === 'help') {

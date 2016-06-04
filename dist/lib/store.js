@@ -16,11 +16,13 @@ var genInsertFeed = function genInsertFeed(Feed, Filter) {
       addded: getTime(),
       lastCheck: 0
     })).flatMap(function (feed) {
-      return O.forkJoin(filters.map(function (f) {
-        return Filter.create(f);
+      return filters.length > 0 ? O.forkJoin(filters.map(function (f) {
+        return O.fromPromise(Filter.create(f));
       })).flatMap(function (filters) {
         return O.fromPromise(feed.addFilters(filters));
-      });
+      }).map(function () {
+        return feed;
+      }) : O.just(feed);
     });
   };
 };

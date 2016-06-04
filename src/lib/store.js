@@ -13,8 +13,11 @@ const genInsertFeed = (Feed, Filter) => (url, filters) =>
     }
   ))
   .flatMap(feed =>
-    O.forkJoin(filters.map(f => Filter.create(f)))
-      .flatMap(filters => O.fromPromise(feed.addFilters(filters)))
+    filters.length > 0
+      ? O.forkJoin(filters.map(f => O.fromPromise(Filter.create(f))))
+        .flatMap(filters => O.fromPromise(feed.addFilters(filters)))
+        .map(() => feed)
+      : O.just(feed)
   )
 
 // TODO: Data races have been prevented.
