@@ -1,4 +1,4 @@
-# RSS-o-Bot 0.3.2
+# RSS-o-Bot 0.4.0
 
 A super simple RSS client.
 
@@ -48,4 +48,5 @@ pm2 start rss-o-bot
 ## TODO
 
 * Multi-threading
+* Add a man-page, since they rock
 
