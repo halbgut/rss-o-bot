@@ -27,8 +27,8 @@ O.combineLatest(initStore(config), Rx.Observable.interval(config.interval * 1000
     var _Rx$Observable;
 
     return (_Rx$Observable = Rx.Observable).combineLatest.apply(_Rx$Observable, _toConsumableArray(feeds.map(function (feed) {
-      return Rx.Observable.fromPromise(feed.getFilters()).flatMap(function (filters) {
-        return poll(feed.get('url'), filters.map(function (f) {
+      return O.fromPromise(feed.getFilters()).flatMap(function (filters) {
+        return O.onErrorResumeNext(poll(feed.get('url'), filters.map(function (f) {
           return [f.get('keyword'), f.get('kind')];
         })).retry(2).flatMap(function (info) {
           return updateLatestLink(feed.get('id'), info.latestLink).map(info);
@@ -39,10 +39,14 @@ O.combineLatest(initStore(config), Rx.Observable.interval(config.interval * 1000
           var blog = _ref4.blog;
           var latestLink = _ref4.latestLink;
           return notify(blog, latestLink).retry(2);
-        });
-      });
+        }));
+      }, O.just().tap(function () {
+        return console.error('Failed to get ' + feed.get('url'));
+      }));
     })));
   });
-}).subscribe(console.log, console.error, function () {
+}).subscribe(function () {}, function (err) {
+  return console.log('ERROR') || console.error(err);
+}, function () {
   return console.log('Complete');
 });
