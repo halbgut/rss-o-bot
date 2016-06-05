@@ -45,6 +45,12 @@ npm i -g pm2
 pm2 start rss-o-bot
 ```
 
+If you haven't yet, I'd make pm2 services start upon reboot.
+
+```js
+pm2 startup [platform] # Refer to `pm2 -h` for available platforms
+```
+
 ## TODO
 
 * Multi-threading
