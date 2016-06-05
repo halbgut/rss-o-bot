@@ -50,4 +50,5 @@ pm2 start rss-o-bot
 * Multi-threading
 * Add a man-page, since they rock
 * Replace the request library
+* Fix the memory leak
 
