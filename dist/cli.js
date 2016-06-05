@@ -24,6 +24,8 @@ var help = 'usage: rss-o-bot [flag | action [arguments]]\n\nFlags:\n  -h, --help
 var action = process.argv[2];
 var args = process.argv.slice(3);
 
+process.title = 'rss-o-bot';
+
 if (action === 'add' && args[0]) {
   (function () {
     var _args = _toArray(args);

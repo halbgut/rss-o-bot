@@ -59,6 +59,8 @@ Arguments:
 const action = process.argv[2]
 const args = process.argv.slice(3)
 
+process.title = 'rss-o-bot'
+
 if (action === 'add' && args[0]) {
   const [url, ...filters] = args
   initStore(config)
