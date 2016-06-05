@@ -1,4 +1,5 @@
 const Rx = require('rx')
+const O = Rx.Observable
 
 const {getConfig} = require('./lib/helpers')
 const config = getConfig()
@@ -6,8 +7,11 @@ const notify = require('./lib/notify')(config)
 const poll = require('./lib/poll')
 const initStore = require('./lib/store')
 
-Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(
-  initStore(config).flatMap(({getFeeds, insertFeed, updateLatestLink}) =>
+O.combineLatest(
+  initStore(config),
+  Rx.Observable.interval(config.interval * 1000)
+)
+  .flatMap(([{getFeeds, insertFeed, updateLatestLink}]) =>
     getFeeds()
       .flatMap((feeds) => Rx.Observable.combineLatest(
         ...feeds.map(feed =>
@@ -23,14 +27,12 @@ Rx.Observable.interval(config.interval * 1000).startWith(0).flatMap(
                 )
                 .flatMap(({ blog, latestLink }) =>
                   notify(blog, latestLink)
+                    .retry(2)
                 )
             )
         )
       ))
   )
-  .retry()
-  .filter(() => false)
-)
   .subscribe(
     console.log,
     console.error,
