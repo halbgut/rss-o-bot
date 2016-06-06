@@ -93,7 +93,7 @@ if (action === 'add' && args[0]) {
   initStore(config).flatMap(opml.export).subscribe(console.log, console.error);
 } else if (action === 'run' || !action) {
   require('.');
-} else if (action === '-h' && action === '--help' && action === 'help') {
+} else if (action === '-h' || action === '--help') {
   process.stdout.write(help);
 } else {
   process.stderr.write('Unrecognized action: ' + action + '\n ' + help);
