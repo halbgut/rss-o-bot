@@ -13,6 +13,7 @@ const help = `usage: rss-o-bot [flag | action [arguments]]
 
 Flags:
   -h, --help                Displays this dialogue
+  -v, --version             Display the current version
 
 Actions:
   [run]                     Run the deamon process in the foreground
@@ -119,6 +120,9 @@ if (action === 'add' && args[0]) {
   require('.')
 } else if (action === '-h' || action === '--help') {
   process.stdout.write(help)
+} else if (action === '-v' || action === '--version') {
+  const packageInfo = require('../package.json')
+  console.log(`RSS-o-Bot Version: ${packageInfo.version}`)
 } else {
   process.stderr.write(`Unrecognized action: ${action}\n ${help}`)
   process.exit(1)
