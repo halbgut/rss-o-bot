@@ -34,7 +34,7 @@ O.combineLatest(initStore(config), Rx.Observable.interval(config.interval * 1000
           return updateLatestLink(feed.get('id'), info.latestLink).map(info);
         }).filter(function (_ref3) {
           var latestLink = _ref3.latestLink;
-          return feed.get('latestLink') && latestLink !== feed.get('latestLink');
+          return latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink');
         }).flatMap(function (_ref4) {
           var blog = _ref4.blog;
           var latestLink = _ref4.latestLink;

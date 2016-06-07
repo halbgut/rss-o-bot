@@ -24,7 +24,7 @@ O.combineLatest(
                     updateLatestLink(feed.get('id'), info.latestLink).map(info)
                   )
                   .filter(({latestLink}) =>
-                    feed.get('latestLink') && latestLink !== feed.get('latestLink')
+                    latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink')
                   )
                   .flatMap(({ blog, latestLink }) =>
                     notify(blog, latestLink)
