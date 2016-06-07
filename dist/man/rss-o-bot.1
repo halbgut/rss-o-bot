@@ -42,6 +42,17 @@ OPML import\. Takes a \fIpath\fR to an OPML\-file as a parameter and scanns it f
 .SS export
 .P
 Exports the RSS feeds as OPML to STDOUT\. The export does not include the defined filters\. Simply beacause, there is no standard way of exporting those\.
+.SH DEBUGGING
+.P
+To enter the debugging mode, you'll need to set the \fBDEBUG\fP environment variable to a list including \fBrss\-o\-bot\fP\|\. For example:
+.P
+.RS 2
+.nf
+DEBUG=rss\-o\-bot rss\-o\-bot
+.fi
+.RE
+.P
+For further information check the debug\-package's docs \fIhttps://www\.npmjs\.com/package/debug\fR\|\. It's the debugging utitlity this tool uses\.
 .SH CONFIGURATION
 .P
 RSS\-o\-Bot checks three places for configuration files\. \fB$HOME/\.rss\-o\-bot\fP, or \fB%USERPROFILE%\\\.rss\-o\-bot\fP on windows, \fB/etc/\.rss\-o\-bot\fP and \fB${__dirname}/config\.json\fP\|\. The last is the root directory of the NPM package\. It is only meant for development puposes\. The files are check for their existance in that order (except for \fBconfig\.json\fP which is checked first)\.

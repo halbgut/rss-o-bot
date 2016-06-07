@@ -39,6 +39,15 @@ OPML import. Takes a _path_ to an OPML-file as a parameter and scanns it for out
 ### export
 Exports the RSS feeds as OPML to STDOUT. The export does not include the defined filters. Simply beacause, there is no standard way of exporting those.
 
+## DEBUGGING
+To enter the debugging mode, you'll need to set the `DEBUG` environment variable to a list including `rss-o-bot`. For example:
+
+```
+DEBUG=rss-o-bot rss-o-bot
+```
+
+For further information check [the debug-package's docs](https://www.npmjs.com/package/debug). It's the debugging utitlity this tool uses.
+
 ## CONFIGURATION
 RSS-o-Bot checks three places for configuration files. `$HOME/.rss-o-bot`, or `%USERPROFILE%\.rss-o-bot` on windows, `/etc/.rss-o-bot` and `${__dirname}/config.json`. The last is the root directory of the NPM package. It is only meant for development puposes. The files are check for their existance in that order (except for `config.json` which is checked first).
 
