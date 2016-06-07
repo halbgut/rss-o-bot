@@ -78,7 +78,7 @@ Please refer to \`man rss-o-bot\`, \`rss-o-bot --manual\` or the README for furt
 } else if (action === '-m' || action === '--manual') {
   process.stdout.write(buildMan().raw)
 } else if (action === 'build-man') {
-  fs.writeFileSync(`${__dirname}/../dist/man/rss-o-bot.man`, buildMan().man)
+  fs.writeFileSync(`${__dirname}/../dist/man/rss-o-bot.1`, buildMan().man)
 } else if (action === '-v' || action === '--version') {
   const packageInfo = require('../package.json')
   console.log(`RSS-o-Bot Version: ${packageInfo.version}`)
