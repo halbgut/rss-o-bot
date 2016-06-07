@@ -2,6 +2,10 @@
 
 A super simple RSS client.
 
+## Documentation
+
+Refer to the [Online man-page](https://github.com/Kriegslustig/rss-o-bot/blob/master/src/man/man.md) or `man rss-o-bot`.
+
 ## Installation
 
 ```bash
