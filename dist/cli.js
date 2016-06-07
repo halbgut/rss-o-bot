@@ -94,7 +94,7 @@ if (action === 'add' && args[0]) {
 } else if (action === 'run' || !action) {
   require('.');
 } else if (action === '-h' || action === '--help') {
-  process.stdout.write(buildMan().synopsis);
+  process.stdout.write(buildMan().synopsis + '\n\nPlease refer to `man rss-o-bot`, `rss-o-bot --manual` or the README for further instructions.');
 } else if (action === '-m' || action === '--manual') {
   process.stdout.write(buildMan().raw);
 } else if (action === 'build-man') {
