@@ -1,0 +1,79 @@
+.TH "RSS\-O\-BOT" "" "June 2016" "" ""
+.SH "NAME"
+\fBRSS-o-Bot\fR
+.SH Synopsis
+.P
+rss\-o\-bot [\-\-help | \-\-version | \-\-man | run |
+            add <url> <filters>\|\.\.\. | rm <id> | list |
+            test\-notification [url] | poll\-telegram |
+            import <file> | export]
+.SH Flags
+.SS \-h, \-\-help
+.P
+Displays the synopsis\.
+.SS \-m, \-\-man, \-\-manual
+.P
+Display the whole man page\.
+.SS \-v, \-\-version
+.P
+Display the current version\.
+.SH Actions
+.SS [run]
+.P
+Run the deamon process in the foreground\.
+.SS add <url> [<filter>\|\.\.\.]
+.P
+Add a Feed\-URL to the database\. <url> is a URL to an Atom or RSS feed\. The URL must include the protocol\. HTTP and HTTPS are supported\. Post\-titles inside a feed will be filtered by the words passed as <filter>s to \fBadd\fP\|\. <filter> can be negated (to check that a title doesn't include a string) by pepending them with a bang (\fB!\fP)\. For example \fBrss\-o\-bot add <url> 'children' '!cooking'\fP\|\. Be carefull to always wrap negated filters in quotes (\fB\|'\fP)\. Otherwise your shell will probably interpret the bang as a keyword\.
+.SS rm <id>
+.P
+Remove a Feed\-URL from the database\. <id> is the key of a Feed\-URL inside the database\. \fBid\fPs are displayed in \fBrss\-o\-bot list\fP\|\.
+.SS list
+.P
+List all Feed\-URLs, their IDs and their filters\.
+.SS test\-notification [<url>]
+.P
+Send a test notification over the defined "notification\-methods"
+.SS poll\-telegram
+.P
+Continuously checks telegram for incomming messages\. When a message is sent to the defined Telegram Bot, the ID of the sender will be displayed\. This ID then may be used as part of the configured "telegram\-recipients" array\. For further information on the configuration of Telegram notifications check the configuration reference below\.
+.SS import <path>
+.P
+OPML import\. Takes a <path> to an OPML\-file as a parameter and scanns it for outline elements\. It's standard for RSS clients to provide an OPML export\. These contain outline tags which the importer searches for\. From those tags, the xmlUrl or Url Attributes are read as feed\-URLs\.
+.SS export
+.P
+Exports the RSS feeds as OPML to STDOUT\. The export does not include the defined filters\. Simply beacause, there is no standard way of exporting those\.
+.SH Configuration
+.P
+RSS\-o\-Bot checks three places for configuration files\. \fB$HOME/\.rss\-o\-bot\fP, or \fB%USERPROFILE%\\\.rss\-o\-bot\fP on windows, \fB/etc/\.rss\-o\-bot\fP and \fB${__dirname}/config\.json\fP\|\. The last is the root directory of the NPM package\. It is only meant for development puposes\. The files are check for their existance in that order (except for \fBconfig\.json\fP which is checked first)\.
+.P
+The configuration file should contain a single JSON\-object on the root level\. Use the example configuration inside the README as a reference\. These are the available configuration options:
+.SS notification\-methods
+.P
+An array of methods\. When a new item appears in a stream, a notification will be sent over the defined methods\. Available methods are \fBtelegam\fP and \fBdesktop\fP\|\.
+.SS telegram\-api\-token
+.P
+A Telegram API token\. It can be retrieved, by writting a message \fB/start\fP to \fB@BotFather\fP\|\. The rest will be explained by the Bot Father\. Notifications will be sent from the Bot if you include \fBtelegram\fP in your \fBnotification\-methods\fP, set this option and set a \fBtelegram\-recipients\fP\|\.
+.SH telegram\-recipients
+.P
+An array of Telegram user IDs\. User IDs may be retrieved using the \fBrss\-o\-bot poll\-telegram\fP command\. Check the description above for more information\.
+.SH interval
+.P
+A number in section that defines how often the Feed\-URLs should be polled\.
+.SH database
+.P
+An object containing information on the database\. It must include a \fBname\fP property\. If you're database requires a username and password (non\-SQLite), set these as the \fBusername\fP and \fBpassword\fP properties\. The object must also include a \fBoptions\fP object containing further information on the database connection\. It must at least include a \fBdialect\fP and a \fBstorage\fP attribute\. SQLite is the prefered database here, since it has a very low overhead and high portability\. The \fBoptions\fP object is passed as\-is to Sequelize\. Check its docs \fIhttp://sequelize\.readthedocs\.io/en/latest/api/sequelize/\fR for further information\. Here's an example of a simple \fBdatabase\fP configuration:
+.P
+.RS 2
+.nf
+{
+  "name": "rssobot",
+  "options": {
+    "dialect": "sqlite",
+    "storage": "~/\.rss\-o\-bot\.sqlite"
+  }
+}
+.fi
+.RE
+.SH Authors
+.P
+Kriegslustig npm@ls7\.ch

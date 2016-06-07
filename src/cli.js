@@ -1,61 +1,14 @@
 #!/usr/bin/env node
 
+const fs = require('fs')
 const Rx = require('rx')
 const O = Rx.Observable
-const { getConfig, transformFilter } = require('./lib/helpers')
+const { getConfig, transformFilter, buildMan } = require('./lib/helpers')
 const Tg = require('tg-yarl')
 const config = getConfig()
 const initStore = require('./lib/store')
 const notify = require('./lib/notify')(config)
 const opml = require('./lib/opml')
-
-const help = `usage: rss-o-bot [flag | action [arguments]]
-
-Flags:
-  -h, --help                Displays this dialogue
-  -v, --version             Display the current version
-
-Actions:
-  [run]                     Run the deamon process in the foreground
-
-  add url [...filters]      Add a Feed-URL to the database
-
-  rm id                     Remove a Feed-URL from the database
-
-  list                      List all Feed-URLs
-
-  test-notification [url]   Send a test notification over the
-
-                            channels defined in config.json
-  poll-telegram             Continuously checks telegram for new
-                            messages and outputs senders userIds.
-
-  import file               OPML import. Takes a path to an XML-file
-                            As a parameter and scanns it for outline
-                            elements. It's standard for RSS clients
-                            to provide an OPML import. These contain
-                            outline tags which the importer searches
-                            for. From those tags, the xmlUrl or Url
-                            Attributes are read as feed-URLs>
-
-  export                    Exports the RSS feeds as OPML. This does
-                            not export the filters.
-
-Arguments:
-  url                       A URL of an RSS or Atom feed
-
-  id                        The \`id\` of a Feed-URL inside the DB.
-                            \`id\`s can be displayed using \`rss-o-bot list\`
-
-  ...                       A space sperated list of something
-
-  filters                   Keywords to search for in titles of items inside
-                            feeds. When filters are passed, only notifications
-                            for items containing that word in their title
-                            will be sent. If a filter is prefixed with '!',
-                            you will only be notified about items without
-                            that word in their titles.
-`
 
 const action = process.argv[2]
 const args = process.argv.slice(3)
@@ -119,12 +72,16 @@ if (action === 'add' && args[0]) {
 } else if (action === 'run' || !action) {
   require('.')
 } else if (action === '-h' || action === '--help') {
-  process.stdout.write(help)
+  process.stdout.write(buildMan().synopsis)
+} else if (action === '-m' || action === '--manual') {
+  process.stdout.write(buildMan().raw)
+} else if (action === 'build-man') {
+  fs.writeFileSync(`${__dirname}/../dist/man/rss-o-bot.man`, buildMan().man)
 } else if (action === '-v' || action === '--version') {
   const packageInfo = require('../package.json')
   console.log(`RSS-o-Bot Version: ${packageInfo.version}`)
 } else {
-  process.stderr.write(`Unrecognized action: ${action}\n ${help}`)
+  process.stderr.write(`Unrecognized action: ${action}\n ${buildMan().synopsis}`)
   process.exit(1)
 }
 

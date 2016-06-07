@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var markedMan = require('marked-man');
 
 var locations = [__dirname + '/../../config.json', process.platform === 'win32' ? process.env.USERPROFILE + '/.rss-o-bot' : process.env.HOME + '/.rss-o-bot', '/etc/.rss-o-bot'].map(function (l) {
   return path.normalize(l);
@@ -46,5 +47,11 @@ module.exports = {
     var match = url.match(new RegExp('(' + protoRegex + ')?' + domainRegex));
     if (!match) return '';
     return match[0];
+  },
+  buildMan: function buildMan() {
+    var synopsis = fs.readFileSync(__dirname + '/../man/synopsis.md').toString();
+    var raw = fs.readFileSync(__dirname + '/../man/man.md').toString().replace('[[SYNOPSIS]]', synopsis);
+    var man = markedMan(raw);
+    return { synopsis: synopsis, man: man, raw: raw };
   }
 };

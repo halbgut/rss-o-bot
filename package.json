@@ -4,9 +4,11 @@
   "description": "A FOSS RSSBot alternative",
   "main": "dist",
   "bin": "dist/cli.js",
+  "man": "dist/man/rss-o-bot.man",
   "scripts": {
-    "build": "babel --presets babel-preset-es2015 src --out-dir dist",
-    "watch-build": "watch 'npm run build -- --source-maps' src",
+    "build": "npm run build-js && ./src/cli.js build-man",
+    "build-js": "babel --presets babel-preset-es2015 src --out-dir dist",
+    "watch-build": "watch 'npm run build-js -- --source-maps' src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "https://github.com/Kriegslustig/rss-o-bot.git",
@@ -14,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "feedparser": "^1.1.4",
+    "marked-man": "^0.1.5",
     "moment": "^2.13.0",
     "node-notifier": "^4.6.0",
     "request": "^2.72.0",

@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const markedMan = require('marked-man')
 
 const locations = [
   `${__dirname}/../../config.json`,
@@ -54,6 +55,14 @@ module.exports = {
     const match = url.match(new RegExp(`(${protoRegex})?${domainRegex}`))
     if (!match) return ''
     return match[0]
+  },
+  buildMan () {
+    const synopsis = fs.readFileSync(`${__dirname}/../man/synopsis.md`).toString()
+    const raw =
+      fs.readFileSync(`${__dirname}/../man/man.md`).toString()
+        .replace('[[SYNOPSIS]]', synopsis)
+    const man = markedMan(raw)
+    return { synopsis, man, raw }
   }
 }
 

@@ -51,10 +51,13 @@ If you haven't yet, I'd make pm2 services start upon reboot.
 pm2 startup [platform] # Refer to `pm2 -h` for available platforms
 ```
 
+## Development
+
+Before committing, use `npm run build` to build the man page and the JS.
+
 ## TODO
 
 * Multi-threading
-* Add a man-page, since they rock
 * Replace the request library
 * Fix the memory leak
 
