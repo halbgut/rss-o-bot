@@ -16,7 +16,7 @@ var notify = require('./lib/notify')(config);
 var poll = require('./lib/poll');
 var initStore = require('./lib/store');
 
-O.combineLatest(initStore(config), Rx.Observable.interval(config.interval * 1000)).flatMap(function (_ref) {
+O.combineLatest(initStore(config), Rx.Observable.interval(config.interval * 1000).startWith(0)).flatMap(function (_ref) {
   var _ref2 = _slicedToArray(_ref, 1);
 
   var _ref2$ = _ref2[0];

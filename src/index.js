@@ -9,7 +9,7 @@ const initStore = require('./lib/store')
 
 O.combineLatest(
   initStore(config),
-  Rx.Observable.interval(config.interval * 1000)
+  Rx.Observable.interval(config.interval * 1000).startWith(0)
 )
   .flatMap(([{getFeeds, insertFeed, updateLatestLink}]) =>
     getFeeds()
