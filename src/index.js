@@ -1,5 +1,6 @@
 const Rx = require('rx')
 const O = Rx.Observable
+const debug = require('debug')('rss-o-bot')
 
 const {getConfig} = require('./lib/helpers')
 const config = getConfig()
@@ -24,10 +25,12 @@ O.combineLatest(
                     updateLatestLink(feed.get('id'), info.latestLink).map(info)
                   )
                   .filter(({latestLink}) =>
-                    latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink')
+                    (latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink')) || debug(`Old URL: ${latestLink}`)
                   )
+                  .tap(({latestLink}) => debug(`New URL: ${latestLink}`))
                   .flatMap(({ blog, latestLink }) =>
                     notify(blog, latestLink)
+                      .tap(() => debug('Sent notifications'))
                       .retry(2)
                   )
                 ),

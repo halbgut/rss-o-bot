@@ -5,6 +5,7 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 var http = require('http');
 var https = require('https');
 var urlUtil = require('url');
+var debug = require('debug')('rss-o-bot');
 
 var Feedparser = require('feedparser');
 var Rx = require('rx');
@@ -27,11 +28,11 @@ var get = function get(url) {
     var protocol = _urlUtil$parse.protocol;
 
     var request = protocol === 'http:' ? http.request : https.request;
+    debug((protocol || 'http:').toUpperCase() + ' GET ' + depth + ' ' + url);
     request({
       host: host, path: path,
       headers: { 'User-Agent': 'RSS-o-Bot' }
     }, function (res) {
-      console.log(res.statusCode);
       var body = '';
       if (isRedirect(res)) {
         if (depth > 10) {

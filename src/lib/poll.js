@@ -1,6 +1,7 @@
 const http = require('http')
 const https = require('https')
 const urlUtil = require('url')
+const debug = require('debug')('rss-o-bot')
 
 const Feedparser = require('feedparser')
 const Rx = require('rx')
@@ -15,11 +16,11 @@ const get = (url, depth = 0) => O.create(o => {
     protocol === 'http:'
       ? http.request
       : https.request
+  debug(`${(protocol || 'http:').toUpperCase()} GET ${depth} ${url}`)
   request({
     host, path,
     headers: { 'User-Agent': 'RSS-o-Bot' }
   }, res => {
-    console.log(res.statusCode)
     let body = ''
     if (isRedirect(res)) {
       if (depth > 10) { // maximum redirects

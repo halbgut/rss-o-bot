@@ -15,6 +15,7 @@
   "author": "Kriegslustig <npm@ls7.ch>",
   "license": "MIT",
   "dependencies": {
+    "debug": "^2.2.0",
     "feedparser": "^1.1.4",
     "marked-man": "^0.1.5",
     "moment": "^2.13.0",

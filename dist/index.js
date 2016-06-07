@@ -6,6 +6,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 var Rx = require('rx');
 var O = Rx.Observable;
+var debug = require('debug')('rss-o-bot');
 
 var _require = require('./lib/helpers');
 
@@ -34,11 +35,16 @@ O.combineLatest(initStore(config), Rx.Observable.interval(config.interval * 1000
           return updateLatestLink(feed.get('id'), info.latestLink).map(info);
         }).filter(function (_ref3) {
           var latestLink = _ref3.latestLink;
-          return latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink');
-        }).flatMap(function (_ref4) {
-          var blog = _ref4.blog;
+          return latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink') || debug('Old URL: ' + latestLink);
+        }).tap(function (_ref4) {
           var latestLink = _ref4.latestLink;
-          return notify(blog, latestLink).retry(2);
+          return debug('New URL: ' + latestLink);
+        }).flatMap(function (_ref5) {
+          var blog = _ref5.blog;
+          var latestLink = _ref5.latestLink;
+          return notify(blog, latestLink).tap(function () {
+            return debug('Sent notifications');
+          }).retry(2);
         }));
       }, O.just().tap(function () {
         return console.error('Failed to get ' + feed.get('url'));
