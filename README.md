@@ -62,10 +62,10 @@ Before committing, use `npm run build` to build the man page and the JS.
 ## TODO
 
 * Multi-threading
-* Replace the request library
 * Fix possible memory leak
 * GUI?
 * Add support for E-Mail notifications (SMTP)
 * Implement extandability for the notifications system throug packages
+* Implement logging and a dev mode
 
 
