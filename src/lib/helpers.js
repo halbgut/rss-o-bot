@@ -57,9 +57,9 @@ module.exports = {
     return match[0]
   },
   buildMan () {
-    const synopsis = fs.readFileSync(`${__dirname}/../man/synopsis.md`).toString()
+    const synopsis = fs.readFileSync(`${__dirname}/../../src/man/synopsis.md`).toString()
     const raw =
-      fs.readFileSync(`${__dirname}/../man/man.md`).toString()
+      fs.readFileSync(`${__dirname}/../../src/man/man.md`).toString()
         .replace('[[SYNOPSIS]]', synopsis)
     const man = markedMan(raw)
     return { synopsis, man, raw }

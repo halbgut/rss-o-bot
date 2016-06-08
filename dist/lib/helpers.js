@@ -49,8 +49,8 @@ module.exports = {
     return match[0];
   },
   buildMan: function buildMan() {
-    var synopsis = fs.readFileSync(__dirname + '/../man/synopsis.md').toString();
-    var raw = fs.readFileSync(__dirname + '/../man/man.md').toString().replace('[[SYNOPSIS]]', synopsis);
+    var synopsis = fs.readFileSync(__dirname + '/../../src/man/synopsis.md').toString();
+    var raw = fs.readFileSync(__dirname + '/../../src/man/man.md').toString().replace('[[SYNOPSIS]]', synopsis);
     var man = markedMan(raw);
     return { synopsis: synopsis, man: man, raw: raw };
   }
