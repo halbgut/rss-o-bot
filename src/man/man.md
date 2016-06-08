@@ -30,9 +30,6 @@ List all Feed-URLs, their IDs and their filters.
 ### test-notification [_url_]
 Send a test notification over the defined "notification-methods"
 
-### poll-telegram
-Continuously checks telegram for incomming messages. When a message is sent to the defined Telegram Bot, the ID of the sender will be displayed. This ID then may be used as part of the configured "telegram-recipients" array. For further information on the configuration of Telegram notifications check the configuration reference below.
-
 ### import _path_
 OPML import. Takes a _path_ to an OPML-file as a parameter and scanns it for outline elements. It's standard for RSS clients to provide an OPML export. These contain outline tags which the importer searches for. From those tags, the xmlUrl or Url Attributes are read as feed-URLs.
 
@@ -54,13 +51,7 @@ RSS-o-Bot checks three places for configuration files. `$HOME/.rss-o-bot`, or `%
 The configuration file should contain a single JSON-object on the root level. Use the example configuration inside the README as a reference. These are the available configuration options:
 
 ### notification-methods
-An array of methods. When a new item appears in a stream, a notification will be sent over the defined methods. Available methods are `telegam` and `desktop`.
-
-### telegram-api-token
-A Telegram API token. It can be retrieved, by writting a message `/start` to `@BotFather`. The rest will be explained by the Bot Father. Notifications will be sent from the Bot if you include `telegram` in your `notification-methods`, set this option and set a `telegram-recipients`.
-
-### telegram-recipients
-An array of Telegram user IDs. User IDs may be retrieved using the `rss-o-bot poll-telegram` command. Check the description above for more information.
+An array of methods. When a new item appears in a stream, a notification will be sent over the defined methods. rss-o-bot requires modules named after these methods. So if you define a method `"email"` you'll need to `npm i -g rss-o-bot-email` first. Currenly known notifiers are `rss-o-bot-email`, `rss-o-bot-desktop`, `rss-o-bot-telegram`.
 
 ### interval
 A number in section that defines how often the Feed-URLs should be polled.
