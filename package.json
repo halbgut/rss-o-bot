@@ -31,6 +31,7 @@
     "watch": "^0.18.0"
   },
   "peerDependencies": {
-    "rss-o-bot-telegram": "0.1.x"
+    "rss-o-bot-telegram": "0.1.x",
+    "rss-o-bot-desktop": "0.1.x"
   }
 }
