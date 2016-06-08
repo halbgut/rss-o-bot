@@ -1,33 +1,21 @@
 const Rx = require('rx')
-const Tg = require('tg-yarl')
-const notifier = require('node-notifier')
+const debug = require('debug')('rss-o-bot')
 
 module.exports = (config) => {
   const sends =
     config['notification-methods'].map(m => {
-      if (m === 'telegram') return telegram(config)
-      if (m === 'desktop') return desktop(config)
-    })
+      const module = `rss-o-bot-${m}`
+      try {
+        const send = require(module)(config)
+        debug(`Successfully loaded notifier: ${module}`)
+        return send
+      } catch (e) {
+        debug(`Failed to load notifier: ${module}`)
+      }
+    }).filter(f => f)
   return (blog, link) =>
     Rx.Observable.forkJoin(
       sends.map(f => f(`${blog} posted something new.`, link))
     )
-}
-
-function telegram (config) {
-  const tg = Tg(config['telegram-api-token'])
-  return (subject, message) =>
-    Rx.Observable.forkJoin(
-      config['telegram-recipients'].map(r =>
-        Rx.Observable.fromPromise(tg.sendMessage(r, `${subject} \n${message}`))
-      )
-    )
-}
-
-function desktop (config) {
-  const notify = Rx.Observable.fromNodeCallback(notifier.notify.bind(notifier))
-  return (title, text) => notify({
-    title, text, open: text
-  }).takeUntilWithTime(1000) // Time out gracefully if nothing happens
 }
 

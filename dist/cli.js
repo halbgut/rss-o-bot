@@ -6,8 +6,6 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
 
 var fs = require('fs');
-var Rx = require('rx');
-var O = Rx.Observable;
 
 var _require = require('./lib/helpers');
 
@@ -15,7 +13,6 @@ var getConfig = _require.getConfig;
 var transformFilter = _require.transformFilter;
 var buildMan = _require.buildMan;
 
-var Tg = require('tg-yarl');
 var config = getConfig();
 var initStore = require('./lib/store');
 var notify = require('./lib/notify')(config);
@@ -68,22 +65,7 @@ if (action === 'add' && args[0]) {
   notify('Test', _url).subscribe(console.log, console.error, function () {
     return process.exit();
   });
-} else if (action === 'poll-telegram') {
-  (function () {
-    var tg = Tg(config['telegram-api-token']);
-    O.interval(1000).startWith(0).flatMap(function () {
-      return O.fromPromise(tg.getUpdates());
-    }).map(function (res) {
-      return res.body.ok ? res.body.result.slice(-1)[0] : null;
-    }).distinctUntilChanged(function (update) {
-      return update ? update.update_id : null;
-    }).map(function (update) {
-      return update ? update.message.from.id : null;
-    }).subscribe(console.log, console.error, function () {
-      return process.exit();
-    });
-  })();
-} else if (action === 'import' && args[0]) {
+} else if (action === 'poll-telegram') {} else if (action === 'import' && args[0]) {
   var _args3 = _slicedToArray(args, 1);
 
   var file = _args3[0];
@@ -92,7 +74,7 @@ if (action === 'add' && args[0]) {
 } else if (action === 'export') {
   initStore(config).flatMap(opml.export).subscribe(console.log, console.error);
 } else if (action === 'run' || !action) {
-  require('.');
+  require('.')();
 } else if (action === '-h' || action === '--help') {
   process.stdout.write(buildMan().synopsis + '\n\nPlease refer to `man rss-o-bot`, `rss-o-bot --manual` or the README for further instructions.');
 } else if (action === '-m' || action === '--manual') {

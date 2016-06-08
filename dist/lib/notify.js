@@ -1,13 +1,20 @@
 'use strict';
 
 var Rx = require('rx');
-var Tg = require('tg-yarl');
-var notifier = require('node-notifier');
+var debug = require('debug')('rss-o-bot');
 
 module.exports = function (config) {
   var sends = config['notification-methods'].map(function (m) {
-    if (m === 'telegram') return telegram(config);
-    if (m === 'desktop') return desktop(config);
+    var module = 'rss-o-bot-' + m;
+    try {
+      var send = require(module)(config);
+      debug('Successfully loaded notifier: ' + module);
+      return send;
+    } catch (e) {
+      debug('Failed to load notifier: ' + module);
+    }
+  }).filter(function (f) {
+    return f;
   });
   return function (blog, link) {
     return Rx.Observable.forkJoin(sends.map(function (f) {
@@ -15,21 +22,3 @@ module.exports = function (config) {
     }));
   };
 };
-
-function telegram(config) {
-  var tg = Tg(config['telegram-api-token']);
-  return function (subject, message) {
-    return Rx.Observable.forkJoin(config['telegram-recipients'].map(function (r) {
-      return Rx.Observable.fromPromise(tg.sendMessage(r, subject + ' \n' + message));
-    }));
-  };
-}
-
-function desktop(config) {
-  var notify = Rx.Observable.fromNodeCallback(notifier.notify.bind(notifier));
-  return function (title, text) {
-    return notify({
-      title: title, text: text, open: text
-    }).takeUntilWithTime(1000);
-  }; // Time out gracefully if nothing happens
-}

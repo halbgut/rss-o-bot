@@ -17,42 +17,46 @@ var notify = require('./lib/notify')(config);
 var poll = require('./lib/poll');
 var initStore = require('./lib/store');
 
-O.combineLatest(initStore(config), Rx.Observable.interval(config.interval * 1000).startWith(0)).flatMap(function (_ref) {
-  var _ref2 = _slicedToArray(_ref, 1);
+module.exports = function runRSSOBotDaemon() {
+  O.combineLatest(initStore(config), Rx.Observable.interval(config.interval * 1000).startWith(0)).flatMap(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 1);
 
-  var _ref2$ = _ref2[0];
-  var getFeeds = _ref2$.getFeeds;
-  var insertFeed = _ref2$.insertFeed;
-  var updateLatestLink = _ref2$.updateLatestLink;
-  return getFeeds().flatMap(function (feeds) {
-    var _Rx$Observable;
+    var _ref2$ = _ref2[0];
+    var getFeeds = _ref2$.getFeeds;
+    var insertFeed = _ref2$.insertFeed;
+    var updateLatestLink = _ref2$.updateLatestLink;
+    return getFeeds().flatMap(function (feeds) {
+      var _Rx$Observable;
 
-    return (_Rx$Observable = Rx.Observable).combineLatest.apply(_Rx$Observable, _toConsumableArray(feeds.map(function (feed) {
-      return O.fromPromise(feed.getFilters()).flatMap(function (filters) {
-        return O.onErrorResumeNext(poll(feed.get('url'), filters.map(function (f) {
-          return [f.get('keyword'), f.get('kind')];
-        })).retry(2).flatMap(function (info) {
-          return updateLatestLink(feed.get('id'), info.latestLink).map(info);
-        }).filter(function (_ref3) {
-          var latestLink = _ref3.latestLink;
-          return latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink') || debug('Old URL: ' + latestLink);
-        }).tap(function (_ref4) {
-          var latestLink = _ref4.latestLink;
-          return debug('New URL: ' + latestLink);
-        }).flatMap(function (_ref5) {
-          var blog = _ref5.blog;
-          var latestLink = _ref5.latestLink;
-          return notify(blog, latestLink).tap(function () {
-            return debug('Sent notifications');
-          }).retry(2);
+      return (_Rx$Observable = Rx.Observable).combineLatest.apply(_Rx$Observable, _toConsumableArray(feeds.map(function (feed) {
+        return O.fromPromise(feed.getFilters()).flatMap(function (filters) {
+          return O.onErrorResumeNext(poll(feed.get('url'), filters.map(function (f) {
+            return [f.get('keyword'), f.get('kind')];
+          })).retry(2).flatMap(function (info) {
+            return updateLatestLink(feed.get('id'), info.latestLink).map(info);
+          }).filter(function (_ref3) {
+            var latestLink = _ref3.latestLink;
+            return latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink') || debug('Old URL: ' + latestLink);
+          }).tap(function (_ref4) {
+            var latestLink = _ref4.latestLink;
+            return debug('New URL: ' + latestLink);
+          }).flatMap(function (_ref5) {
+            var blog = _ref5.blog;
+            var latestLink = _ref5.latestLink;
+            return notify(blog, latestLink).tap(function () {
+              return debug('Sent notifications');
+            }).retry(2);
+          }));
+        }, O.just().tap(function () {
+          return console.error('Failed to get ' + feed.get('url'));
         }));
-      }, O.just().tap(function () {
-        return console.error('Failed to get ' + feed.get('url'));
-      }));
-    })));
+      })));
+    });
+  }).subscribe(function () {}, function (err) {
+    return console.log('ERROR') || console.error(err);
+  }, function () {
+    return console.log('Complete');
   });
-}).subscribe(function () {}, function (err) {
-  return console.log('ERROR') || console.error(err);
-}, function () {
-  return console.log('Complete');
-});
+};
+
+module.exports.config = config;

@@ -1,10 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs')
-const Rx = require('rx')
-const O = Rx.Observable
 const { getConfig, transformFilter, buildMan } = require('./lib/helpers')
-const Tg = require('tg-yarl')
 const config = getConfig()
 const initStore = require('./lib/store')
 const notify = require('./lib/notify')(config)
@@ -44,16 +41,6 @@ if (action === 'add' && args[0]) {
   notify('Test', url)
     .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'poll-telegram') {
-  const tg = Tg(config['telegram-api-token'])
-  O.interval(1000).startWith(0)
-    .flatMap(() => O.fromPromise(tg.getUpdates()))
-    .map(res => res.body.ok
-      ? res.body.result.slice(-1)[0]
-      : null
-    )
-    .distinctUntilChanged(update => update ? update.update_id : null)
-    .map(update => update ? update.message.from.id : null)
-    .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'import' && args[0]) {
   const [file] = args
   initStore(config)
@@ -70,7 +57,7 @@ if (action === 'add' && args[0]) {
       console.error
     )
 } else if (action === 'run' || !action) {
-  require('.')
+  require('.')()
 } else if (action === '-h' || action === '--help') {
   process.stdout.write(`${buildMan().synopsis}
 
