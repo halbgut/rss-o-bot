@@ -40,7 +40,6 @@ if (action === 'add' && args[0]) {
   const url = args[0] || 'test'
   notify('Test', url)
     .subscribe(console.log, console.error, () => process.exit())
-} else if (action === 'poll-telegram') {
 } else if (action === 'import' && args[0]) {
   const [file] = args
   initStore(config)

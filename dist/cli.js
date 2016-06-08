@@ -65,7 +65,7 @@ if (action === 'add' && args[0]) {
   notify('Test', _url).subscribe(console.log, console.error, function () {
     return process.exit();
   });
-} else if (action === 'poll-telegram') {} else if (action === 'import' && args[0]) {
+} else if (action === 'import' && args[0]) {
   var _args3 = _slicedToArray(args, 1);
 
   var file = _args3[0];
