@@ -61,7 +61,11 @@ if (action === 'add' && args[0]) {
     return listFeeds();
   }).subscribe(printFeeds, console.error);
 } else if (action === 'poll-feeds') {
-  initStore(config).flatMap(require('.').pollFeeds);
+  initStore(config).flatMap(function (s) {
+    return require('.').pollFeeds(s);
+  }).subscribe(console.log, console.error, function () {
+    return process.exit();
+  });
 } else if (action === 'test-notification') {
   var _url = args[0] || 'test';
   notify('Test', _url).subscribe(console.log, console.error, function () {
