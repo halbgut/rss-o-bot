@@ -62,7 +62,7 @@ if (action === 'add' && args[0]) {
   }).subscribe(printFeeds, console.error);
 } else if (action === 'poll-feeds') {
   initStore(config).flatMap(function (s) {
-    return require('.').pollFeeds(s);
+    return require('.').pollFeeds(s, true);
   }).subscribe(console.log, console.error, function () {
     return process.exit();
   });

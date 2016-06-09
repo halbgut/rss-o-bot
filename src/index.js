@@ -24,7 +24,7 @@ module.exports = function runRSSOBotDaemon () {
 module.exports.pollFeeds = pollFeeds
 module.exports.config = config
 
-function pollFeeds ({getFeeds, insertFeed, updateLatestLink}) {
+function pollFeeds ({getFeeds, insertFeed, updateLatestLink}, force) {
   return (
     getFeeds()
       .flatMap((feeds) => Rx.Observable.combineLatest(

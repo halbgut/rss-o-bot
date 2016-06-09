@@ -33,7 +33,7 @@ module.exports = function runRSSOBotDaemon() {
 module.exports.pollFeeds = pollFeeds;
 module.exports.config = config;
 
-function pollFeeds(_ref3) {
+function pollFeeds(_ref3, force) {
   var getFeeds = _ref3.getFeeds;
   var insertFeed = _ref3.insertFeed;
   var updateLatestLink = _ref3.updateLatestLink;
