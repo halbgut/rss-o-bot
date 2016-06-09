@@ -12,6 +12,16 @@ var configError = 'No config file found!\nRTFM and put one in one of these locat
 
 var domainRegex = '([\\w\\d-]+\\.)+\\w{2,}';
 var protoRegex = '\\w+:\\/\\/';
+var defaults = {
+  interval: 600,
+  database: {
+    name: 'rss-o-bot',
+    options: {
+      dialect: 'sqlite',
+      storage: '~/.rss-o-bot.sqlite'
+    }
+  }
+};
 
 var helpers = {
   getTime: function getTime() {
@@ -34,7 +44,7 @@ var helpers = {
     if (!config) {
       throw new Error(configError);
     }
-    return config;
+    return Object.assign(defaults, config);
   },
   transformFilter: function transformFilter(filter) {
     return filter[0] === '!' ? { keyword: filter.substr(1), kind: false } : { keyword: filter, kind: true };

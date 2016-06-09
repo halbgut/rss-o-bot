@@ -17,6 +17,16 @@ ${locations.join(', ')}
 
 const domainRegex = '([\\w\\d-]+\\.)+\\w{2,}'
 const protoRegex = '\\w+:\\/\\/'
+const defaults = {
+  interval: 600,
+  database: {
+    name: 'rss-o-bot',
+    options: {
+      dialect: 'sqlite',
+      storage: '~/.rss-o-bot.sqlite'
+    }
+  }
+}
 
 const helpers = {
   getTime (mod = 0) {
@@ -39,7 +49,7 @@ const helpers = {
     if (!config) {
       throw new Error(configError)
     }
-    return config
+    return Object.assign(defaults, config)
   },
 
   transformFilter (filter) {
