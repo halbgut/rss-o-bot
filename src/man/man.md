@@ -57,17 +57,17 @@ RSS-o-Bot checks three places for configuration files. `$HOME/.rss-o-bot`, or `%
 The configuration file should contain a single JSON-object on the root level. Use the example configuration inside the README as a reference. These are the available configuration options:
 
 ### notification-methods
-An array of methods. When a new item appears in a stream, a notification will be sent over the defined methods. rss-o-bot requires modules named after these methods. So if you define a method `"email"` you'll need to `npm i -g rss-o-bot-email` first. Currenly known notifiers are `rss-o-bot-email`, `rss-o-bot-desktop`, `rss-o-bot-telegram`.
+An array of methods. No **default**. When a new item appears in a stream, a notification will be sent over the defined methods. rss-o-bot requires modules named after these methods. So if you define a method `"email"` you'll need to `npm i -g rss-o-bot-email` first. Currenly known notifiers are `rss-o-bot-email`, `rss-o-bot-desktop`, `rss-o-bot-telegram`.
 
 ### interval
-A number in section that defines how often the Feed-URLs should be polled.
+A number in section that defines how often the Feed-URLs should be polled. **Defaults** to 300.
 
 ### database
-An object containing information on the database. It must include a `name` property. If you're database requires a username and password (non-SQLite), set these as the `username` and `password` properties. The object must also include a `options` object containing further information on the database connection. It must at least include a `dialect` and a `storage` attribute. SQLite is the prefered database here, since it has a very low overhead and high portability. The `options` object is passed as-is to Sequelize. Check its [docs](http://sequelize.readthedocs.io/en/latest/api/sequelize/) for further information. Here's an example of a simple `database` configuration:
+An object containing information on the database. It must include a `name` property. If you're database requires a username and password (non-SQLite), set these as the `username` and `password` properties. The object must also include a `options` object containing further information on the database connection. It must at least include a `dialect` and a `storage` attribute. SQLite is the prefered database here, since it has a very low overhead and high portability. The `options` object is passed as-is to Sequelize. Check its [docs](http://sequelize.readthedocs.io/en/latest/api/sequelize/) for further information. The **default** is:
 
 ```
 {
-  "name": "rssobot",
+  "name": "rss-o-bot",
   "options": {
     "dialect": "sqlite",
     "storage": "~/.rss-o-bot.sqlite"
