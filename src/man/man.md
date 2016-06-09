@@ -3,6 +3,9 @@
 ## SYNOPSIS
 [[SYNOPSIS]]
 
+## VERSION
+[[VERSION]]
+
 ## FLAGS
 
 ### -h, --help

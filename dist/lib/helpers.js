@@ -13,7 +13,7 @@ var configError = 'No config file found!\nRTFM and put one in one of these locat
 var domainRegex = '([\\w\\d-]+\\.)+\\w{2,}';
 var protoRegex = '\\w+:\\/\\/';
 
-module.exports = {
+var helpers = {
   getTime: function getTime() {
     var mod = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
@@ -31,7 +31,6 @@ module.exports = {
     }).map(function (c) {
       return JSON.parse(c);
     })[0];
-
     if (!config) {
       throw new Error(configError);
     }
@@ -49,9 +48,15 @@ module.exports = {
     return match[0];
   },
   buildMan: function buildMan() {
+    var packageInfo = require('../../package.json');
     var synopsis = fs.readFileSync(__dirname + '/../../src/man/synopsis.md').toString();
-    var raw = fs.readFileSync(__dirname + '/../../src/man/man.md').toString().replace('[[SYNOPSIS]]', synopsis);
-    var man = markedMan(raw);
+    var raw = fs.readFileSync(__dirname + '/../../src/man/man.md').toString().replace('[[SYNOPSIS]]', synopsis).replace('[[VERSION]]', packageInfo.version);
+    var man = markedMan(raw, {
+      version: packageInfo.version,
+      section: 1
+    });
     return { synopsis: synopsis, man: man, raw: raw };
   }
 };
+
+module.exports = helpers;
