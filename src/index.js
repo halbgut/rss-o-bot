@@ -43,8 +43,8 @@ function pollFeeds ({getFeeds, insertFeed, updateLatestLink}, force) {
                   )
                   .filter(() => feed.get('latestLink'))
                   .tap(({latestLink}) => debug(`New URL: ${latestLink}`))
-                  .flatMap(({ blog, latestLink }) =>
-                    notify(blog, latestLink)
+                  .flatMap(({ blog, latestLink, latestTitle }) =>
+                    notify(blog, latestLink, latestTitle)
                       .tap(() => debug('Sent notifications'))
                       .retry(2)
                   )

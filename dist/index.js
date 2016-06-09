@@ -58,7 +58,8 @@ function pollFeeds(_ref3, force) {
         }).flatMap(function (_ref6) {
           var blog = _ref6.blog;
           var latestLink = _ref6.latestLink;
-          return notify(blog, latestLink).tap(function () {
+          var latestTitle = _ref6.latestTitle;
+          return notify(blog, latestLink, latestTitle).tap(function () {
             return debug('Sent notifications');
           }).retry(2);
         }));
