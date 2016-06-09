@@ -84,7 +84,13 @@ Before committing, use `npm run build` to build the man page and the JS.
 
 ### Developing Notifiers
 
+RSS-o-Bot requires a module for each "notification-methods" in the pattern `rss-o-bot-${method}`. You may develop your own notifier by ceating a package and naming it `rss-o-bot-${method-name}`. That package's main should export a single function that is called by `rss-o-bot` in the following manner:
 
+```js
+notifier(configuration)(blogTitle, entryUrl, entryTitle)
+```
+
+You may want to check the [`rss-o-bot-email`](https://github.com/kriegslustig/rss-o-bot-email) source code for further reference.
 
 ## TODO
 
