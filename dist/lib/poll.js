@@ -100,7 +100,7 @@ module.exports = function poll(url, filters) {
       var title = _ref3.title;
 
       var lowTitle = title.toLowerCase();
-      filters.filter(function (_ref4) {
+      return filters.filter(function (_ref4) {
         var _ref5 = _slicedToArray(_ref4, 2);
 
         var keyword = _ref5[0];
@@ -125,11 +125,13 @@ module.exports = function poll(url, filters) {
 
     var stream = _ref7[0];
     var meta = _ref7[1];
-    return {
-      blog: meta.title,
-      latestTitle: stream[0].title,
-      latestLink: isAbsoluteUrl(stream[0].link) ? stream[0].link : getBaseUrl(url) + stream[0].link
-    };
+    return stream.map(function (entry) {
+      return {
+        blog: meta.title,
+        latestTitle: entry.title,
+        latestLink: isAbsoluteUrl(entry.link) ? entry.link : getBaseUrl(url) + entry.link
+      };
+    });
   });
 };
 

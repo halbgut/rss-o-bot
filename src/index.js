@@ -34,12 +34,14 @@ function pollFeeds ({getFeeds, insertFeed, updateLatestLink}, force) {
               O.onErrorResumeNext(
                 poll(feed.get('url'), filters.map(f => [f.get('keyword'), f.get('kind')]))
                   .retry(2)
+                  .flatMap(getNewLinks(feed))
+                  .filter(({latestLink}) =>
+                    (latestLink && latestLink !== feed.get('latestLink')) || debug(`Old URL: ${latestLink}`)
+                  )
                   .flatMap((info) =>
                     updateLatestLink(feed.get('id'), info.latestLink).map(info)
                   )
-                  .filter(({latestLink}) =>
-                    (latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink')) || debug(`Old URL: ${latestLink}`)
-                  )
+                  .filter(() => feed.get('latestLink'))
                   .tap(({latestLink}) => debug(`New URL: ${latestLink}`))
                   .flatMap(({ blog, latestLink }) =>
                     notify(blog, latestLink)
@@ -54,4 +56,12 @@ function pollFeeds ({getFeeds, insertFeed, updateLatestLink}, force) {
       ))
   )
 }
+
+const getNewLinks = feed => stream =>
+  feed.get('latestLink')
+    ? O.fromArray(stream.slice(
+      0,
+      stream.findIndex(e => e.latestLink === feed.get('latestLink'))
+    ).reverse())
+    : O.of(stream[0])
 

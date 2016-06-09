@@ -45,11 +45,13 @@ function pollFeeds(_ref3, force) {
       return O.fromPromise(feed.getFilters()).flatMap(function (filters) {
         return O.onErrorResumeNext(poll(feed.get('url'), filters.map(function (f) {
           return [f.get('keyword'), f.get('kind')];
-        })).retry(2).flatMap(function (info) {
-          return updateLatestLink(feed.get('id'), info.latestLink).map(info);
-        }).filter(function (_ref4) {
+        })).retry(2).flatMap(getNewLinks(feed)).filter(function (_ref4) {
           var latestLink = _ref4.latestLink;
-          return latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink') || debug('Old URL: ' + latestLink);
+          return latestLink && latestLink !== feed.get('latestLink') || debug('Old URL: ' + latestLink);
+        }).flatMap(function (info) {
+          return updateLatestLink(feed.get('id'), info.latestLink).map(info);
+        }).filter(function () {
+          return feed.get('latestLink');
         }).tap(function (_ref5) {
           var latestLink = _ref5.latestLink;
           return debug('New URL: ' + latestLink);
@@ -66,3 +68,11 @@ function pollFeeds(_ref3, force) {
     })));
   });
 }
+
+var getNewLinks = function getNewLinks(feed) {
+  return function (stream) {
+    return feed.get('latestLink') ? O.fromArray(stream.slice(0, stream.findIndex(function (e) {
+      return e.latestLink === feed.get('latestLink');
+    })).reverse()) : O.of(stream[0]);
+  };
+};

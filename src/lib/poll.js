@@ -70,7 +70,7 @@ module.exports =
           stream
             .filter(({ title }) => {
               const lowTitle = title.toLowerCase()
-              filters.filter(([keyword, not]) => {
+              return filters.filter(([keyword, not]) => {
                 const lowerCase = !includesUpperCase(keyword)
                 if (not && lowerCase) {
                   return lowTitle.indexOf(keyword) === -1
@@ -87,13 +87,15 @@ module.exports =
             }),
           meta
         ])
-        .map(([stream, meta]) => ({
-          blog: meta.title,
-          latestTitle: stream[0].title,
-          latestLink: isAbsoluteUrl(stream[0].link)
-            ? stream[0].link
-            : getBaseUrl(url) + stream[0].link
-        }))
+        .map(([stream, meta]) =>
+          stream.map(entry => ({
+            blog: meta.title,
+            latestTitle: entry.title,
+            latestLink: isAbsoluteUrl(entry.link)
+              ? entry.link
+              : getBaseUrl(url) + entry.link
+          }))
+        )
     )
   }
 
