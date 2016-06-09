@@ -21,34 +21,51 @@ Your RSS-o-Bot, will search for a configuration file in ~/.rss-o-bot. Here's an 
 
 ```json
 {
-  "notification-methods": ["telegram", "desktop"],
+  "notification-methods": ["desktop", "telegram", "email"],
+  "email-recipients": ["someone@somewhereinthe.net"],
   "telegram-api-token": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "telegram-recipients": ["00000000"],
-  "interval": 100,
-  "database": {
-    "name": "data",
-    "username": null,
-    "password": null,
-    "options": {
-      "dialect": "sqlite",
-      "storage": "/home/myuser/.rss-o-bot.sqlite"
-    }
-  }
+  "telegram-recipients": ["00000000"]
 }
 ```
 
 ## Usage
 
+First, let's add a feed:
+
 ```bash
-rss-o-bot -h
-rss-o-bot add https://www.youtube.com/feeds/videos.xml?channel_id=UC_x5XG1OV2P6uZZ5FSM9Ttw "Machine Learning Recipes"
+$ rss-o-bot add https://github.com/kriegslustig/rss-o-bot/commits/master.atom
 ```
+
+That feed might might get a bit busy. So let's say, we only care about changes in the notification system. To add a filter, we'll first need to delete the old feed. To do that, we'll need to know its ID.
+
+```bash
+$ rss-o-bot list
+1 https://github.com/kriegslustig/rss-o-bot/commits/master.atom
+```
+
+The first column in the output of `rss-o-bot list` denotes the ID. So let's remove it:
+
+```bash
+$ rss-o-bot rm 1
+```
+
+Now we can add the URL again, now with a filter:
+
+```bash
+$ rss-o-bot add https://github.com/kriegslustig/rss-o-bot/commits/master.atom "notif"
+```
+
+So now we get notified, whenever a commit message contains the string "notif". There are some more options available when adding filtered feeds. Refer to the [man-page](https://github.com/Kriegslustig/rss-o-bot/blob/master/src/man/man.md) for more information.
+
+## Available Notifiers
+
+* [`rss-o-bot-email`](https://github.com/kriegslustig/rss-o-bot-email)
+* [`rss-o-bot-desktop`](https://github.com/kriegslustig/rss-o-bot-desktop)
+* [`rss-o-bot-telegram`](https://github.com/kriegslustig/rss-o-bot-telegram)
 
 ## Daemonizing
 
-If you're using linux you'll probably want to go with systemd. Figure it out yourself.
-
-If not, you probably want to use pm2. It provides a really powerful, yet simple to use system for process-daemonization (LOL).
+To run rss-o-bot, you'll want to daemonize (make it run in the background) it. Daemonizing it bings some problems with it though. The daemonized process can't send desktop notifications. If you're using linux you'll probably want to go with systemd. Figure it out yourself. If not, you probably want to use pm2. It provides a really powerful, yet simple to use system for process-daemonization (LOL).
 
 ```bash
 npm i -g pm2
@@ -64,6 +81,10 @@ pm2 startup [platform] # Refer to `pm2 -h` for available platforms
 ## Development
 
 Before committing, use `npm run build` to build the man page and the JS.
+
+### Developing Notifiers
+
+
 
 ## TODO
 
