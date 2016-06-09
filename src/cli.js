@@ -36,6 +36,9 @@ if (action === 'add' && args[0]) {
       printFeeds,
       console.error
     )
+} else if (action === 'poll-feeds') {
+  initStore(config)
+    .flatMap(require('.').pollFeeds)
 } else if (action === 'test-notification') {
   const url = args[0] || 'test'
   notify('Test', url)

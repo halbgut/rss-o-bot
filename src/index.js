@@ -13,34 +13,7 @@ module.exports = function runRSSOBotDaemon () {
     initStore(config),
     Rx.Observable.interval(config.interval * 1000).startWith(0)
   )
-    .flatMap(([{getFeeds, insertFeed, updateLatestLink}]) =>
-      getFeeds()
-        .flatMap((feeds) => Rx.Observable.combineLatest(
-          ...feeds.map(feed =>
-            O.fromPromise(feed.getFilters())
-              .flatMap(filters =>
-                O.onErrorResumeNext(
-                  poll(feed.get('url'), filters.map(f => [f.get('keyword'), f.get('kind')]))
-                    .retry(2)
-                    .flatMap((info) =>
-                      updateLatestLink(feed.get('id'), info.latestLink).map(info)
-                    )
-                    .filter(({latestLink}) =>
-                      (latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink')) || debug(`Old URL: ${latestLink}`)
-                    )
-                    .tap(({latestLink}) => debug(`New URL: ${latestLink}`))
-                    .flatMap(({ blog, latestLink }) =>
-                      notify(blog, latestLink)
-                        .tap(() => debug('Sent notifications'))
-                        .retry(2)
-                    )
-                  ),
-                  O.just()
-                    .tap(() => console.error(`Failed to get ${feed.get('url')}`))
-              )
-          )
-        ))
-    )
+    .flatMap(([s]) => pollFeeds(s))
     .subscribe(
       () => {},
       err => console.log('ERROR') || console.error(err),
@@ -48,5 +21,37 @@ module.exports = function runRSSOBotDaemon () {
     )
 }
 
+module.exports.pollFeeds = pollFeeds
 module.exports.config = config
+
+function pollFeeds ({getFeeds, insertFeed, updateLatestLink}) {
+  return (
+    getFeeds()
+      .flatMap((feeds) => Rx.Observable.combineLatest(
+        ...feeds.map(feed =>
+          O.fromPromise(feed.getFilters())
+            .flatMap(filters =>
+              O.onErrorResumeNext(
+                poll(feed.get('url'), filters.map(f => [f.get('keyword'), f.get('kind')]))
+                  .retry(2)
+                  .flatMap((info) =>
+                    updateLatestLink(feed.get('id'), info.latestLink).map(info)
+                  )
+                  .filter(({latestLink}) =>
+                    (latestLink && feed.get('latestLink') && latestLink !== feed.get('latestLink')) || debug(`Old URL: ${latestLink}`)
+                  )
+                  .tap(({latestLink}) => debug(`New URL: ${latestLink}`))
+                  .flatMap(({ blog, latestLink }) =>
+                    notify(blog, latestLink)
+                      .tap(() => debug('Sent notifications'))
+                      .retry(2)
+                  )
+                ),
+                O.just()
+                  .tap(() => console.error(`Failed to get ${feed.get('url')}`))
+            )
+        )
+      ))
+  )
+}
 
