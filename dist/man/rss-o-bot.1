@@ -6,7 +6,7 @@
 rss\-o\-bot [\-\-help | \-\-version | \-\-man | run |
             add <url> <filters>\|\.\.\. | rm <id> | list |
             test\-notification [url] | import <file> |
-            export]
+            export | poll\-feeds]
 .SH FLAGS
 .SS \-h, \-\-help
 .P
@@ -39,6 +39,9 @@ OPML import\. Takes a \fIpath\fR to an OPML\-file as a parameter and scanns it f
 .SS export
 .P
 Exports the RSS feeds as OPML to STDOUT\. The export does not include the defined filters\. Simply beacause, there is no standard way of exporting those\.
+.SS poll\-feeds
+.P
+Triggers a poll of all feeds in the database\.
 .SH DEBUGGING
 .P
 To enter the debugging mode, you'll need to set the \fBDEBUG\fP environment variable to a list including \fBrss\-o\-bot\fP\|\. For example:

@@ -36,6 +36,9 @@ OPML import. Takes a _path_ to an OPML-file as a parameter and scanns it for out
 ### export
 Exports the RSS feeds as OPML to STDOUT. The export does not include the defined filters. Simply beacause, there is no standard way of exporting those.
 
+### poll-feeds
+Triggers a poll of all feeds in the database.
+
 ## DEBUGGING
 To enter the debugging mode, you'll need to set the `DEBUG` environment variable to a list including `rss-o-bot`. For example:
 
