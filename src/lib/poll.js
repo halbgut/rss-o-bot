@@ -68,13 +68,23 @@ module.exports =
         .flatMap(parse)
         .map(([stream, meta]) => [
           stream
-            .filter(({ title }) =>
-              filters.filter(([keyword, kind]) =>
-                kind
-                  ? title.indexOf(keyword) === -1 // When the kind is true and it's not in the title
-                  : title.indexOf(keyword) > -1 // When the kind is false and it's inside the title
-              ).length === 0
-            ),
+            .filter(({ title }) => {
+              const lowTitle = title.toLowerCase()
+              filters.filter(([keyword, not]) => {
+                const lowerCase = !includesUpperCase(keyword)
+                if (not && lowerCase) {
+                  return lowTitle.indexOf(keyword) === -1
+                } else if (not && !lowerCase) {
+                  return title.indexOf(keyword) === -1
+                } else if (!not && lowerCase) {
+                  return lowTitle.indexOf(keyword) > -1
+                } else if (!not && !lowerCase) {
+                  return title.indexOf(keyword) > -1
+                } else {
+                  debug('Unexpected case in filter ${not}, ${lowerCase}')
+                }
+              }).length === 0
+            }),
           meta
         ])
         .map(([stream, meta]) => ({
@@ -86,4 +96,8 @@ module.exports =
         }))
     )
   }
+
+function includesUpperCase (str) {
+  return !!str.match(/[A-Z]/)
+}
 

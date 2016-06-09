@@ -98,15 +98,27 @@ module.exports = function poll(url, filters) {
     var meta = _ref2[1];
     return [stream.filter(function (_ref3) {
       var title = _ref3.title;
-      return filters.filter(function (_ref4) {
+
+      var lowTitle = title.toLowerCase();
+      filters.filter(function (_ref4) {
         var _ref5 = _slicedToArray(_ref4, 2);
 
         var keyword = _ref5[0];
-        var kind = _ref5[1];
-        return kind ? title.indexOf(keyword) === -1 // When the kind is true and it's not in the title
-        : title.indexOf(keyword) > -1;
-      } // When the kind is false and it's inside the title
-      ).length === 0;
+        var not = _ref5[1];
+
+        var lowerCase = !includesUpperCase(keyword);
+        if (not && lowerCase) {
+          return lowTitle.indexOf(keyword) === -1;
+        } else if (not && !lowerCase) {
+          return title.indexOf(keyword) === -1;
+        } else if (!not && lowerCase) {
+          return lowTitle.indexOf(keyword) > -1;
+        } else if (!not && !lowerCase) {
+          return title.indexOf(keyword) > -1;
+        } else {
+          debug('Unexpected case in filter ${not}, ${lowerCase}');
+        }
+      }).length === 0;
     }), meta];
   }).map(function (_ref6) {
     var _ref7 = _slicedToArray(_ref6, 2);
@@ -120,3 +132,7 @@ module.exports = function poll(url, filters) {
     };
   });
 };
+
+function includesUpperCase(str) {
+  return !!str.match(/[A-Z]/);
+}
