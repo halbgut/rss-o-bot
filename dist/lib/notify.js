@@ -24,9 +24,9 @@ module.exports = function (config) {
   }).filter(function (f) {
     return f;
   });
-  return function (blog, link) {
+  return function (blog, link, title) {
     return Rx.Observable.forkJoin(sends.map(function (f) {
-      return f(blog + ' posted something new.', link);
+      return f(blog + ' posted something new.', link, title);
     }));
   };
 };

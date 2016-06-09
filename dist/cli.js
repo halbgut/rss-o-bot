@@ -68,7 +68,7 @@ if (action === 'add' && args[0]) {
   });
 } else if (action === 'test-notification') {
   var _url = args[0] || 'test';
-  notify('Test', _url).subscribe(console.log, console.error, function () {
+  notify('Test', _url, 'Test Title').subscribe(console.log, console.error, function () {
     return process.exit();
   });
 } else if (action === 'import' && args[0]) {
