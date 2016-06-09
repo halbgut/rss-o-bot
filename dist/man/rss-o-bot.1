@@ -1,4 +1,4 @@
-.TH "RSS\-O\-BOT" "1" "June 2016" "0.4.7" ""
+.TH "RSS\-O\-BOT" "1" "June 2016" "0.5.0" ""
 .SH "NAME"
 \fBRSS-o-Bot\fR
 .SH SYNOPSIS
@@ -9,7 +9,7 @@ rss\-o\-bot [\-\-help | \-\-version | \-\-man | run |
             export | poll\-feeds]
 .SH VERSION
 .P
-0\.4\.7
+0\.5\.0
 .SH FLAGS
 .SS \-h, \-\-help
 .P
@@ -26,7 +26,7 @@ Display the current version\.
 Run the deamon process in the foreground\.
 .SS add \fIurl\fR [\fIfilter\fR\|\.\.\.]
 .P
-\fI$1\fR a Feed\-URL to the database\. \fIurl\fR is a URL to an Atom or RSS feed\. The URL must include the protocol\. HTTP and HTTPS are supported\. Post\-titles inside a feed will be filtered by the words passed as \fIfilter\fR to \fBadd\fP\|\. \fIfilter\fR can be negated (to check that a title doesn't include a string) by pepending them with a bang (\fB!\fP)\. For example \fBrss\-o\-bot add <url> 'children' '!cooking'\fP\|\. Be carefull to always wrap negated filters in quotes (\fB\|'\fP)\. Otherwise your shell will probably interpret the bang as a keyword\.
+\fI$1\fR a Feed\-URL to the database\. \fIurl\fR is a URL to an Atom or RSS feed\. The URL must include the protocol\. HTTP and HTTPS are supported\. Post\-titles inside a feed will be filtered by the words passed as \fIfilter\fR to \fBadd\fP\|\. \fIfilter\fR can be negated (to check that a title doesn't include a string) by pepending them with a bang (\fB!\fP)\. For example \fBrss\-o\-bot add <url> 'children' '!cooking'\fP\|\. Be carefull to always wrap negated filters in quotes (\fB\|'\fP)\. Otherwise your shell will probably interpret the bang as a keyword\. The filters are matched using "\fIsmartcase\fR" (as in VIM smartcase)\. So if a filter includes no upper\-case letters, it will be matched case\-insensitively\. When it contains an upper\-case letter it will be matched case\-sensitively\.
 .SS rm \fIid\fR
 .P
 Remove a Feed\-URL from the database\. \fIid\fR is the key of a Feed\-URL inside the database\. \fBid\fPs are displayed in \fBrss\-o\-bot list\fP\|\.

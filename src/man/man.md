@@ -22,7 +22,7 @@ Display the current version.
 Run the deamon process in the foreground.
 
 ### add _url_ [_filter_...]
-_$1_ a Feed-URL to the database. _url_ is a URL to an Atom or RSS feed. The URL must include the protocol. HTTP and HTTPS are supported. Post-titles inside a feed will be filtered by the words passed as _filter_ to `add`. _filter_ can be negated (to check that a title doesn't include a string) by pepending them with a bang (`!`). For example `rss-o-bot add <url> 'children' '!cooking'`. Be carefull to always wrap negated filters in quotes (`'`). Otherwise your shell will probably interpret the bang as a keyword.
+_$1_ a Feed-URL to the database. _url_ is a URL to an Atom or RSS feed. The URL must include the protocol. HTTP and HTTPS are supported. Post-titles inside a feed will be filtered by the words passed as _filter_ to `add`. _filter_ can be negated (to check that a title doesn't include a string) by pepending them with a bang (`!`). For example `rss-o-bot add <url> 'children' '!cooking'`. Be carefull to always wrap negated filters in quotes (`'`). Otherwise your shell will probably interpret the bang as a keyword. The filters are matched using "_smartcase_" (as in VIM smartcase). So if a filter includes no upper-case letters, it will be matched case-insensitively. When it contains an upper-case letter it will be matched case-sensitively.
 
 ### rm _id_
 Remove a Feed-URL from the database. _id_ is the key of a Feed-URL inside the database. `id`s are displayed in `rss-o-bot list`.
