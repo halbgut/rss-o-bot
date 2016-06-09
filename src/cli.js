@@ -42,7 +42,7 @@ if (action === 'add' && args[0]) {
     .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'test-notification') {
   const url = args[0] || 'test'
-  notify('Test', url)
+  notify('Test', url, 'Test Title')
     .subscribe(console.log, console.error, () => process.exit())
 } else if (action === 'import' && args[0]) {
   const [file] = args

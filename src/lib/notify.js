@@ -21,9 +21,9 @@ module.exports = (config) => {
         debug(`Failed to load notifier: ${module}`)
       }
     }).filter(f => f)
-  return (blog, link) =>
+  return (blog, link, title) =>
     Rx.Observable.forkJoin(
-      sends.map(f => f(`${blog} posted something new.`, link))
+      sends.map(f => f(`${blog} posted something new.`, link, title))
     )
 }
 
