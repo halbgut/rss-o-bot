@@ -1,7 +1,7 @@
 {
   "name": "rss-o-bot",
   "version": "0.5.0",
-  "description": "A FOSS RSSBot alternative",
+  "description": "A FOSS RSS Bot alternative",
   "main": "dist",
   "bin": "dist/cli.js",
   "man": "dist/man/rss-o-bot.1",
