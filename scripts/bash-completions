@@ -1,0 +1,21 @@
+_rss-o-bot () {
+  local cur prev opts files
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  COMPREPLY=()
+  case "${prev}" in
+    import)
+    COMPREPLY=( $( compgen -f ${cur}) );;
+    *)
+    case "${cur}" in
+      -*)
+      COMPREPLY=( $( compgen -W "-h --help -m --manual -v --version" -- ${cur} ) );;
+      *)
+      COMPREPLY=( $( compgen -W "-h --help -m --manual -v --version add rm list poll-feeds test-notification import export run" -- ${cur} ) );;
+    esac;;
+  esac
+  return 0
+}
+
+complete -F _rss-o-bot rss-o-bot
+
