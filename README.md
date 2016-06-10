@@ -1,4 +1,4 @@
-# RSS-o-Bot 0.5.3
+# RSS-o-Bot 0.5.4
 
 A super simple commandline RSS and Atom reader/client. It's not made to read Feeds (like Newsbeuter), but to notify you when new items are posted. The Web is supposed to be decentralized most readers (like RSS Bot) are built through centralized services. RSS-o-Bot is not. It's build to be run on your own machine. Notifications are managed by services that are installed seperatly. Notification services are available for email, desktop notifications and Telegram.
 
@@ -17,7 +17,7 @@ npm i -g rss-o-bot
 npm i -g rss-o-bot-email # A notifier
 ```
 
-Your RSS-o-Bot, will search for a configuration file in ~/.rss-o-bot. Here's an example configuration:
+Your RSS-o-Bot, will search for a configuration file in `~/.rss-o-bot`. Here's an example configuration:
 
 ```json
 {
@@ -27,6 +27,8 @@ Your RSS-o-Bot, will search for a configuration file in ~/.rss-o-bot. Here's an 
   "telegram-recipients": ["00000000"]
 }
 ```
+
+By default rss-o-bot stores its data inside a SQLite database in `~/.rss-o-bot.sqlite`.
 
 ## Usage
 
