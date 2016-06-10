@@ -1,3 +1,5 @@
 /src
 *.map
+/data.sqlite
+/config.json
 
