@@ -28,7 +28,7 @@ const defaults = {
     name: 'rss-o-bot',
     options: {
       dialect: 'sqlite',
-      storage: path.normalize('~/.rss-o-bot.sqlite')
+      storage: `${locations[1]}.sqlite`
     }
   }
 }
