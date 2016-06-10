@@ -12,7 +12,7 @@ module.exports = (config) => {
           debug(msg)
           return send
         } catch (e) {
-          const send = require(`${__dirname}/../../${module}`)(config) // Global require
+          const send = require(`${__dirname}/../../../${module}`)(config) // Global require
           debug(msg)
           return send
         }

@@ -13,7 +13,7 @@ module.exports = function (config) {
         debug(msg);
         return send;
       } catch (e) {
-        var _send = require(__dirname + '/../../' + module)(config); // Global require
+        var _send = require(__dirname + '/../../../' + module)(config); // Global require
         debug(msg);
         return _send;
       }
