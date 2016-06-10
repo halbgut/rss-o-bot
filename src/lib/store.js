@@ -9,6 +9,8 @@ const {getTime} = require('./helpers.js')
 const Rx = require('rx')
 const O = Rx.Observable
 const Sequelize = require('sequelize')
+const path = require('path')
+const debug = require('debug')('rss-o-bot')
 
 const genInsertFeed = (Feed, Filter) => (url, filters) =>
   O.fromPromise(Feed.create(
@@ -71,6 +73,10 @@ const genRemoveFeed = Feed => id => O.fromPromise(
 const genListFeeds = Feed => () => O.fromPromise(Feed.findAll())
 
 module.exports = function initStore (config) {
+  const storage = 'storage' in config.database.options
+    ? config.database.options.storage
+    : null
+  if (storage) debug(`Loading database: ${path.resolve(storage)}`)
   const sequelize = new Sequelize(
     config.name,
     config.username,

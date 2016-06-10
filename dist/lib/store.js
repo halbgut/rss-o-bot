@@ -15,6 +15,8 @@ var getTime = _require.getTime;
 var Rx = require('rx');
 var O = Rx.Observable;
 var Sequelize = require('sequelize');
+var path = require('path');
+var debug = require('debug')('rss-o-bot');
 
 var genInsertFeed = function genInsertFeed(Feed, Filter) {
   return function (url, filters) {
@@ -83,6 +85,8 @@ var genListFeeds = function genListFeeds(Feed) {
 };
 
 module.exports = function initStore(config) {
+  var storage = 'storage' in config.database.options ? config.database.options.storage : null;
+  if (storage) debug('Loading database: ' + path.resolve(storage));
   var sequelize = new Sequelize(config.name, config.username, config.password, Object.assign({
     logging: function logging() {}
   }, config.database.options));
