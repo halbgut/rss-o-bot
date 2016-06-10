@@ -1,0 +1,26 @@
+#compdef rss-o-bot
+typeset -A opt_args
+
+local context state line
+_arguments \
+  {-h,--help}'[Print the help dialogue]' \
+  {-m,--manual}'[Print the man-page as markdown]' \
+  {-v,--version}'[Print the installed version number]' \
+  add'[Add a feed-URL to the database]' \
+  rm'[Remove a feed-URL from the database, referenced by id]' \
+  list'[List all feed-URLs, their IDs and filters]' \
+  poll-feeds'[Force a poll of all feed-URLs (ignoring the set interval)]' \
+  test-notification'[send a test notification over all configured methods]' \
+  import'[Import an OPML file containing RSS feed-URLs]' \
+  export'[Export an OPML file containing RSS feed-URLs in the database]' \
+  run'[Run the daemon]' \
+  && return 0
+
+case $state in
+  (import)
+    _files -g '*.opml' && return 0
+    ;;
+esac
+
+return 0
+
