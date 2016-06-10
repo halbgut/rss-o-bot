@@ -5,6 +5,7 @@
 const fs = require('fs')
 const path = require('path')
 const markedMan = require('marked-man')
+const debug = require('debug')('rss-o-bot')
 
 const locations = [
   `${__dirname}/../../config.json`,
@@ -27,7 +28,7 @@ const defaults = {
     name: 'rss-o-bot',
     options: {
       dialect: 'sqlite',
-      storage: '~/.rss-o-bot.sqlite'
+      storage: path.normalize('~/.rss-o-bot.sqlite')
     }
   }
 }
@@ -48,7 +49,7 @@ const helpers = {
           }
         })
         .slice(0, 1)
-        .map(l => fs.readFileSync(l))
+        .map(l => debug(`Loading config ${l}`) || fs.readFileSync(l))
         .map(c => JSON.parse(c))[0]
     if (!config) {
       throw new Error(configError)
