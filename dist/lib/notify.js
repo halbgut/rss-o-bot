@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * notifiy
+ * This module notifies about new entries users.
+ */
 var Rx = require('rx');
 var debug = require('debug')('rss-o-bot');
 

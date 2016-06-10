@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * helpers
+ * Helper functions used by multiple modules.
+ */
 var fs = require('fs');
 var path = require('path');
 var markedMan = require('marked-man');

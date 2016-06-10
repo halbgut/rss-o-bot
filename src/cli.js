@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+/**
+ * cli
+ * The executable configured by the package.
+ */
+
 const fs = require('fs')
 const { getConfig, transformFilter, buildMan } = require('./lib/helpers')
 const config = getConfig()

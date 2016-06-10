@@ -1,3 +1,9 @@
+/**
+ * store
+ * All interactions with the database are abstracted
+ * by this module. They are made through sequelize.
+ * This allows users to use any DB they might want.
+ */
 const {getTime} = require('./helpers.js')
 
 const Rx = require('rx')

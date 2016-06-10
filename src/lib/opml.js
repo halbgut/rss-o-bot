@@ -1,3 +1,10 @@
+/**
+ * opml
+ * This module defines OPML import and export methods.
+ * OPML (Outline Processor Markup Language) is an XML
+ * format widely used by RSS clients for importing and
+ * exporting defined Feed-URLs.
+ */
 const sax = require('sax')
 const fs = require('fs')
 const xml = require('xml')

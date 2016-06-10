@@ -4,6 +4,12 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+/**
+ * index
+ * This module exports a function with a config property.
+ * The main function takes no parameters and simply runs
+ * the daemon process.
+ */
 var Rx = require('rx');
 var O = Rx.Observable;
 var debug = require('debug')('rss-o-bot');

@@ -1,3 +1,7 @@
+/**
+ * notifiy
+ * This module notifies about new entries users.
+ */
 const Rx = require('rx')
 const debug = require('debug')('rss-o-bot')
 

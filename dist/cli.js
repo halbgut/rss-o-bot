@@ -5,6 +5,11 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
 
+/**
+ * cli
+ * The executable configured by the package.
+ */
+
 var fs = require('fs');
 
 var _require = require('./lib/helpers');

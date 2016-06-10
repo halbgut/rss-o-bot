@@ -1,3 +1,8 @@
+/**
+ * poll
+ * This module downloads XML feeds, parses them, filters them by
+ * defined keywords and extracts relevant data from entries.
+ */
 const http = require('http')
 const https = require('https')
 const urlUtil = require('url')

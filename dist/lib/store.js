@@ -1,5 +1,12 @@
 'use strict';
 
+/**
+ * store
+ * All interactions with the database are abstracted
+ * by this module. They are made through sequelize.
+ * This allows users to use any DB they might want.
+ */
+
 var _require = require('./helpers.js');
 
 var getTime = _require.getTime;

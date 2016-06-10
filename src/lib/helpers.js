@@ -1,3 +1,7 @@
+/**
+ * helpers
+ * Helper functions used by multiple modules.
+ */
 const fs = require('fs')
 const path = require('path')
 const markedMan = require('marked-man')

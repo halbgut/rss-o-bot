@@ -1,3 +1,9 @@
+/**
+ * index
+ * This module exports a function with a config property.
+ * The main function takes no parameters and simply runs
+ * the daemon process.
+ */
 const Rx = require('rx')
 const O = Rx.Observable
 const debug = require('debug')('rss-o-bot')
