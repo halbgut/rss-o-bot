@@ -98,5 +98,4 @@ You may want to check the [`rss-o-bot-email`](https://github.com/kriegslustig/rs
 
 * Multi-threading
 * GUI?
-* Add support for E-Mail notifications (SMTP)
 
