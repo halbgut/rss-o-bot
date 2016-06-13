@@ -28,11 +28,13 @@
   "devDependencies": {
     "babel-core": "^6.9.1",
     "babel-preset-es2015": "^6.9.0",
+    "pre-commit": "^1.1.3",
     "watch": "^0.18.0"
   },
   "peerDependencies": {
     "rss-o-bot-telegram": "0.1.x",
     "rss-o-bot-desktop": "0.1.x",
     "rss-o-bot-email": "0.1.x"
-  }
+  },
+  "pre-commit": ["build"]
 }
