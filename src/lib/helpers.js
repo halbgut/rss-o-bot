@@ -23,6 +23,7 @@ ${locations.join(', ')}
 const domainRegex = '([\\w\\d-]+\\.)+\\w{2,}'
 const protoRegex = '\\w+:\\/\\/'
 const defaults = {
+  port: 3645,
   interval: 600,
   database: {
     name: 'rss-o-bot',

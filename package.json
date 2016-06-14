@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^2.2.0",
+    "faye-websocket": "^0.11.0",
     "feedparser": "^1.1.4",
     "marked-man": "^0.1.5",
     "moment": "^2.13.0",
@@ -36,5 +37,7 @@
     "rss-o-bot-desktop": "0.1.x",
     "rss-o-bot-email": "0.1.x"
   },
-  "pre-commit": ["build"]
+  "pre-commit": [
+    "build"
+  ]
 }
