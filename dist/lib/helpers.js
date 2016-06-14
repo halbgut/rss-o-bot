@@ -35,7 +35,7 @@ var helpers = {
 
     return Math.round((new Date().getTime() + mod) / 1000);
   },
-  getConfig: function getConfig() {
+  getConfig: function getConfig(key) {
     var config = locations.filter(function (l) {
       try {
         return fs.statSync(l).isFile();
@@ -50,7 +50,7 @@ var helpers = {
     if (!config) {
       throw new Error(configError);
     }
-    return Object.assign(defaults, config);
+    return key ? Object.assign(defaults, config)[key] : Object.assign(defaults, config);
   },
   transformFilter: function transformFilter(filter) {
     return filter[0] === '!' ? { keyword: filter.substr(1), kind: false } : { keyword: filter, kind: true };

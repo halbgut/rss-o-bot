@@ -5,6 +5,7 @@ var _require = require('./helpers');
 var getConfig = _require.getConfig;
 
 var WebSocket = require('faye-websocket');
+var jwt = require('jsonwebtoken');
 var http = require('http');
 var Rx = require('rx');
 var O = Rx.Observable;
@@ -18,8 +19,19 @@ module.exports = {
         if (WebSocket.isWebSocket(request)) {
           (function () {
             var ws = new WebSocket(request, socket, body);
-            ws.on('message', function (msg) {
-              return o.onNext([ws, msg]);
+            var respond = function respond(msg) {
+              return O.create(function (o) {
+                jwt.sign(msg, getConfig('remote-key'), {}, function (err, token) {
+                  if (err) return o.onError(err);
+                  ws.send(token);
+                });
+              });
+            };
+            ws.on('message', function (e) {
+              jwt.verify(e.data, getConfig('remote-key'), {}, function (err, data) {
+                if (err) return o.onError(err);
+                o.onNext([data, respond]);
+              });
             });
             ws.on('error', function (err) {
               ws = null;
