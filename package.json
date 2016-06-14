@@ -18,6 +18,7 @@
     "debug": "^2.2.0",
     "faye-websocket": "^0.11.0",
     "feedparser": "^1.1.4",
+    "jsonwebtoken": "^7.0.0",
     "marked-man": "^0.1.5",
     "moment": "^2.13.0",
     "rx": "^4.1.0",

@@ -39,7 +39,7 @@ const helpers = {
     return Math.round(((new Date()).getTime() + mod) / 1000)
   },
 
-  getConfig () {
+  getConfig (key) {
     const config =
       locations
         .filter(l => {
@@ -55,7 +55,11 @@ const helpers = {
     if (!config) {
       throw new Error(configError)
     }
-    return Object.assign(defaults, config)
+    return (
+      key
+        ? Object.assign(defaults, config)[key]
+        : Object.assign(defaults, config)
+    )
   },
 
   transformFilter (filter) {
