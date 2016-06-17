@@ -20,12 +20,7 @@ module.exports = {
           (function () {
             var ws = new WebSocket(request, socket, body);
             var respond = function respond(msg) {
-              return O.create(function (o) {
-                jwt.sign(msg, getConfig('remote-key'), {}, function (err, token) {
-                  if (err) return o.onError(err);
-                  ws.send(token);
-                });
-              });
+              return ws.send(msg);
             };
             ws.on('message', function (e) {
               jwt.verify(e.data, getConfig('remote-key'), {}, function (err, data) {
