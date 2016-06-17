@@ -14,12 +14,7 @@ module.exports = {
         .on('upgrade', (request, socket, body) => {
           if (WebSocket.isWebSocket(request)) {
             let ws = new WebSocket(request, socket, body)
-            const respond = msg => O.create(o => {
-              jwt.sign(msg, getConfig('remote-key'), {}, (err, token) => {
-                if (err) return o.onError(err)
-                ws.send(token)
-              })
-            })
+            const respond = msg => ws.send(msg)
             ws.on('message', e => {
               jwt.verify(e.data, getConfig('remote-key'), {}, (err, data) => {
                 if (err) return o.onError(err)
