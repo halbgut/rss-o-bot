@@ -2,7 +2,7 @@
 
 # RSS-o-Bot 0.5.4
 
-A super simple commandline RSS and Atom reader/client. It's not made to read Feeds (like Newsbeuter), but to notify you when new items are posted. The Web is supposed to be decentralized most readers (like RSS Bot) are built through centralized services. RSS-o-Bot is not. It's build to be run on your own machine. Notifications are managed by services that are installed seperatly. Notification services are available for email, desktop notifications and Telegram.
+A super simple command-line RSS and Atom reader/client. It's not made to read Feeds (like Newsbeuter), but to notify you when new items are posted. The Web is supposed to be decentralized most readers (like RSS Bot) are built through centralized services. RSS-o-Bot is not. It's build to be run on your own machine. Notifications are managed by services that are installed separately. Notification services are available for email, desktop notifications and Telegram.
 
 ## Name
 
@@ -13,6 +13,10 @@ The name RSS-o-Bot is a play on [RSS Bot](https://itunes.apple.com/us/app/rss-bo
 Refer to the [man-page on Github](https://github.com/Kriegslustig/rss-o-bot/blob/master/src/man/man.md) or `man rss-o-bot` (if you have installed it).
 
 ## Installation
+
+RSS-o-Bot can be run in two modes; remote and local. The former is meant for running RSS-o-Bot on a server and controlling it from your local machine. Local mode is preferred, since it's a lot simpler to use.
+
+### Local Mode Installation
 
 ```bash
 npm i -g rss-o-bot
@@ -31,6 +35,30 @@ Your RSS-o-Bot, will search for a configuration file in `~/.rss-o-bot`. Here's a
 ```
 
 By default rss-o-bot stores its data inside a SQLite database in `~/.rss-o-bot.sqlite`.
+
+### Remote Mode Installation
+
+Installing RSS-o-Bot on a remote Server is a bit more complex. You'll first need to create you're configuration files. The local configuration is pretty simple:
+
+```json
+{
+  "remote": "[URL]",
+  "remote-key": "[some random string]"
+}
+```
+
+The `remote-key` is used as a key to sign the commands that you send to the server. It's symmetrical, meaning the key should be the same on the server and on the client. For more information on the implementation, refer to the man-page.
+
+The configuration options on the server is basically the same as the local one.
+
+```json
+{
+  "remote-key": "[some random string (same as in the local configuration)]",
+  ...
+}
+```
+
+For other configuration options, refer to the installation guide for the local version or the man-page.
 
 ## Usage
 
@@ -69,7 +97,7 @@ So now we get notified, whenever a commit message contains the string "notif". T
 
 ## Daemonizing
 
-To run rss-o-bot, you'll want to daemonize (make it run in the background) it. Daemonizing it bings some problems with it though. The daemonized process can't send desktop notifications. If you're using linux you'll probably want to go with systemd. Figure it out yourself. If not, you probably want to use pm2. It provides a really powerful, yet simple to use system for process-daemonization (LOL).
+To run RSS-o-Bot, you'll want to daemonize (make it run in the background) it. Daemonizing it brings some problems with it though. The daemonized process can't send desktop notifications. If you're using Linux you'll probably want to go with systemd. Figure it out yourself. If not, you probably want to use pm2. It provides a really powerful, yet simple to use system for process-daemonization (LOL).
 
 ```bash
 npm i -g pm2
@@ -88,7 +116,7 @@ Before committing, use `npm run build` to build the man page and the JS.
 
 ### Developing Notifiers
 
-RSS-o-Bot requires a module for each "notification-methods" in the pattern `rss-o-bot-${method}`. You may develop your own notifier by ceating a package and naming it `rss-o-bot-${method-name}`. That package's main should export a single function that is called by `rss-o-bot` in the following manner:
+RSS-o-Bot requires a module for each "notification-methods" in the pattern `rss-o-bot-${method}`. You may develop your own notifier by creating a package and naming it `rss-o-bot-${method-name}`. That package's main should export a single function that is called by `rss-o-bot` in the following manner:
 
 ```js
 notifier(configuration)(blogTitle, entryUrl, entryTitle)
@@ -97,6 +125,7 @@ notifier(configuration)(blogTitle, entryUrl, entryTitle)
 You may want to check the [`rss-o-bot-email`](https://github.com/kriegslustig/rss-o-bot-email) source code for further reference.
 
 ## Credits
+
 Logo created by [mala23](https://github.com/mala23)
 
 ## TODO
