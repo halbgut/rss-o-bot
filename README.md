@@ -1,3 +1,5 @@
+![alt text](https://i.imgur.com/reQMPMD.png "RSS-o-Bot Logo")
+
 # RSS-o-Bot 0.5.4
 
 A super simple commandline RSS and Atom reader/client. It's not made to read Feeds (like Newsbeuter), but to notify you when new items are posted. The Web is supposed to be decentralized most readers (like RSS Bot) are built through centralized services. RSS-o-Bot is not. It's build to be run on your own machine. Notifications are managed by services that are installed seperatly. Notification services are available for email, desktop notifications and Telegram.
@@ -98,4 +100,7 @@ You may want to check the [`rss-o-bot-email`](https://github.com/kriegslustig/rs
 
 * Multi-threading
 * GUI?
+
+## Credits
+Logo created by [mala23](https://github.com/mala23)
 
