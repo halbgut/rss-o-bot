@@ -96,11 +96,11 @@ notifier(configuration)(blogTitle, entryUrl, entryTitle)
 
 You may want to check the [`rss-o-bot-email`](https://github.com/kriegslustig/rss-o-bot-email) source code for further reference.
 
+## Credits
+Logo created by [mala23](https://github.com/mala23)
+
 ## TODO
 
 * Multi-threading
 * GUI?
-
-## Credits
-Logo created by [mala23](https://github.com/mala23)
 
