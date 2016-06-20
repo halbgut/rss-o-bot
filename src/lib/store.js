@@ -16,7 +16,6 @@ const genInsertFeed = (Feed, Filter) => (url, filters) =>
   O.fromPromise(Feed.create(
     {
       url,
-      addded: getTime(),
       lastCheck: 0
     }
   ))
