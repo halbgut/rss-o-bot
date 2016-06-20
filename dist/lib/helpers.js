@@ -36,7 +36,9 @@ var helpers = {
 
     return Math.round(new Date().getTime() / 1000) + mod;
   },
-  getConfig: function getConfig(key) {
+
+
+  getConfig: function () {
     var config = locations.filter(function (l) {
       try {
         return fs.statSync(l).isFile();
@@ -48,11 +50,14 @@ var helpers = {
     }).map(function (c) {
       return JSON.parse(c);
     })[0];
-    if (!config) {
-      throw new Error(configError);
-    }
-    return key ? Object.assign(defaults, config)[key] : Object.assign(defaults, config);
-  },
+    return function (key) {
+      if (!config) {
+        throw new Error(configError);
+      }
+      return key ? Object.assign(defaults, config)[key] : Object.assign(defaults, config);
+    };
+  }(),
+
   transformFilter: function transformFilter(filter) {
     return filter[0] === '!' ? { keyword: filter.substr(1), kind: false } : { keyword: filter, kind: true };
   },

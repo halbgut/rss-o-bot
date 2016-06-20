@@ -40,7 +40,7 @@ const helpers = {
     return Math.round(((new Date()).getTime()) / 1000) + mod
   },
 
-  getConfig (key) {
+  getConfig: (() => {
     const config =
       locations
         .filter(l => {
@@ -53,15 +53,17 @@ const helpers = {
         .slice(0, 1)
         .map(l => debug(`Loading config ${l}`) || fs.readFileSync(l))
         .map(c => JSON.parse(c))[0]
-    if (!config) {
-      throw new Error(configError)
+    return key => {
+      if (!config) {
+        throw new Error(configError)
+      }
+      return (
+        key
+          ? Object.assign(defaults, config)[key]
+          : Object.assign(defaults, config)
+      )
     }
-    return (
-      key
-        ? Object.assign(defaults, config)[key]
-        : Object.assign(defaults, config)
-    )
-  },
+  })(),
 
   transformFilter (filter) {
     return (
