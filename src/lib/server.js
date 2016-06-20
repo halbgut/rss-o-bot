@@ -1,4 +1,4 @@
-const {getConfig} = require('./helpers')
+const {getConfig, getTime} = require('./helpers')
 const WebSocket = require('faye-websocket')
 const jwt = require('jsonwebtoken')
 const http = require('http')
@@ -16,10 +16,17 @@ module.exports = {
             let ws = new WebSocket(request, socket, body)
             const respond = msg => ws.send(msg)
             ws.on('message', e => {
-              jwt.verify(e.data, getConfig('remote-key'), {}, (err, data) => {
-                if (err) return o.onError(err)
-                o.onNext([data, respond])
-              })
+              jwt.verify(
+               e.data,
+                getConfig('remote-key'),
+                {},
+                (err, data) => {
+                  if (err || !valid([data.jit, data.exp])) {
+                    return o.onError(err || new Error('Invalid jit'))
+                  }
+                  o.onNext([data, respond])
+                }
+              )
             })
             ws.on('error', err => {
               ws = null
@@ -34,4 +41,12 @@ module.exports = {
         .listen(port)
     })
 }
+
+const valid = (() => {
+  let cache = []
+  return nEl => {
+    cache = cache.filter(el => el[1] > getTime())
+    return !(cache.findIndex(el => el[0] === nEl) > -1)
+  }
+})()
 

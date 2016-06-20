@@ -25,6 +25,7 @@ const protoRegex = '\\w+:\\/\\/'
 const defaults = {
   port: 3645,
   interval: 600,
+  'jwt-expiration': 60,
   database: {
     name: 'rss-o-bot',
     options: {
@@ -36,7 +37,7 @@ const defaults = {
 
 const helpers = {
   getTime (mod = 0) {
-    return Math.round(((new Date()).getTime() + mod) / 1000)
+    return Math.round(((new Date()).getTime()) / 1000) + mod
   },
 
   getConfig (key) {
