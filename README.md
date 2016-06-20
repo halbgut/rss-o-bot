@@ -23,7 +23,7 @@ npm i -g rss-o-bot
 npm i -g rss-o-bot-email # A notifier
 ```
 
-Your RSS-o-Bot, will search for a configuration file in `~/.rss-o-bot`. Here's an example configuration:
+Your RSS-o-Bot, will search for a configuration file here: `~/.rss-o-bot/config.json`. Here's an example configuration:
 
 ```json
 {
@@ -34,7 +34,7 @@ Your RSS-o-Bot, will search for a configuration file in `~/.rss-o-bot`. Here's a
 }
 ```
 
-By default rss-o-bot stores its data inside a SQLite database in `~/.rss-o-bot.sqlite`.
+By default rss-o-bot stores its data inside a SQLite database in `~/.rss-o-bot/feeds.sqlite`.
 
 ### Remote Mode Installation
 
@@ -136,4 +136,5 @@ Logo created by [mala23](https://github.com/mala23)
 * Document the installation options somewhere else
 * Test the docker container
 * Implement an asynchronous algorithm, in order to generate keys automatically
+* Completions
 
