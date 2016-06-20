@@ -12,6 +12,7 @@ var _require = require('./helpers.js');
 var getTime = _require.getTime;
 
 
+var uuid = require('node-uuid');
 var Rx = require('rx');
 var O = Rx.Observable;
 var Sequelize = require('sequelize');
@@ -22,7 +23,6 @@ var genInsertFeed = function genInsertFeed(Feed, Filter) {
   return function (url, filters) {
     return O.fromPromise(Feed.create({
       url: url,
-      addded: getTime(),
       lastCheck: 0
     })).flatMap(function (feed) {
       return filters.length > 0 ? O.forkJoin(filters.map(function (f) {
@@ -46,7 +46,7 @@ var genInsertFeed = function genInsertFeed(Feed, Filter) {
 // query didn't affect any elements.
 var genGetFeeds = function genGetFeeds(Feed, interval, force) {
   return function () {
-    var updaterId = Math.round(Math.random() * 1000000000000);
+    var updaterId = uuid.v4();
     return O.fromPromise(Feed.update({ lastCheck: getTime(), updaterId: updaterId }, force ? {} : { where: { lastCheck: { $lt: getTime(interval * -1) } } }).then(function () {
       return Feed.findAll({
         where: { updaterId: updaterId }

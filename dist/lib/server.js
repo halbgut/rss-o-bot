@@ -3,6 +3,7 @@
 var _require = require('./helpers');
 
 var getConfig = _require.getConfig;
+var getTime = _require.getTime;
 
 var WebSocket = require('faye-websocket');
 var jwt = require('jsonwebtoken');
@@ -24,7 +25,9 @@ module.exports = {
             };
             ws.on('message', function (e) {
               jwt.verify(e.data, getConfig('remote-key'), {}, function (err, data) {
-                if (err) return o.onError(err);
+                if (err || !valid([data.jit, data.exp])) {
+                  return o.onError(err || new Error('Invalid jit'));
+                }
                 o.onNext([data, respond]);
               });
             });
@@ -42,3 +45,15 @@ module.exports = {
     });
   }
 };
+
+var valid = function () {
+  var cache = [];
+  return function (nEl) {
+    cache = cache.filter(function (el) {
+      return el[1] > getTime();
+    });
+    return !(cache.findIndex(function (el) {
+      return el[0] === nEl;
+    }) > -1);
+  };
+}();

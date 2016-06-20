@@ -131,5 +131,6 @@ Logo created by [mala23](https://github.com/mala23)
 ## TODO
 
 * Multi-threading
-* GUI?
+* Remote
+* Titles
 

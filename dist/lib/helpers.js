@@ -20,6 +20,7 @@ var protoRegex = '\\w+:\\/\\/';
 var defaults = {
   port: 3645,
   interval: 600,
+  'jwt-expiration': 60,
   database: {
     name: 'rss-o-bot',
     options: {
@@ -33,7 +34,7 @@ var helpers = {
   getTime: function getTime() {
     var mod = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
-    return Math.round((new Date().getTime() + mod) / 1000);
+    return Math.round(new Date().getTime() / 1000) + mod;
   },
   getConfig: function getConfig(key) {
     var config = locations.filter(function (l) {
