@@ -6,6 +6,7 @@
  */
 const {getTime} = require('./helpers.js')
 
+const uuid = require('node-uuid')
 const Rx = require('rx')
 const O = Rx.Observable
 const Sequelize = require('sequelize')
@@ -36,7 +37,7 @@ const genInsertFeed = (Feed, Filter) => (url, filters) =>
 // retryWhen operator to repeat the whole process if the update
 // query didn't affect any elements.
 const genGetFeeds = (Feed, interval, force) => () => {
-  const updaterId = Math.round(Math.random() * 1000000000000)
+  const updaterId = uuid.v4()
   return O.fromPromise(
     Feed.update(
       { lastCheck: getTime(), updaterId },
