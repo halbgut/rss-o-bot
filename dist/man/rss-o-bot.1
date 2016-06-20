@@ -58,7 +58,7 @@ DEBUG=rss\-o\-bot rss\-o\-bot
 For further information check the debug\-package's docs \fIhttps://www\.npmjs\.com/package/debug\fR\|\. It's the debugging utitlity this tool uses\.
 .SH CONFIGURATION
 .P
-RSS\-o\-Bot checks three places for configuration files\. \fB$HOME/\.rss\-o\-bot\fP, or \fB%USERPROFILE%\\\.rss\-o\-bot\fP on windows, \fB/etc/\.rss\-o\-bot\fP and \fB${__dirname}/config\.json\fP\|\. The last is the root directory of the NPM package\. It is only meant for development puposes\. The files are check for their existance in that order (except for \fBconfig\.json\fP which is checked first)\.
+RSS\-o\-Bot checks three places for configuration files\. \fB$HOME/\.rss\-o\-bot/config\.json\fP, or \fB%USERPROFILE%\\\.rss\-o\-bot\\config\.json\fP on windows and \fB${__dirname}/data/config\.json\fP\|\. The last is the root directory of the NPM package\. It is only meant for development puposes\. The files are check for their existance in that order (except for \fBconfig\.json\fP which is checked first)\.
 .P
 The configuration file should contain a single JSON\-object on the root level\. Use the example configuration inside the README as a reference\. These are the available configuration options:
 .SS notification\-methods
@@ -77,7 +77,7 @@ An object containing information on the database\. It must include a \fBname\fP 
   "name": "rss\-o\-bot",
   "options": {
     "dialect": "sqlite",
-    "storage": "~/\.rss\-o\-bot\.sqlite"
+    "storage": "~/\.rss\-o\-bot/feeds\.sqlite"
   }
 }
 .fi

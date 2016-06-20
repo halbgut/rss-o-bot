@@ -9,7 +9,7 @@ var path = require('path');
 var markedMan = require('marked-man');
 var debug = require('debug')('rss-o-bot');
 
-var locations = [__dirname + '/../../config.json', process.platform === 'win32' ? process.env.USERPROFILE + '/.rss-o-bot' : process.env.HOME + '/.rss-o-bot', '/etc/.rss-o-bot'].map(function (l) {
+var locations = [__dirname + '/../../data', process.platform === 'win32' ? process.env.USERPROFILE + '/.rss-o-bot' : process.env.HOME + '/.rss-o-bot'].map(function (l) {
   return path.normalize(l);
 });
 
@@ -25,7 +25,7 @@ var defaults = {
     name: 'rss-o-bot',
     options: {
       dialect: 'sqlite',
-      storage: locations[1] + '.sqlite'
+      storage: locations[1] + '/feeds.sqlite'
     }
   }
 };
@@ -39,7 +39,9 @@ var helpers = {
 
 
   getConfig: function () {
-    var config = locations.filter(function (l) {
+    var config = locations.map(function (l) {
+      return path.normalize(l + '/config.json');
+    }).filter(function (l) {
       try {
         return fs.statSync(l).isFile();
       } catch (e) {

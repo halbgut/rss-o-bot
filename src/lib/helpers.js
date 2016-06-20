@@ -8,11 +8,10 @@ const markedMan = require('marked-man')
 const debug = require('debug')('rss-o-bot')
 
 const locations = [
-  `${__dirname}/../../config.json`,
+  `${__dirname}/../../data`,
   process.platform === 'win32'
     ? `${process.env.USERPROFILE}/.rss-o-bot`
-    : `${process.env.HOME}/.rss-o-bot`,
-  '/etc/.rss-o-bot'
+    : `${process.env.HOME}/.rss-o-bot`
 ].map(l => path.normalize(l))
 
 const configError = `No config file found!
@@ -30,7 +29,7 @@ const defaults = {
     name: 'rss-o-bot',
     options: {
       dialect: 'sqlite',
-      storage: `${locations[1]}.sqlite`
+      storage: `${locations[1]}/feeds.sqlite`
     }
   }
 }
@@ -43,6 +42,7 @@ const helpers = {
   getConfig: (() => {
     const config =
       locations
+        .map(l => path.normalize(`${l}/config.json`))
         .filter(l => {
           try {
             return fs.statSync(l).isFile()

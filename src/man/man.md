@@ -52,7 +52,7 @@ DEBUG=rss-o-bot rss-o-bot
 For further information check [the debug-package's docs](https://www.npmjs.com/package/debug). It's the debugging utitlity this tool uses.
 
 ## CONFIGURATION
-RSS-o-Bot checks three places for configuration files. `$HOME/.rss-o-bot`, or `%USERPROFILE%\.rss-o-bot` on windows, `/etc/.rss-o-bot` and `${__dirname}/config.json`. The last is the root directory of the NPM package. It is only meant for development puposes. The files are check for their existance in that order (except for `config.json` which is checked first).
+RSS-o-Bot checks three places for configuration files. `$HOME/.rss-o-bot/config.json`, or `%USERPROFILE%\.rss-o-bot\config.json` on windows and `${__dirname}/data/config.json`. The last is the root directory of the NPM package. It is only meant for development puposes. The files are check for their existance in that order (except for `config.json` which is checked first).
 
 The configuration file should contain a single JSON-object on the root level. Use the example configuration inside the README as a reference. These are the available configuration options:
 
@@ -70,7 +70,7 @@ An object containing information on the database. It must include a `name` prope
   "name": "rss-o-bot",
   "options": {
     "dialect": "sqlite",
-    "storage": "~/.rss-o-bot.sqlite"
+    "storage": "~/.rss-o-bot/feeds.sqlite"
   }
 }
 ```
