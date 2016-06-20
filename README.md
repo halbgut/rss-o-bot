@@ -133,4 +133,7 @@ Logo created by [mala23](https://github.com/mala23)
 * Multi-threading
 * Remote
 * Titles
+* Document the installation options somewhere else
+* Test the docker container
+* Implement an asynchronous algorithm, in order to generate keys automatically
 
