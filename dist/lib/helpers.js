@@ -1,5 +1,7 @@
 'use strict';
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 /**
  * helpers
  * Helper functions used by multiple modules.
@@ -39,24 +41,26 @@ var helpers = {
 
 
   getConfig: function () {
-    var config = locations.map(function (l) {
-      return path.normalize(l + '/config.json');
-    }).filter(function (l) {
+    var config = locations.filter(function (l) {
       try {
-        return fs.statSync(l).isFile();
+        return fs.statSync(l).isDirectory();
       } catch (e) {
         return false;
       }
     }).slice(0, 1).map(function (l) {
-      return debug('Loading config ' + l) || fs.readFileSync(l);
-    }).map(function (c) {
-      return JSON.parse(c);
+      return debug('Loading config ' + l) || [fs.readFileSync(path.normalize(l + '/config.json')), l];
+    }).map(function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2);
+
+      var c = _ref2[0];
+      var l = _ref2[1];
+      return Object.assign(defaults, { location: l }, JSON.parse(c));
     })[0];
     return function (key) {
       if (!config) {
         throw new Error(configError);
       }
-      return key ? Object.assign(defaults, config)[key] : Object.assign(defaults, config);
+      return key ? config[key] : config;
     };
   }(),
 

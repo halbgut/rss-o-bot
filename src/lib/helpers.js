@@ -42,25 +42,30 @@ const helpers = {
   getConfig: (() => {
     const config =
       locations
-        .map(l => path.normalize(`${l}/config.json`))
         .filter(l => {
           try {
-            return fs.statSync(l).isFile()
+            return fs.statSync(l).isDirectory()
           } catch (e) {
             return false
           }
         })
         .slice(0, 1)
-        .map(l => debug(`Loading config ${l}`) || fs.readFileSync(l))
-        .map(c => JSON.parse(c))[0]
+        .map(l =>
+           debug(`Loading config ${l}`) ||
+           [
+             fs.readFileSync(path.normalize(`${l}/config.json`)),
+             l
+           ]
+        )
+        .map(([c, l]) => Object.assign(defaults, { location: l }, JSON.parse(c)))[0]
     return key => {
       if (!config) {
         throw new Error(configError)
       }
       return (
         key
-          ? Object.assign(defaults, config)[key]
-          : Object.assign(defaults, config)
+          ? config[key]
+          : config
       )
     }
   })(),
