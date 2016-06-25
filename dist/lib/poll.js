@@ -130,11 +130,11 @@ module.exports = function poll(url, filters) {
 
     var stream = _ref7[0];
     var meta = _ref7[1];
-    return console.log(meta.title) || stream.map(function (entry) {
+    return stream.map(function (entry) {
       return {
         blogTitle: meta.title,
-        latestTitle: entry.title,
-        latestLink: isAbsoluteUrl(entry.link) ? entry.link : getBaseUrl(url) + entry.link
+        title: entry.title,
+        link: isAbsoluteUrl(entry.link) ? entry.link : getBaseUrl(url) + entry.link
       };
     });
   });

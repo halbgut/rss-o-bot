@@ -40,8 +40,8 @@ function pollFeeds ({getFeeds, insertFeed, updateLatestLink, setBlogTitle}, forc
                 poll(feed.get('url'), filters.map(f => [f.get('keyword'), f.get('kind')]))
                   .retry(2)
                   .flatMap(getNewLinks(feed))
-                  .filter(({latestLink}) =>
-                    (latestLink && latestLink !== feed.get('latestLink')) || debug(`Old URL: ${latestLink}`)
+                  .filter(({link}) =>
+                    (link && link !== feed.get('latestLink')) || debug(`Old URL: ${link}`)
                   )
                   .flatMap(info =>
                     feed.get('blogTitle')
@@ -49,12 +49,12 @@ function pollFeeds ({getFeeds, insertFeed, updateLatestLink, setBlogTitle}, forc
                       : setBlogTitle(feed.get('id'), info.blogTitle)
                   )
                   .flatMap(info =>
-                    updateLatestLink(feed.get('id'), info.latestLink).map(info)
+                    updateLatestLink(feed.get('id'), info.link).map(info)
                   )
                   .filter(() => feed.get('latestLink'))
-                  .tap(({latestLink}) => debug(`New URL: ${latestLink}`))
-                  .flatMap(({ blog, latestLink, latestTitle }) =>
-                    notify(blog, latestLink, latestTitle)
+                  .tap(({link}) => debug(`New URL: ${link}`))
+                  .flatMap(({ blog, link, title }) =>
+                    notify(blog, link, title)
                       .tap(() => debug('Sent notifications'))
                       .retry(2)
                   )
@@ -71,7 +71,7 @@ const getNewLinks = feed => stream =>
   feed.get('latestLink')
     ? O.fromArray(stream.slice(
       0,
-      stream.findIndex(e => e.latestLink === feed.get('latestLink'))
+      stream.findIndex(e => e.link === feed.get('latestLink'))
     ).reverse())
     : O.of(stream[0])
 

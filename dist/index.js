@@ -49,22 +49,22 @@ function pollFeeds(_ref3, force) {
         return O.onErrorResumeNext(poll(feed.get('url'), filters.map(function (f) {
           return [f.get('keyword'), f.get('kind')];
         })).retry(2).flatMap(getNewLinks(feed)).filter(function (_ref4) {
-          var latestLink = _ref4.latestLink;
-          return latestLink && latestLink !== feed.get('latestLink') || debug('Old URL: ' + latestLink);
+          var link = _ref4.link;
+          return link && link !== feed.get('latestLink') || debug('Old URL: ' + link);
         }).flatMap(function (info) {
           return feed.get('blogTitle') ? O.of(info) : setBlogTitle(feed.get('id'), info.blogTitle);
         }).flatMap(function (info) {
-          return updateLatestLink(feed.get('id'), info.latestLink).map(info);
+          return updateLatestLink(feed.get('id'), info.link).map(info);
         }).filter(function () {
           return feed.get('latestLink');
         }).tap(function (_ref5) {
-          var latestLink = _ref5.latestLink;
-          return debug('New URL: ' + latestLink);
+          var link = _ref5.link;
+          return debug('New URL: ' + link);
         }).flatMap(function (_ref6) {
           var blog = _ref6.blog;
-          var latestLink = _ref6.latestLink;
-          var latestTitle = _ref6.latestTitle;
-          return notify(blog, latestLink, latestTitle).tap(function () {
+          var link = _ref6.link;
+          var title = _ref6.title;
+          return notify(blog, link, title).tap(function () {
             return debug('Sent notifications');
           }).retry(2);
         }));
@@ -78,7 +78,7 @@ function pollFeeds(_ref3, force) {
 var getNewLinks = function getNewLinks(feed) {
   return function (stream) {
     return feed.get('latestLink') ? O.fromArray(stream.slice(0, stream.findIndex(function (e) {
-      return e.latestLink === feed.get('latestLink');
+      return e.link === feed.get('latestLink');
     })).reverse()) : O.of(stream[0]);
   };
 };
