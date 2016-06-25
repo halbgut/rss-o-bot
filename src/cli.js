@@ -87,7 +87,7 @@ const commands = [
     })
   ],
   [
-    ['-m', '--manual', 'manual'],
+    ['-m', '--manual', '--man', 'manual'],
     true,
     () => O.create(o => {
       o.onNext(buildMan().raw)

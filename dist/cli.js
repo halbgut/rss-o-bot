@@ -88,7 +88,7 @@ var commands = [['add', function (args) {
     o.onNext(buildMan().synopsis + 'Please refer to `man rss-o-bot`, `rss-o-bot --manual` or the README for further instructions.');
     o.onCompleted();
   });
-}], [['-m', '--manual', 'manual'], true, function () {
+}], [['-m', '--manual', '--man', 'manual'], true, function () {
   return O.create(function (o) {
     o.onNext(buildMan().raw);
     o.onCompleted();
