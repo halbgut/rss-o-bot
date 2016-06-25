@@ -22,8 +22,7 @@ module.exports = function runRSSOBotDaemon () {
     .flatMap(([s]) => pollFeeds(s))
     .subscribe(
       () => {},
-      err => console.log('ERROR') || console.error(err),
-      () => console.log('Complete')
+      console.error
     )
 }
 
@@ -32,8 +31,8 @@ module.exports.config = config
 
 function pollFeeds ({getFeeds, insertFeed, updateLatestLink}, force) {
   return (
-    getFeeds()
-      .flatMap((feeds) => Rx.Observable.combineLatest(
+    getFeeds(force)
+      .flatMap((feeds) => Rx.Observable.forkJoin(
         ...feeds.map(feed =>
           O.fromPromise(feed.getFilters())
             .flatMap(filters =>

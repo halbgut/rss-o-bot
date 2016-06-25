@@ -36,13 +36,13 @@ const genInsertFeed = (Feed, Filter) => (url, filters) =>
 // still use that same where clause in that query. Then use a
 // retryWhen operator to repeat the whole process if the update
 // query didn't affect any elements.
-const genGetFeeds = (Feed, interval, force) => () => {
+const genGetFeeds = (Feed, interval) => force => {
   const updaterId = uuid.v4()
   return O.fromPromise(
     Feed.update(
       { lastCheck: getTime(), updaterId },
       force
-        ? {}
+        ? { where: {} }
         : { where: { lastCheck: { $lt: getTime(interval * -1) } } }
     )
       .then(() => Feed.findAll({

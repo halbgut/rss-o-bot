@@ -44,10 +44,10 @@ var genInsertFeed = function genInsertFeed(Feed, Filter) {
 // still use that same where clause in that query. Then use a
 // retryWhen operator to repeat the whole process if the update
 // query didn't affect any elements.
-var genGetFeeds = function genGetFeeds(Feed, interval, force) {
-  return function () {
+var genGetFeeds = function genGetFeeds(Feed, interval) {
+  return function (force) {
     var updaterId = uuid.v4();
-    return O.fromPromise(Feed.update({ lastCheck: getTime(), updaterId: updaterId }, force ? {} : { where: { lastCheck: { $lt: getTime(interval * -1) } } }).then(function () {
+    return O.fromPromise(Feed.update({ lastCheck: getTime(), updaterId: updaterId }, force ? { where: {} } : { where: { lastCheck: { $lt: getTime(interval * -1) } } }).then(function () {
       return Feed.findAll({
         where: { updaterId: updaterId }
       });

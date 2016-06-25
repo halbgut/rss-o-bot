@@ -29,11 +29,7 @@ module.exports = function runRSSOBotDaemon() {
 
     var s = _ref2[0];
     return pollFeeds(s);
-  }).subscribe(function () {}, function (err) {
-    return console.log('ERROR') || console.error(err);
-  }, function () {
-    return console.log('Complete');
-  });
+  }).subscribe(function () {}, console.error);
 };
 
 module.exports.pollFeeds = pollFeeds;
@@ -44,10 +40,10 @@ function pollFeeds(_ref3, force) {
   var insertFeed = _ref3.insertFeed;
   var updateLatestLink = _ref3.updateLatestLink;
 
-  return getFeeds().flatMap(function (feeds) {
+  return getFeeds(force).flatMap(function (feeds) {
     var _Rx$Observable;
 
-    return (_Rx$Observable = Rx.Observable).combineLatest.apply(_Rx$Observable, _toConsumableArray(feeds.map(function (feed) {
+    return (_Rx$Observable = Rx.Observable).forkJoin.apply(_Rx$Observable, _toConsumableArray(feeds.map(function (feed) {
       return O.fromPromise(feed.getFilters()).flatMap(function (filters) {
         return O.onErrorResumeNext(poll(feed.get('url'), filters.map(function (f) {
           return [f.get('keyword'), f.get('kind')];
