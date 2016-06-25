@@ -80,8 +80,20 @@ const helpers = {
     return Math.round(((new Date()).getTime()) / 1000) + mod
   },
 
-  getPrivateKey: () => readFile('priv.pem').toString(),
-  getPublicKey: () => readFile('pub.pem').toString(),
+  getPrivateKey: (() => {
+    let cache
+    return () => {
+      if (!cache) cache = readFile('priv.pem').toString()
+      return cache
+    }
+  })(),
+  getPublicKey: (() => {
+    let cache
+    return () => {
+      if (!cache) cache = readFile('pub.pem').toString()
+      return cache
+    }
+  })(),
 
   getConfig,
 

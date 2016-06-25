@@ -80,12 +80,20 @@ var helpers = {
   },
 
 
-  getPrivateKey: function getPrivateKey() {
-    return readFile('priv.pem').toString();
-  },
-  getPublicKey: function getPublicKey() {
-    return readFile('pub.pem').toString();
-  },
+  getPrivateKey: function () {
+    var cache = void 0;
+    return function () {
+      if (!cache) cache = readFile('priv.pem').toString();
+      return cache;
+    };
+  }(),
+  getPublicKey: function () {
+    var cache = void 0;
+    return function () {
+      if (!cache) cache = readFile('pub.pem').toString();
+      return cache;
+    };
+  }(),
 
   getConfig: getConfig,
 
