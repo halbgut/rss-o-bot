@@ -42,18 +42,15 @@ Installing RSS-o-Bot on a remote Server is a bit more complex. You'll first need
 
 ```json
 {
-  "remote": "[URL]",
-  "remote-key": "[some random string]"
+  "remote": "[URL]"
 }
 ```
 
-The `remote-key` is used as a key to sign the commands that you send to the server. It's symmetrical, meaning the key should be the same on the server and on the client. For more information on the implementation, refer to the man-page.
-
-The configuration options on the server is basically the same as the local one.
+The configuration options on the server is basically the same as for a local install one.
 
 ```json
 {
-  "remote-key": "[some random string (same as in the local configuration)]",
+  "mode": "server",
   ...
 }
 ```
