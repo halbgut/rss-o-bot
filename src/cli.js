@@ -79,7 +79,7 @@ const commands = [
     })
   ],
   [
-    ['-h', '--help'],
+    ['-h', '--help', 'help'],
     true,
     () => O.create(o => {
       o.onNext(`${buildMan().synopsis}Please refer to \`man rss-o-bot\`, \`rss-o-bot --manual\` or the README for further instructions.`)
@@ -87,7 +87,7 @@ const commands = [
     })
   ],
   [
-    ['-m', '--manual'],
+    ['-m', '--manual', 'manual'],
     true,
     () => O.create(o => {
       o.onNext(buildMan().raw)
@@ -95,7 +95,7 @@ const commands = [
     })
   ],
   [
-    ['-v', '--version'],
+    ['-v', '--version', 'version'],
     true,
     () => O.create(o => {
       const packageInfo = require('../package.json')

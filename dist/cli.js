@@ -83,17 +83,17 @@ var commands = [['add', function (args) {
   return O.create(function (o) {
     require('.')();
   });
-}], [['-h', '--help'], true, function () {
+}], [['-h', '--help', 'help'], true, function () {
   return O.create(function (o) {
     o.onNext(buildMan().synopsis + 'Please refer to `man rss-o-bot`, `rss-o-bot --manual` or the README for further instructions.');
     o.onCompleted();
   });
-}], [['-m', '--manual'], true, function () {
+}], [['-m', '--manual', 'manual'], true, function () {
   return O.create(function (o) {
     o.onNext(buildMan().raw);
     o.onCompleted();
   });
-}], [['-v', '--version'], true, function () {
+}], [['-v', '--version', 'version'], true, function () {
   return O.create(function (o) {
     var packageInfo = require('../package.json');
     o.onNext('RSS-o-Bot Version: ' + packageInfo.version);

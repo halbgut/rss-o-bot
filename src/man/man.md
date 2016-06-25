@@ -8,13 +8,13 @@
 
 ## FLAGS
 
-### -h, --help
+### help, -h, --help
 Displays the synopsis.
 
-### -m, --man, --manual
+### manual, -m, --man, --manual
 Display the whole man page.
 
-### -v, --version
+### version, -v, --version
 Display the current version.
 
 ## ACTIONS
