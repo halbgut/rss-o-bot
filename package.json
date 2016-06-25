@@ -9,8 +9,7 @@
     "build": "npm run build-js && ./src/cli.js build-man",
     "build-js": "babel --presets babel-preset-es2015 src --out-dir dist",
     "watch-build": "watch 'npm run build-js -- --source-maps' src",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build-and-add": "npm run build && git add dist"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "https://github.com/Kriegslustig/rss-o-bot.git",
   "author": "Kriegslustig <npm@ls7.ch>",
@@ -32,15 +31,11 @@
   "devDependencies": {
     "babel-core": "^6.9.1",
     "babel-preset-es2015": "^6.9.0",
-    "pre-commit": "^1.1.3",
     "watch": "^0.18.0"
   },
   "peerDependencies": {
     "rss-o-bot-telegram": "0.1.x",
     "rss-o-bot-desktop": "0.1.x",
     "rss-o-bot-email": "0.1.x"
-  },
-  "pre-commit": [
-    "build-and-add"
-  ]
+  }
 }
