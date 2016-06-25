@@ -6,6 +6,7 @@ const fs = require('fs')
 const path = require('path')
 const markedMan = require('marked-man')
 const debug = require('debug')('rss-o-bot')
+const {Observable: O} = require('rx')
 
 const locations = [
   `${__dirname}/../../data`,
@@ -69,6 +70,11 @@ const readFile = p => fs.readFileSync(
   path.normalize(`${getConfig('location')}/${p}`)
 )
 
+const cut = (str, l = 100) =>
+  str.length > l
+    ? [str.substr(0, l), ...cut(str.substr(l), l)]
+    : [str]
+
 const helpers = {
   getTime (mod = 0) {
     return Math.round(((new Date()).getTime()) / 1000) + mod
@@ -109,7 +115,28 @@ const helpers = {
       section: 1
     })
     return { synopsis, man, raw }
-  }
+  },
+
+  printFeeds: feeds =>
+    O.forkJoin(
+      feeds.map(feed => O.fromPromise(feed.getFilters()
+        .then(filters => [
+          feed.get('id'),
+          feed.get('url'),
+          filters.map(f =>
+            f.get('kind')
+              ? f.get('keyword')
+              : `!${f.get('keyword')}`
+          ).join(', ')
+        ])
+      ))
+    )
+      .map(feeds =>
+        feeds.map(([id, url, filters]) =>
+          `${id}: ${url}  ${filters}\n`
+        ).join('')
+      ),
+  cut
 }
 
 module.exports = helpers
