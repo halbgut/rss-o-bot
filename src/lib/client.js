@@ -1,4 +1,4 @@
-const {getConfig, getTime} = require('./helpers')
+const {getConfig, getTime, getPrivateKey} = require('./helpers')
 const uuid = require('node-uuid')
 const WebSocket = require('faye-websocket')
 const jwt = require('jsonwebtoken')
@@ -11,8 +11,8 @@ module.exports = {
     ws.on('open', () => {
       jwt.sign(
         Object.assign(message, { exp: getTime(getConfig('jwt-expiration')), jti: uuid.v4() }),
-        getConfig('remote-key'),
-        {},
+        getPrivateKey(),
+        { algorithm: 'RS512' },
         (err, token) => {
           if (err) return o.onError(err)
           ws.send(token)

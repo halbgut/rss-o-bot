@@ -1,4 +1,4 @@
-const {getConfig, getTime} = require('./helpers')
+const {getConfig, getTime, getPublicKey} = require('./helpers')
 const WebSocket = require('faye-websocket')
 const jwt = require('jsonwebtoken')
 const http = require('http')
@@ -17,9 +17,9 @@ module.exports = {
             const respond = msg => ws.send(msg)
             ws.on('message', e => {
               jwt.verify(
-               e.data,
-                getConfig('remote-key'),
-                {},
+                e.data,
+                getPublicKey(),
+                { algorithms: ['RS512'] },
                 (err, data) => {
                   if (err || !valid([data.jit, data.exp])) {
                     return o.onError(err || new Error('Invalid jit'))

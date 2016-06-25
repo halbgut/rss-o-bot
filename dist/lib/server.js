@@ -4,6 +4,7 @@ var _require = require('./helpers');
 
 var getConfig = _require.getConfig;
 var getTime = _require.getTime;
+var getPublicKey = _require.getPublicKey;
 
 var WebSocket = require('faye-websocket');
 var jwt = require('jsonwebtoken');
@@ -24,7 +25,7 @@ module.exports = {
               return ws.send(msg);
             };
             ws.on('message', function (e) {
-              jwt.verify(e.data, getConfig('remote-key'), {}, function (err, data) {
+              jwt.verify(e.data, getPublicKey(), { algorithms: ['RS512'] }, function (err, data) {
                 if (err || !valid([data.jit, data.exp])) {
                   return o.onError(err || new Error('Invalid jit'));
                 }

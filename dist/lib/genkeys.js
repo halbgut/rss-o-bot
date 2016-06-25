@@ -4,16 +4,24 @@ var _require = require('./helpers.js');
 
 var getConfig = _require.getConfig;
 
-var crypto = require('crypto');
+var cp = require('child_process');
 var fs = require('fs');
 var path = require('path');
 
 module.exports = {
   genKeys: function genKeys() {
-    var ecdh = crypto.createECDH('secp521r1');
-    var pub = ecdh.generateKeys();
-    var priv = ecdh.getPrivateKey('base64');
-    fs.writeFileSync(path.normalize(getConfig('location') + '/pub.key'), pub);
-    fs.writeFileSync(path.normalize(getConfig('location') + '/priv.key'), priv);
+    /**
+     * OS specific approach. Works on MacOS but probably not
+     * on Windows. It might also work on Linux. If this doesn't
+     * work, the RSA keys must be generated manualy.
+     */
+    var privPath = path.normalize(getConfig('location') + '/priv.pem');
+    var pubPath = path.normalize(getConfig('location') + '/pub.pem');
+
+    var privKey = cp.execSync('openssl genrsa 4096 -outform PEM');
+    fs.writeFileSync(privPath, privKey);
+
+    var pubKey = cp.execSync('openssl rsa -pubout -in ' + privPath);
+    fs.writeFileSync(pubPath, pubKey);
   }
 };

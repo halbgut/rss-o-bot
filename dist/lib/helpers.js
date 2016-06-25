@@ -32,6 +32,34 @@ var defaults = {
   }
 };
 
+var getConfig = function () {
+  var config = locations.filter(function (l) {
+    try {
+      return fs.statSync(l).isDirectory();
+    } catch (e) {
+      return false;
+    }
+  }).slice(0, 1).map(function (l) {
+    return debug('Loading config ' + l) || [fs.readFileSync(path.normalize(l + '/config.json')), l];
+  }).map(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2);
+
+    var c = _ref2[0];
+    var l = _ref2[1];
+    return Object.assign(defaults, { location: l }, JSON.parse(c));
+  })[0];
+  return function (key) {
+    if (!config) {
+      throw new Error(configError);
+    }
+    return key ? config[key] : config;
+  };
+}();
+
+var readFile = function readFile(p) {
+  return fs.readFileSync(path.normalize(getConfig('location') + '/' + p));
+};
+
 var helpers = {
   getTime: function getTime() {
     var mod = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
@@ -40,29 +68,14 @@ var helpers = {
   },
 
 
-  getConfig: function () {
-    var config = locations.filter(function (l) {
-      try {
-        return fs.statSync(l).isDirectory();
-      } catch (e) {
-        return false;
-      }
-    }).slice(0, 1).map(function (l) {
-      return debug('Loading config ' + l) || [fs.readFileSync(path.normalize(l + '/config.json')), l];
-    }).map(function (_ref) {
-      var _ref2 = _slicedToArray(_ref, 2);
+  getPrivateKey: function getPrivateKey() {
+    return readFile('priv.pem').toString();
+  },
+  getPublicKey: function getPublicKey() {
+    return readFile('pub.pem').toString();
+  },
 
-      var c = _ref2[0];
-      var l = _ref2[1];
-      return Object.assign(defaults, { location: l }, JSON.parse(c));
-    })[0];
-    return function (key) {
-      if (!config) {
-        throw new Error(configError);
-      }
-      return key ? config[key] : config;
-    };
-  }(),
+  getConfig: getConfig,
 
   transformFilter: function transformFilter(filter) {
     return filter[0] === '!' ? { keyword: filter.substr(1), kind: false } : { keyword: filter, kind: true };

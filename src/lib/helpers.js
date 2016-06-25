@@ -34,41 +34,50 @@ const defaults = {
   }
 }
 
+const getConfig = (() => {
+  const config =
+    locations
+      .filter(l => {
+        try {
+          return fs.statSync(l).isDirectory()
+        } catch (e) {
+          return false
+        }
+      })
+      .slice(0, 1)
+      .map(l =>
+         debug(`Loading config ${l}`) ||
+         [
+           fs.readFileSync(path.normalize(`${l}/config.json`)),
+           l
+         ]
+      )
+      .map(([c, l]) => Object.assign(defaults, { location: l }, JSON.parse(c)))[0]
+  return key => {
+    if (!config) {
+      throw new Error(configError)
+    }
+    return (
+      key
+        ? config[key]
+        : config
+    )
+  }
+})()
+
+const readFile = p => fs.readFileSync(
+  path.normalize(`${getConfig('location')}/${p}`)
+)
+
 const helpers = {
   getTime (mod = 0) {
     return Math.round(((new Date()).getTime()) / 1000) + mod
   },
 
-  getConfig: (() => {
-    const config =
-      locations
-        .filter(l => {
-          try {
-            return fs.statSync(l).isDirectory()
-          } catch (e) {
-            return false
-          }
-        })
-        .slice(0, 1)
-        .map(l =>
-           debug(`Loading config ${l}`) ||
-           [
-             fs.readFileSync(path.normalize(`${l}/config.json`)),
-             l
-           ]
-        )
-        .map(([c, l]) => Object.assign(defaults, { location: l }, JSON.parse(c)))[0]
-    return key => {
-      if (!config) {
-        throw new Error(configError)
-      }
-      return (
-        key
-          ? config[key]
-          : config
-      )
-    }
-  })(),
+  getPrivateKey: () => readFile('priv.pem').toString(),
+  getPublicKey: () => readFile('pub.pem').toString(),
+
+  getConfig,
 
   transformFilter (filter) {
     return (
