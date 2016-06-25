@@ -32,6 +32,8 @@ var genInsertFeed = function genInsertFeed(Feed, Filter) {
       }).map(function () {
         return feed;
       }) : O.just(feed);
+    }).tap(function (feed) {
+      return debug('feed inserted: ' + feed.get('url'));
     });
   };
 };
@@ -52,6 +54,12 @@ var genGetFeeds = function genGetFeeds(Feed, interval) {
         where: { updaterId: updaterId }
       });
     }));
+  };
+};
+
+var genSetBlogTitle = function genSetBlogTitle(Feed) {
+  return function (id, blogTitle) {
+    return debug('Setting blog title: ' + blogTitle) || O.fromPromise(Feed.update({ blogTitle: blogTitle }, { where: { id: id } }));
   };
 };
 
@@ -91,6 +99,7 @@ module.exports = function initStore(config) {
     logging: function logging() {}
   }, config.database.options));
   var Feed = sequelize.define('feed', {
+    blogTitle: Sequelize.STRING,
     url: Sequelize.STRING,
     added: Sequelize.INTEGER,
     lastCheck: Sequelize.INTEGER,
@@ -111,7 +120,8 @@ module.exports = function initStore(config) {
       getFeeds: genGetFeeds(Feed, config.interval),
       updateLatestLink: genUpdateLatestLink(Feed),
       removeFeed: genRemoveFeed(Feed),
-      listFeeds: genListFeeds(Feed)
+      listFeeds: genListFeeds(Feed),
+      setBlogTitle: genSetBlogTitle(Feed)
     };
   });
 };

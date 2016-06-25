@@ -27,6 +27,7 @@ const genInsertFeed = (Feed, Filter) => (url, filters) =>
         .map(() => feed)
       : O.just(feed)
   )
+  .tap(feed => debug(`feed inserted: ${feed.get('url')}`))
 
 // TODO: Data races have been prevented.
 // The updaterId is for reference inside the next select query
@@ -50,6 +51,13 @@ const genGetFeeds = (Feed, interval) => force => {
       }))
   )
 }
+
+const genSetBlogTitle = Feed => (id, blogTitle) =>
+  debug(`Setting blog title: ${blogTitle}`) ||
+  O.fromPromise(Feed.update(
+    { blogTitle },
+    { where: { id } }
+  ))
 
 const genUpdateLatestLink = Feed => (id, latestLink) =>
   O.fromPromise(Feed.update(
@@ -86,6 +94,7 @@ module.exports = function initStore (config) {
     }, config.database.options)
   )
   const Feed = sequelize.define('feed', {
+    blogTitle: Sequelize.STRING,
     url: Sequelize.STRING,
     added: Sequelize.INTEGER,
     lastCheck: Sequelize.INTEGER,
@@ -107,7 +116,8 @@ module.exports = function initStore (config) {
         getFeeds: genGetFeeds(Feed, config.interval),
         updateLatestLink: genUpdateLatestLink(Feed),
         removeFeed: genRemoveFeed(Feed),
-        listFeeds: genListFeeds(Feed)
+        listFeeds: genListFeeds(Feed),
+        setBlogTitle: genSetBlogTitle(Feed)
       }))
   )
 }

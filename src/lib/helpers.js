@@ -134,6 +134,7 @@ const helpers = {
       feeds.map(feed => O.fromPromise(feed.getFilters()
         .then(filters => [
           feed.get('id'),
+          feed.get('blogTitle'),
           feed.get('url'),
           filters.map(f =>
             f.get('kind')
@@ -144,8 +145,8 @@ const helpers = {
       ))
     )
       .map(feeds =>
-        feeds.map(([id, url, filters]) =>
-          `${id}: ${url}  ${filters}\n`
+        feeds.map(([id, blogTitle, url, filters]) =>
+          `${id}: ${blogTitle} – ${url} – ${filters}\n`
         ).join('')
       ),
   cut

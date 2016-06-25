@@ -123,18 +123,19 @@ var helpers = {
   printFeeds: function printFeeds(feeds) {
     return O.forkJoin(feeds.map(function (feed) {
       return O.fromPromise(feed.getFilters().then(function (filters) {
-        return [feed.get('id'), feed.get('url'), filters.map(function (f) {
+        return [feed.get('id'), feed.get('blogTitle'), feed.get('url'), filters.map(function (f) {
           return f.get('kind') ? f.get('keyword') : '!' + f.get('keyword');
         }).join(', ')];
       }));
     })).map(function (feeds) {
       return feeds.map(function (_ref3) {
-        var _ref4 = _slicedToArray(_ref3, 3);
+        var _ref4 = _slicedToArray(_ref3, 4);
 
         var id = _ref4[0];
-        var url = _ref4[1];
-        var filters = _ref4[2];
-        return id + ': ' + url + '  ' + filters + '\n';
+        var blogTitle = _ref4[1];
+        var url = _ref4[2];
+        var filters = _ref4[3];
+        return id + ': ' + blogTitle + ' – ' + url + ' – ' + filters + '\n';
       }).join('');
     });
   },

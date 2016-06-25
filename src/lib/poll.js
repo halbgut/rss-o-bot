@@ -93,8 +93,9 @@ module.exports =
           meta
         ])
         .map(([stream, meta]) =>
+            console.log(meta.title) ||
           stream.map(entry => ({
-            blog: meta.title,
+            blogTitle: meta.title,
             latestTitle: entry.title,
             latestLink: isAbsoluteUrl(entry.link)
               ? entry.link

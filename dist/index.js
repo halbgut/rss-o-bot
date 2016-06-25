@@ -39,6 +39,7 @@ function pollFeeds(_ref3, force) {
   var getFeeds = _ref3.getFeeds;
   var insertFeed = _ref3.insertFeed;
   var updateLatestLink = _ref3.updateLatestLink;
+  var setBlogTitle = _ref3.setBlogTitle;
 
   return getFeeds(force).flatMap(function (feeds) {
     var _Rx$Observable;
@@ -50,6 +51,8 @@ function pollFeeds(_ref3, force) {
         })).retry(2).flatMap(getNewLinks(feed)).filter(function (_ref4) {
           var latestLink = _ref4.latestLink;
           return latestLink && latestLink !== feed.get('latestLink') || debug('Old URL: ' + latestLink);
+        }).flatMap(function (info) {
+          return feed.get('blogTitle') ? O.of(info) : setBlogTitle(feed.get('id'), info.blogTitle);
         }).flatMap(function (info) {
           return updateLatestLink(feed.get('id'), info.latestLink).map(info);
         }).filter(function () {

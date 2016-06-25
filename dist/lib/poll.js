@@ -130,9 +130,9 @@ module.exports = function poll(url, filters) {
 
     var stream = _ref7[0];
     var meta = _ref7[1];
-    return stream.map(function (entry) {
+    return console.log(meta.title) || stream.map(function (entry) {
       return {
-        blog: meta.title,
+        blogTitle: meta.title,
         latestTitle: entry.title,
         latestLink: isAbsoluteUrl(entry.link) ? entry.link : getBaseUrl(url) + entry.link
       };

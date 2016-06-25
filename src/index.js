@@ -29,7 +29,7 @@ module.exports = function runRSSOBotDaemon () {
 module.exports.pollFeeds = pollFeeds
 module.exports.config = config
 
-function pollFeeds ({getFeeds, insertFeed, updateLatestLink}, force) {
+function pollFeeds ({getFeeds, insertFeed, updateLatestLink, setBlogTitle}, force) {
   return (
     getFeeds(force)
       .flatMap((feeds) => Rx.Observable.forkJoin(
@@ -43,7 +43,12 @@ function pollFeeds ({getFeeds, insertFeed, updateLatestLink}, force) {
                   .filter(({latestLink}) =>
                     (latestLink && latestLink !== feed.get('latestLink')) || debug(`Old URL: ${latestLink}`)
                   )
-                  .flatMap((info) =>
+                  .flatMap(info =>
+                    feed.get('blogTitle')
+                      ? O.of(info)
+                      : setBlogTitle(feed.get('id'), info.blogTitle)
+                  )
+                  .flatMap(info =>
                     updateLatestLink(feed.get('id'), info.latestLink).map(info)
                   )
                   .filter(() => feed.get('latestLink'))
