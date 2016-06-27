@@ -22,15 +22,26 @@ module.exports = {
           (function () {
             var ws = new WebSocket(request, socket, body);
             var respond = function respond(msg) {
-              return ws.send(msg);
+              ws.send(msg);
+              ws.close();
+              ws = null;
             };
             ws.on('message', function (e) {
-              jwt.verify(e.data, getPublicKey(), { algorithms: ['RS512'] }, function (err, data) {
-                if (err || !valid([data.jit, data.exp])) {
-                  return o.onError(err || new Error('Invalid jit'));
+              if (e.data.indexOf('PUBLIC KEY') > -1) {
+                // Must be a public key
+                if (getPublicKey()) {
+                  respond('I already have a public key. Please remove it from the server manually before generating a new one.');
+                } else {
+                  o.onNext([e.data, respond]);
                 }
-                o.onNext([data, respond]);
-              });
+              } else {
+                jwt.verify(e.data, getPublicKey(), { algorithms: ['RS512'] }, function (err, data) {
+                  if (err || !valid([data.jit, data.exp])) {
+                    return o.onError(err || new Error('Invalid jit'));
+                  }
+                  o.onNext([data, respond]);
+                });
+              }
             });
             ws.on('error', function (err) {
               ws = null;

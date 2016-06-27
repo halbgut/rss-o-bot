@@ -17,9 +17,13 @@ var fs = require('fs');
 var _require = require('./lib/helpers');
 
 var getConfig = _require.getConfig;
+var getPrivateKey = _require.getPrivateKey;
+var getPublicKey = _require.getPublicKey;
+var setPublicKey = _require.setPublicKey;
 var transformFilter = _require.transformFilter;
 var buildMan = _require.buildMan;
 var printFeeds = _require.printFeeds;
+var getMode = _require.getMode;
 
 var config = getConfig();
 var initStore = require('./lib/store');
@@ -30,9 +34,12 @@ var _require2 = require('rx');
 
 var O = _require2.Observable;
 
+var client = require('./lib/client');
+var server = require('./lib/server');
+var genKeys = require('./lib/genKeys');
+var debug = require('debug')('rss-o-bot');
 
-var action = process.argv[2];
-var args = process.argv.slice(3);
+var CLIENT_ONLY = Symbol('CLIENT_ONLY');
 
 process.title = 'rss-o-bot';
 
@@ -79,7 +86,7 @@ var commands = [['add', function (args) {
   return initStore(config).flatMap(opml.import(file)).flatMap(printFeeds);
 }], ['export', true, function () {
   return initStore(config).flatMap(opml.export);
-}], [['run', undefined], true, function () {
+}], [['run'], true, function () {
   return O.create(function (o) {
     require('.')();
   });
@@ -105,20 +112,77 @@ var commands = [['add', function (args) {
     o.onNext('Man built');
     o.onCompleted();
   });
-}]];
+}, CLIENT_ONLY], ['ping', true, function () {
+  return O.create(function (o) {
+    if (getMode() === 'local') {
+      o.onNext('No server configured, running in local mode. Check the configuration section of the man-page for more info.');
+      o.onCompleted();
+    } else if (getMode() === 'remote') {
+      client.send({ action: 'ping', args: [] }).subscribe(function (msg) {
+        return o.onNext(msg);
+      }, function (err) {
+        return o.onNext(err);
+      }, function () {
+        return o.onCompleted();
+      });
+    } else if (getMode() === 'server') {
+      o.onNext('pong');
+      o.onCompleted();
+    }
+  });
+}, CLIENT_ONLY]];
 
-var command = commands.find(function (_ref10) {
-  var _ref11 = _slicedToArray(_ref10, 3);
+var executeCommand = function executeCommand(commands, action, args) {
+  return command ? command[2](args) : O.create(function (o) {
+    return o.onError('Unrecognized action: ' + action + '\n ' + buildMan().synopsis);
+  });
+};
 
-  var command = _ref11[0];
-  var validator = _ref11[1];
-  var run = _ref11[2];
-  return ((typeof command === 'undefined' ? 'undefined' : _typeof(command)) === 'object' ? command.indexOf(action) > -1 : command === action) && (typeof validator === 'function' ? validator(args) : validator);
-});
+var action = process.argv[2];
+var args = process.argv.slice(3);
+var findCommand = function findCommand(commands, action, args) {
+  return commands.find(function (_ref10) {
+    var _ref11 = _slicedToArray(_ref10, 3);
 
-if (command) {
-  command[2](args).subscribe(console.log, console.error);
-} else {
-  console.log('Unrecognized action: ' + action + '\n ' + buildMan().synopsis);
-  process.exit(1);
+    var command = _ref11[0];
+    var validator = _ref11[1];
+    var run = _ref11[2];
+    return ((typeof command === 'undefined' ? 'undefined' : _typeof(command)) === 'object' ? command.indexOf(action) > -1 : command === action) && (typeof validator === 'function' ? validator(args) : validator);
+  });
+};
+
+var command = findCommand(commands, action, args);
+if (getMode() === 'local' || command && command[3] === CLIENT_ONLY) {
+  debug('running command locally');
+  executeCommand(command, action, args).subscribe(console.log, console.error);
+} else if (getMode() === 'remote') {
+  debug('Sending command as remote');
+  if (!getPrivateKey()) {
+    try {
+      debug('Generating new key pair');
+      genKeys();
+      client.send({ key: getPublicKey() }, true);
+    } catch (e) {
+      throw new Error('Failed to generate key pair. Automatic generation might work if you install OpenSSL. If you have already installed it and are still unable to initialize RSS-o-Bot, please generate a keypair manually.refer to the manual for more information');
+    }
+  }
+  client.send({ action: action, args: args }).subscribe(console.log, console.error);
+} else if (getMode() === 'server') {
+  debug('Starting server');
+  server.listen().subscribe(function (_ref12) {
+    var _ref13 = _slicedToArray(_ref12, 2);
+
+    var data = _ref13[0];
+    var respond = _ref13[1];
+
+    debug('Recieved public key');
+    if (typeof data === 'string') {
+      // Must be a public key
+      setPublicKey(data);
+    } else {
+      debug('Executing command ' + data.action);
+      var _action = findCommand(commands, data.action, data.args);
+      executeCommand(_action, data.args).subscribe(respond, respond);
+    }
+  });
 }

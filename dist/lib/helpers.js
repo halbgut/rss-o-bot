@@ -27,6 +27,7 @@ var configError = 'No config file found!\nRTFM and put one in one of these locat
 var domainRegex = '([\\w\\d-]+\\.)+\\w{2,}';
 var protoRegex = '\\w+:\\/\\/';
 var defaults = {
+  mode: 'local',
   port: 3645,
   interval: 600,
   'jwt-expiration': 60,
@@ -63,6 +64,9 @@ var getConfig = function () {
   };
 }();
 
+var privateKeyPath = path.normalize(getConfig('location') + '/priv.pem');
+var publicKeyPath = path.normalize(getConfig('location') + '/pub.pem');
+
 var readFile = function readFile(p) {
   return fs.readFileSync(path.normalize(getConfig('location') + '/' + p));
 };
@@ -72,30 +76,38 @@ var cut = function cut(str) {
   return str.length > l ? [str.substr(0, l)].concat(_toConsumableArray(cut(str.substr(l), l))) : [str];
 };
 
+var tryGetKey = function tryGetKey(key) {
+  var cache = void 0;
+  return function () {
+    try {
+      if (!cache) cache = readFile(key + '.pem').toString();
+      return cache;
+    } catch (e) {
+      return false;
+    }
+  };
+};
+
 var helpers = {
+  getConfig: getConfig, privateKeyPath: privateKeyPath, publicKeyPath: publicKeyPath, cut: cut,
+  getMode: function getMode() {
+    return getConfig('remote') ? 'remote' : getConfig('mode');
+  },
+
   getTime: function getTime() {
     var mod = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
     return Math.round(new Date().getTime() / 1000) + mod;
   },
+  setPrivateKey: function setPrivateKey(key) {
+    fs.writeFileSync(privateKeyPath, key);
+  },
+  setPublicKey: function setPublicKey(key) {
+    fs.writeFileSync(publicKeyPath, key);
+  },
 
-
-  getPrivateKey: function () {
-    var cache = void 0;
-    return function () {
-      if (!cache) cache = readFile('priv.pem').toString();
-      return cache;
-    };
-  }(),
-  getPublicKey: function () {
-    var cache = void 0;
-    return function () {
-      if (!cache) cache = readFile('pub.pem').toString();
-      return cache;
-    };
-  }(),
-
-  getConfig: getConfig,
+  getPrivateKey: tryGetKey('priv'),
+  getPublicKey: tryGetKey('pub'),
 
   transformFilter: function transformFilter(filter) {
     return filter[0] === '!' ? { keyword: filter.substr(1), kind: false } : { keyword: filter, kind: true };
@@ -138,8 +150,7 @@ var helpers = {
         return id + ': ' + blogTitle + ' – ' + url + ' – ' + filters + '\n';
       }).join('');
     });
-  },
-  cut: cut
+  }
 };
 
 module.exports = helpers;

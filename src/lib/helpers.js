@@ -23,6 +23,7 @@ ${locations.join(', ')}
 const domainRegex = '([\\w\\d-]+\\.)+\\w{2,}'
 const protoRegex = '\\w+:\\/\\/'
 const defaults = {
+  mode: 'local',
   port: 3645,
   interval: 600,
   'jwt-expiration': 60,
@@ -66,6 +67,9 @@ const getConfig = (() => {
   }
 })()
 
+const privateKeyPath = path.normalize(`${getConfig('location')}/priv.pem`)
+const publicKeyPath = path.normalize(`${getConfig('location')}/pub.pem`)
+
 const readFile = p => fs.readFileSync(
   path.normalize(`${getConfig('location')}/${p}`)
 )
@@ -75,27 +79,37 @@ const cut = (str, l = 100) =>
     ? [str.substr(0, l), ...cut(str.substr(l), l)]
     : [str]
 
+const tryGetKey = (key) => {
+  let cache
+  return () => {
+    try {
+      if (!cache) cache = readFile(`${key}.pem`).toString()
+      return cache
+    } catch (e) {
+      return false
+    }
+  }
+}
+
 const helpers = {
+  getConfig, privateKeyPath, publicKeyPath, cut,
+  getMode: () =>
+    getConfig('remote')
+      ? 'remote'
+      : getConfig('mode'),
+
   getTime (mod = 0) {
     return Math.round(((new Date()).getTime()) / 1000) + mod
   },
 
-  getPrivateKey: (() => {
-    let cache
-    return () => {
-      if (!cache) cache = readFile('priv.pem').toString()
-      return cache
-    }
-  })(),
-  getPublicKey: (() => {
-    let cache
-    return () => {
-      if (!cache) cache = readFile('pub.pem').toString()
-      return cache
-    }
-  })(),
-
-  getConfig,
+  setPrivateKey (key) {
+    fs.writeFileSync(privateKeyPath, key)
+  },
+  setPublicKey (key) {
+    fs.writeFileSync(publicKeyPath, key)
+  },
+  getPrivateKey: tryGetKey('priv'),
+  getPublicKey: tryGetKey('pub'),
 
   transformFilter (filter) {
     return (
@@ -148,8 +162,7 @@ const helpers = {
         feeds.map(([id, blogTitle, url, filters]) =>
           `${id}: ${blogTitle} – ${url} – ${filters}\n`
         ).join('')
-      ),
-  cut
+      )
 }
 
 module.exports = helpers

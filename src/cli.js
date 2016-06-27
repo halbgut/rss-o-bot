@@ -6,15 +6,26 @@
  */
 
 const fs = require('fs')
-const { getConfig, transformFilter, buildMan, printFeeds } = require('./lib/helpers')
+const {
+  getConfig,
+  getPrivateKey,
+  getPublicKey,
+  setPublicKey,
+  transformFilter,
+  buildMan,
+  printFeeds,
+  getMode } = require('./lib/helpers')
 const config = getConfig()
 const initStore = require('./lib/store')
 const notify = require('./lib/notify')(config)
 const opml = require('./lib/opml')
 const {Observable: O} = require('rx')
+const client = require('./lib/client')
+const server = require('./lib/server')
+const genKeys = require('./lib/genKeys')
+const debug = require('debug')('rss-o-bot')
 
-const action = process.argv[2]
-const args = process.argv.slice(3)
+const CLIENT_ONLY = Symbol('CLIENT_ONLY')
 
 process.title = 'rss-o-bot'
 
@@ -72,7 +83,7 @@ const commands = [
         .flatMap(opml.export)
   ],
   [
-    ['run', undefined],
+    ['run'],
     true,
     () => O.create(o => {
       require('.')()
@@ -110,31 +121,95 @@ const commands = [
       fs.writeFileSync(`${__dirname}/../dist/man/rss-o-bot.1`, buildMan().man)
       o.onNext('Man built')
       o.onCompleted()
-    })
+    }),
+    CLIENT_ONLY
+  ],
+  [
+    'ping',
+    true,
+    () => O.create(o => {
+      if (getMode() === 'local') {
+        o.onNext('No server configured, running in local mode. Check the configuration section of the man-page for more info.')
+        o.onCompleted()
+      } else if (getMode() === 'remote') {
+        client.send({action: 'ping', args: []})
+          .subscribe(
+            msg => o.onNext(msg),
+            err => o.onNext(err),
+            () => o.onCompleted()
+          )
+      } else if (getMode() === 'server') {
+        o.onNext('pong')
+        o.onCompleted()
+      }
+    }),
+    CLIENT_ONLY
   ]
 ]
 
-const command = commands.find(([command, validator, run]) =>
-  (
-    typeof command === 'object'
-      ? command.indexOf(action) > -1
-      : command === action
-  ) &&
-  (
-    typeof validator === 'function'
-      ? validator(args)
-      : validator
-  )
-)
+const executeCommand = (commands, action, args) =>
+  command
+    ? command[2](args)
+    : O.create(o => o.onError(`Unrecognized action: ${action}\n ${buildMan().synopsis}`))
 
-if (command) {
-  command[2](args)
+const action = process.argv[2]
+const args = process.argv.slice(3)
+const findCommand = (commands, action, args) =>
+  commands.find(([command, validator, run]) =>
+    (
+      typeof command === 'object'
+        ? command.indexOf(action) > -1
+        : command === action
+    ) &&
+    (
+      typeof validator === 'function'
+        ? validator(args)
+        : validator
+    )
+  )
+
+const command = findCommand(commands, action, args)
+if (getMode() === 'local' || (command && command[3] === CLIENT_ONLY)) {
+  debug('running command locally')
+  executeCommand(command, action, args)
     .subscribe(
       console.log,
       console.error
     )
-} else {
-  console.log(`Unrecognized action: ${action}\n ${buildMan().synopsis}`)
-  process.exit(1)
+} else if (getMode() === 'remote') {
+  debug('Sending command as remote')
+  if (!getPrivateKey()) {
+    try {
+      debug('Generating new key pair')
+      genKeys()
+      client.send({ key: getPublicKey() }, true)
+    } catch (e) {
+      throw new Error('Failed to generate key pair. Automatic generation might work if you install OpenSSL. If you have already installed it and are still unable to initialize RSS-o-Bot, please generate a keypair manually.refer to the manual for more information')
+    }
+  }
+  client.send({ action, args })
+    .subscribe(
+      console.log,
+      console.error
+    )
+} else if (getMode() === 'server') {
+  debug('Starting server')
+  server.listen()
+    .subscribe(
+      ([data, respond]) => {
+        debug('Recieved public key')
+        if (typeof data === 'string') { // Must be a public key
+          setPublicKey(data)
+        } else {
+          debug(`Executing command ${data.action}`)
+          const action = findCommand(commands, data.action, data.args)
+          executeCommand(action, data.args)
+            .subscribe(
+              respond,
+              respond
+            )
+        }
+      }
+    )
 }
 
