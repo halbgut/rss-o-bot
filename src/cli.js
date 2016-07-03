@@ -18,8 +18,6 @@ const Config = require('./lib/config')
 const Argv = require('./lib/argv')
 const H = require('./lib/helpers')
 
-process.title = 'rss-o-bot'
-
 const commands = [
   [
     'add',
@@ -136,75 +134,85 @@ const commands = [
   ]
 ]
 
-O.of(process.argv)
-  /* Extract arguments */
-  .map(Argv.extractArguments)
-  /* Get config */
-  .flatMap(state =>
-    H.findExistingDirectory(Config.locations)
-      .catch(() => O.throw('No config file found! RTFM!'))
-      .flatMap(location => H.readFile(`${location}/${Config.filename}`)
-          .map(Config.parse(state, location))
-      )
-  )
-  .map(Config.applyDefaults)
-  /* Define mode */
-  .map(state =>
-    state.set(
-      'mode',
-      state.getIn(['configuration', 'remote'])
-        ? 'remote'
-        : state.getIn(['configuration', 'mode'])
-    )
-  )
-  .map(Argv.applyModeFlags)
-  .map(H.getCommand(commands))
-  /* Run command */
-  .flatMap(state => {
-    const mode = state.get('mode')
-    const config = state.get('configuration')
-    /* Execute the command locally */
-    if (mode === 'local' || state.get('localOnly')) {
-      debug('running command locally')
-      return state.get('command')(state)
-    /* Send to a server */
-    } else if (mode === 'remote') {
-      debug('Sending command as remote')
-      return (
-        H.readFile(H.privateKeyPath(config))
-          .flatMap(remote.send(config.get('remote'), {
-            action: state.get('action'),
-            arguments: state.get('arguments').toJS()
-          }))
-      )
-    } else if (mode === 'server') {
-      if (state.get('mode') === 'server') {
-        /* Ignore any command passed, since there's only
-         * `run` on the server.
-         */
-        return (
-          H.readFile(H.publicKeyPath(config))
-            .flatMap(server.listen(config))
-            .map(([data, respond]) => {
-              /* Must be a public key */
-              if (typeof data === 'string') {
-                debug('Recieved public key')
-                return H.writeFile(H.publicKeyPath(config), data)
-              } else {
-                debug(`Executing command ${data.action}`)
-                const cState = H.setCommandState(state)(
-                  H.findCommand(commands, data.action, data.args)
-                )
-                if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'))
-                return cState.get('command')(state)
-              }
-            })
+const runCLI = (
+  argv = process.argv,
+  configLocations = Config.locations
+) =>
+  O.of(argv)
+    /* Extract arguments */
+    .map(Argv.extractArguments)
+    /* Get config */
+    .flatMap(state =>
+      H.findExistingDirectory(configLocations)
+        .catch(() => O.throw('No config file found! RTFM!'))
+        .flatMap(location => H.readFile(`${location}/${Config.filename}`)
+            .map(Config.parse(state, location))
         )
+    )
+    .map(Config.applyDefaults)
+    /* Define mode */
+    .map(state =>
+      state.set(
+        'mode',
+        state.getIn(['configuration', 'remote'])
+          ? 'remote'
+          : state.getIn(['configuration', 'mode'])
+      )
+    )
+    .map(Argv.applyModeFlags)
+    .map(H.getCommand(commands))
+    /* Run command */
+    .flatMap(state => {
+      const mode = state.get('mode')
+      const config = state.get('configuration')
+      /* Execute the command locally */
+      if (mode === 'local' || state.get('localOnly')) {
+        debug('running command locally')
+        return state.get('command')(state)
+      /* Send to a server */
+      } else if (mode === 'remote') {
+        debug('Sending command as remote')
+        return (
+          H.readFile(H.privateKeyPath(config))
+            .flatMap(remote.send(config.get('remote'), {
+              action: state.get('action'),
+              arguments: state.get('arguments').toJS()
+            }))
+        )
+      } else if (mode === 'server') {
+        if (state.get('mode') === 'server') {
+          /* Ignore any command passed, since there's only
+           * `run` on the server.
+           */
+          return (
+            H.readFile(H.publicKeyPath(config))
+              .flatMap(server.listen(config))
+              .map(([data, respond]) => {
+                /* Must be a public key */
+                if (typeof data === 'string') {
+                  debug('Recieved public key')
+                  return H.writeFile(H.publicKeyPath(config), data)
+                } else {
+                  debug(`Executing command ${data.action}`)
+                  const cState = H.setCommandState(state)(
+                    H.findCommand(commands, data.action, data.args)
+                  )
+                  if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'))
+                  return cState.get('command')(state)
+                }
+              })
+          )
+        }
       }
-    }
-  })
+    })
+
+module.exports = runCLI
+
+if (!process.env['RSS-O-BOT-TESTING-MODE']) {
+  runCLI()
     .subscribe(
       console.log,
       console.error
     )
+}
 

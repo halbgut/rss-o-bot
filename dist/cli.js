@@ -27,8 +27,6 @@ var Config = require('./lib/config');
 var Argv = require('./lib/argv');
 var H = require('./lib/helpers');
 
-process.title = 'rss-o-bot';
-
 var commands = [['add', function (args) {
   return !!args[0];
 }, function (state) {
@@ -127,58 +125,68 @@ var commands = [['add', function (args) {
   }
 }, true]];
 
-O.of(process.argv)
-/* Extract arguments */
-.map(Argv.extractArguments)
-/* Get config */
-.flatMap(function (state) {
-  return H.findExistingDirectory(Config.locations).catch(function () {
-    return O.throw('No config file found! RTFM!');
-  }).flatMap(function (location) {
-    return H.readFile(location + '/' + Config.filename).map(Config.parse(state, location));
-  });
-}).map(Config.applyDefaults)
-/* Define mode */
-.map(function (state) {
-  return state.set('mode', state.getIn(['configuration', 'remote']) ? 'remote' : state.getIn(['configuration', 'mode']));
-}).map(Argv.applyModeFlags).map(H.getCommand(commands))
-/* Run command */
-.flatMap(function (state) {
-  var mode = state.get('mode');
-  var config = state.get('configuration');
-  /* Execute the command locally */
-  if (mode === 'local' || state.get('localOnly')) {
-    debug('running command locally');
-    return state.get('command')(state);
-    /* Send to a server */
-  } else if (mode === 'remote') {
-      debug('Sending command as remote');
-      return H.readFile(H.privateKeyPath(config)).flatMap(remote.send(config.get('remote'), {
-        action: state.get('action'),
-        arguments: state.get('arguments').toJS()
-      }));
-    } else if (mode === 'server') {
-      if (state.get('mode') === 'server') {
-        /* Ignore any command passed, since there's only
-         * `run` on the server.
-         */
-        return H.readFile(H.publicKeyPath(config)).flatMap(server.listen(config)).map(function (_ref16) {
-          var _ref17 = _slicedToArray(_ref16, 2);
+var runCLI = function runCLI() {
+  var argv = arguments.length <= 0 || arguments[0] === undefined ? process.argv : arguments[0];
+  var configLocations = arguments.length <= 1 || arguments[1] === undefined ? Config.locations : arguments[1];
+  return O.of(argv)
+  /* Extract arguments */
+  .map(Argv.extractArguments)
+  /* Get config */
+  .flatMap(function (state) {
+    return H.findExistingDirectory(configLocations).catch(function () {
+      return O.throw('No config file found! RTFM!');
+    }).flatMap(function (location) {
+      return H.readFile(location + '/' + Config.filename).map(Config.parse(state, location));
+    });
+  }).map(Config.applyDefaults)
+  /* Define mode */
+  .map(function (state) {
+    return state.set('mode', state.getIn(['configuration', 'remote']) ? 'remote' : state.getIn(['configuration', 'mode']));
+  }).map(Argv.applyModeFlags).map(H.getCommand(commands))
+  /* Run command */
+  .flatMap(function (state) {
+    var mode = state.get('mode');
+    var config = state.get('configuration');
+    /* Execute the command locally */
+    if (mode === 'local' || state.get('localOnly')) {
+      debug('running command locally');
+      return state.get('command')(state);
+      /* Send to a server */
+    } else if (mode === 'remote') {
+        debug('Sending command as remote');
+        return H.readFile(H.privateKeyPath(config)).flatMap(remote.send(config.get('remote'), {
+          action: state.get('action'),
+          arguments: state.get('arguments').toJS()
+        }));
+      } else if (mode === 'server') {
+        if (state.get('mode') === 'server') {
+          /* Ignore any command passed, since there's only
+           * `run` on the server.
+           */
+          return H.readFile(H.publicKeyPath(config)).flatMap(server.listen(config)).map(function (_ref16) {
+            var _ref17 = _slicedToArray(_ref16, 2);
 
-          var data = _ref17[0];
-          var respond = _ref17[1];
+            var data = _ref17[0];
+            var respond = _ref17[1];
 
-          /* Must be a public key */
-          if (typeof data === 'string') {
-            debug('Recieved public key');
-            return H.writeFile(H.publicKeyPath(config), data);
-          } else {
-            debug('Executing command ' + data.action);
-            var cState = H.setCommandState(state)(H.findCommand(commands, data.action, data.args));
-            if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'));
-            return cState.get('command')(state);
-          }
-        });
+            /* Must be a public key */
+            if (typeof data === 'string') {
+              debug('Recieved public key');
+              return H.writeFile(H.publicKeyPath(config), data);
+            } else {
+              debug('Executing command ' + data.action);
+              var cState = H.setCommandState(state)(H.findCommand(commands, data.action, data.args));
+              if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'));
+              return cState.get('command')(state);
+            }
+          });
+        }
       }
-    }
-}).subscribe(console.log, console.error);
+  });
+};
+
+module.exports = runCLI;
+
+if (!process.env['RSS-O-BOT-TESTING-MODE']) {
+  runCLI().subscribe(console.log, console.error);
+}
