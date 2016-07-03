@@ -11,18 +11,19 @@ module.exports = (config) => {
      * Map over all configured notification methods and check if there
      * are installed modules by that name.
      */
-    config['notification-methods'].map(m => {
+    config.get('notification-methods').map(m => {
+      const configObj = config.toJS()
       const module = `rss-o-bot-${m}`
       const msg = `Successfully loaded notifier: ${module}`
       try {
         try {
          /* Attempt local require */
-          const send = require(module)(config)
+          const send = require(module)(configObj)
           debug(msg)
           return send
         } catch (e) {
          /* Attempt global require */
-          const send = require(`${__dirname}/../../../${module}`)(config)
+          const send = require(`${__dirname}/../../../${module}`)(configObj)
           debug(msg)
           return send
         }

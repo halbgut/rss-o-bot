@@ -1,4 +1,4 @@
-const {getConfig, getTime, getPublicKey} = require('./helpers')
+const {getTime} = require('./helpers')
 const WebSocket = require('faye-websocket')
 const jwt = require('jsonwebtoken')
 const http = require('http')
@@ -6,9 +6,9 @@ const Rx = require('rx')
 const O = Rx.Observable
 
 module.exports = {
-  listen: () =>
+  listen: (config) => (publicKey) =>
     O.create(o => {
-      const port = getConfig('port')
+      const port = config.get('port')
 
       http.createServer()
         .on('upgrade', (request, socket, body) => {
@@ -21,7 +21,7 @@ module.exports = {
             }
             ws.on('message', e => {
               if (e.data.indexOf('PUBLIC KEY') > -1) { // Must be a public key
-                if (getPublicKey()) {
+                if (publicKey) {
                   respond('I already have a public key. Please remove it from the server manually before generating a new one.')
                 } else {
                   o.onNext([e.data, respond])
@@ -29,7 +29,7 @@ module.exports = {
               } else {
                 jwt.verify(
                   e.data,
-                  getPublicKey(),
+                  publicKey,
                   { algorithms: ['RS512'] },
                   (err, data) => {
                     if (err || !valid([data.jit, data.exp])) {

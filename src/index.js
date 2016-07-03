@@ -8,16 +8,15 @@ const Rx = require('rx')
 const O = Rx.Observable
 const debug = require('debug')('rss-o-bot')
 
-const {getConfig} = require('./lib/helpers')
-const config = getConfig()
-const notify = require('./lib/notify')(config)
+const Notify = require('./lib/notify')
 const poll = require('./lib/poll')
 const initStore = require('./lib/store')
 
-module.exports = function runRSSOBotDaemon () {
+module.exports = function runRSSOBotDaemon (state) {
+  const config = state.get('configuration')
   O.combineLatest(
     initStore(config),
-    Rx.Observable.interval(config.interval * 1000).startWith(0)
+    Rx.Observable.interval(config.get('interval') * 1000).startWith(0)
   )
     .flatMap(([s]) => pollFeeds(s))
     .subscribe(
@@ -27,12 +26,14 @@ module.exports = function runRSSOBotDaemon () {
 }
 
 module.exports.pollFeeds = pollFeeds
-module.exports.config = config
 
-function pollFeeds ({getFeeds, insertFeed, updateLatestLink, setBlogTitle}, force) {
+function pollFeeds (config, {getFeeds, insertFeed, updateLatestLink, setBlogTitle}, force) {
   return (
-    getFeeds(force)
-      .flatMap((feeds) => Rx.Observable.forkJoin(
+    O.forkJoin(
+      O.of(Notify(config)),
+      getFeeds(force)
+    )
+      .flatMap(([notify, feeds]) => Rx.Observable.forkJoin(
         ...feeds.map(feed =>
           O.fromPromise(feed.getFilters())
             .flatMap(filters =>

@@ -14,17 +14,13 @@ var Rx = require('rx');
 var O = Rx.Observable;
 var debug = require('debug')('rss-o-bot');
 
-var _require = require('./lib/helpers');
-
-var getConfig = _require.getConfig;
-
-var config = getConfig();
-var notify = require('./lib/notify')(config);
+var Notify = require('./lib/notify');
 var poll = require('./lib/poll');
 var initStore = require('./lib/store');
 
-module.exports = function runRSSOBotDaemon() {
-  O.combineLatest(initStore(config), Rx.Observable.interval(config.interval * 1000).startWith(0)).flatMap(function (_ref) {
+module.exports = function runRSSOBotDaemon(state) {
+  var config = state.get('configuration');
+  O.combineLatest(initStore(config), Rx.Observable.interval(config.get('interval') * 1000).startWith(0)).flatMap(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 1);
 
     var s = _ref2[0];
@@ -33,23 +29,26 @@ module.exports = function runRSSOBotDaemon() {
 };
 
 module.exports.pollFeeds = pollFeeds;
-module.exports.config = config;
 
-function pollFeeds(_ref3, force) {
+function pollFeeds(config, _ref3, force) {
   var getFeeds = _ref3.getFeeds;
   var insertFeed = _ref3.insertFeed;
   var updateLatestLink = _ref3.updateLatestLink;
   var setBlogTitle = _ref3.setBlogTitle;
 
-  return getFeeds(force).flatMap(function (feeds) {
+  return O.forkJoin(O.of(Notify(config)), getFeeds(force)).flatMap(function (_ref4) {
     var _Rx$Observable;
 
+    var _ref5 = _slicedToArray(_ref4, 2);
+
+    var notify = _ref5[0];
+    var feeds = _ref5[1];
     return (_Rx$Observable = Rx.Observable).forkJoin.apply(_Rx$Observable, _toConsumableArray(feeds.map(function (feed) {
       return O.fromPromise(feed.getFilters()).flatMap(function (filters) {
         return O.onErrorResumeNext(poll(feed.get('url'), filters.map(function (f) {
           return [f.get('keyword'), f.get('kind')];
-        })).retry(2).flatMap(getNewLinks(feed)).filter(function (_ref4) {
-          var link = _ref4.link;
+        })).retry(2).flatMap(getNewLinks(feed)).filter(function (_ref6) {
+          var link = _ref6.link;
           return link && link !== feed.get('latestLink') || debug('Old URL: ' + link);
         }).flatMap(function (info) {
           return feed.get('blogTitle') ? O.of(info) : setBlogTitle(feed.get('id'), info.blogTitle);
@@ -57,13 +56,13 @@ function pollFeeds(_ref3, force) {
           return updateLatestLink(feed.get('id'), info.link).map(info);
         }).filter(function () {
           return feed.get('latestLink');
-        }).tap(function (_ref5) {
-          var link = _ref5.link;
+        }).tap(function (_ref7) {
+          var link = _ref7.link;
           return debug('New URL: ' + link);
-        }).flatMap(function (_ref6) {
-          var blog = _ref6.blog;
-          var link = _ref6.link;
-          var title = _ref6.title;
+        }).flatMap(function (_ref8) {
+          var blog = _ref8.blog;
+          var link = _ref8.link;
+          var title = _ref8.title;
           return notify(blog, link, title).tap(function () {
             return debug('Sent notifications');
           }).retry(2);

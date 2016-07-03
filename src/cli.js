@@ -5,27 +5,18 @@
  * The executable configured by the package.
  */
 
-const fs = require('fs')
-const {
-  getConfig,
-  getPrivateKey,
-  getPublicKey,
-  setPublicKey,
-  transformFilter,
-  buildMan,
-  printFeeds,
-  getMode } = require('./lib/helpers')
-const config = getConfig()
 const initStore = require('./lib/store')
-const notify = require('./lib/notify')(config)
+const Notify = require('./lib/notify')
 const opml = require('./lib/opml')
 const {Observable: O} = require('rx')
-const client = require('./lib/client')
+const remote = require('./lib/remote')
 const server = require('./lib/server')
-const genKeys = require('./lib/genKeys')
 const debug = require('debug')('rss-o-bot')
 
-const CLIENT_ONLY = Symbol('CLIENT_ONLY')
+/* Pure modules */
+const Config = require('./lib/config')
+const Argv = require('./lib/argv')
+const H = require('./lib/helpers')
 
 process.title = 'rss-o-bot'
 
@@ -33,82 +24,84 @@ const commands = [
   [
     'add',
     args => !!args[0],
-    ([url, ...filters]) =>
-      initStore(config)
-      .flatMap(({ insertFeed }) =>
-        insertFeed(url, filters.map(transformFilter))
-      )
+    state =>
+      O.of(state).flatMap(H.setUpEnv(initStore))
+        .flatMap(([{ insertFeed }, config, url, ...filters]) =>
+          insertFeed(url, filters.map(H.transformFilter))
+        )
   ],
   [
     'rm',
     args => !!args[0],
-    ([id]) =>
-      initStore(config)
-        .flatMap(({ removeFeed }) => removeFeed(id))
+    state =>
+      O.of(state).flatMap(H.setUpEnv(initStore))
+        .flatMap(([{ removeFeed }, config, id]) => removeFeed(id))
   ],
   [
     'list',
     true,
-    () =>
-      initStore(config)
-        .flatMap(({ listFeeds }) => listFeeds())
-        .flatMap(printFeeds)
+    state =>
+      O.of(state).flatMap(H.setUpEnv(initStore))
+        .flatMap(([{ listFeeds }]) => listFeeds())
   ],
   [
     'poll-feeds',
     true,
-    () =>
-      initStore(config)
-        .flatMap(s => require('.').pollFeeds(s, true))
+    state =>
+      O.of(state).flatMap(H.setUpEnv(initStore))
+        .flatMap(([store, config]) => require('.').pollFeeds(config, store, true))
   ],
   [
     'test-notification',
     true,
-    (args) =>
-      notify('Test', args[0] || 'test', 'Test Title')
+    state =>
+      Notify(state.get('config'))('Test', state.get('arguments').first() || 'test', 'Test Title')
   ],
   [
     'import',
-    args => !!args[0],
-    ([file]) =>
-      initStore(config)
-        .flatMap(opml.import(file))
-        .flatMap(printFeeds)
+    (args) => !!args[0],
+    state =>
+      O.of(state).flatMap(H.setUpEnv(initStore))
+        .map(([store]) => store)
+        // TODO: Perform readFile here instead of inside opml.import
+        .flatMap(opml.import(state.get('arguments').first()))
+        .flatMap(H.printFeeds)
   ],
   [
     'export',
     true,
-    () =>
-      initStore(config)
+    state =>
+      O.of(state).flatMap(H.setUpEnv(initStore))
+        .map(([ config, store ]) => store)
         .flatMap(opml.export)
   ],
   [
     ['run'],
     true,
-    () => O.create(o => {
+    state => O.create(o => {
       require('.')()
     })
   ],
   [
     ['-h', '--help', 'help'],
     true,
-    () => O.create(o => {
-      o.onNext(`${buildMan().synopsis}Please refer to \`man rss-o-bot\`, \`rss-o-bot --manual\` or the README for further instructions.`)
-      o.onCompleted()
-    })
+    state =>
+      O.of(state)
+        .flatMap(H.buildMan)
+        .map(({ synopsis }) => `${synopsis}Please refer to \`man rss-o-bot\`, \`rss-o-bot --manual\` or the README for further instructions.`)
   ],
   [
     ['-m', '--manual', '--man', 'manual'],
     true,
-    () => O.create(o => {
-      o.onNext(buildMan().raw)
-      o.onCompleted()
-    })
+    state =>
+      O.of(state)
+        .flatMap(H.buildMan)
+        .map(({ raw }) => raw)
   ],
   [
     ['-v', '--version', 'version'],
     true,
-    () => O.create(o => {
+    state => O.create(o => {
       const packageInfo = require('../package.json')
       o.onNext(`RSS-o-Bot Version: ${packageInfo.version}`)
       o.onCompleted()
@@ -117,99 +110,101 @@ const commands = [
   [
     'build-man',
     true,
-    () => O.create(o => {
-      fs.writeFileSync(`${__dirname}/../dist/man/rss-o-bot.1`, buildMan().man)
-      o.onNext('Man built')
-      o.onCompleted()
-    }),
-    CLIENT_ONLY
+    state =>
+      O.of(state)
+        .flatMap(H.buildMan)
+        .flatMap(({ man }) => H.writeFile(`${__dirname}/../dist/man/rss-o-bot.1`, man))
+        .map(() => 'Man built'),
+    true
   ],
   [
     'ping',
     true,
-    () => O.create(o => {
-      if (getMode() === 'local') {
-        o.onNext('No server configured, running in local mode. Check the configuration section of the man-page for more info.')
-        o.onCompleted()
-      } else if (getMode() === 'remote') {
-        client.send({action: 'ping', args: []})
-          .subscribe(
-            msg => o.onNext(msg),
-            err => o.onNext(err),
-            () => o.onCompleted()
-          )
-      } else if (getMode() === 'server') {
-        o.onNext('pong')
-        o.onCompleted()
+    state => {
+      if (state.get('mode') === 'local') {
+        O.of('No server configured, running in local mode. Check the configuration section of the man-page for more info.')
+      } else if (state.get('mode') === 'remote') {
+        return (
+          H.readFile(H.privateKeyPath(state.get('config')))
+            .flatMap(remote.send({ action: 'ping', args: [] }))
+        )
+      } else if (state.get('mode') === 'server') {
+        return O.of('pong')
       }
-    }),
-    CLIENT_ONLY
+    },
+    true
   ]
 ]
 
-const executeCommand = (commands, action, args) =>
-  command
-    ? command[2](args)
-    : O.create(o => o.onError(`Unrecognized action: ${action}\n ${buildMan().synopsis}`))
-
-const action = process.argv[2]
-const args = process.argv.slice(3)
-const findCommand = (commands, action, args) =>
-  commands.find(([command, validator, run]) =>
-    (
-      typeof command === 'object'
-        ? command.indexOf(action) > -1
-        : command === action
-    ) &&
-    (
-      typeof validator === 'function'
-        ? validator(args)
-        : validator
+O.of(process.argv)
+  /* Extract arguments */
+  .map(Argv.extractArguments)
+  /* Get config */
+  .flatMap(state =>
+    H.findExistingDirectory(Config.locations)
+      .catch(() => O.throw('No config file found! RTFM!'))
+      .flatMap(location => H.readFile(`${location}/${Config.filename}`)
+          .map(Config.parse(state, location))
+      )
+  )
+  .map(Config.applyDefaults)
+  /* Define mode */
+  .map(state =>
+    state.set(
+      'mode',
+      state.getIn(['configuration', 'remote'])
+        ? 'remote'
+        : state.getIn(['configuration', 'mode'])
     )
   )
-
-const command = findCommand(commands, action, args)
-if (getMode() === 'local' || (command && command[3] === CLIENT_ONLY)) {
-  debug('running command locally')
-  executeCommand(command, action, args)
-    .subscribe(
-      console.log,
-      console.error
-    )
-} else if (getMode() === 'remote') {
-  debug('Sending command as remote')
-  if (!getPrivateKey()) {
-    try {
-      debug('Generating new key pair')
-      genKeys()
-      client.send({ key: getPublicKey() }, true)
-    } catch (e) {
-      throw new Error('Failed to generate key pair. Automatic generation might work if you install OpenSSL. If you have already installed it and are still unable to initialize RSS-o-Bot, please generate a keypair manually.refer to the manual for more information')
-    }
-  }
-  client.send({ action, args })
-    .subscribe(
-      console.log,
-      console.error
-    )
-} else if (getMode() === 'server') {
-  debug('Starting server')
-  server.listen()
-    .subscribe(
-      ([data, respond]) => {
-        debug('Recieved public key')
-        if (typeof data === 'string') { // Must be a public key
-          setPublicKey(data)
-        } else {
-          debug(`Executing command ${data.action}`)
-          const action = findCommand(commands, data.action, data.args)
-          executeCommand(action, data.args)
-            .subscribe(
-              respond,
-              respond
-            )
-        }
+  .map(Argv.applyModeFlags)
+  .map(H.getCommand(commands))
+  /* Run command */
+  .flatMap(state => {
+    const mode = state.get('mode')
+    const config = state.get('configuration')
+    /* Execute the command locally */
+    if (mode === 'local' || state.get('localOnly')) {
+      debug('running command locally')
+      return state.get('command')(state)
+    /* Send to a server */
+    } else if (mode === 'remote') {
+      debug('Sending command as remote')
+      return (
+        H.readFile(H.privateKeyPath(config))
+          .flatMap(remote.send(config.get('remote'), {
+            action: state.get('action'),
+            arguments: state.get('arguments').toJS()
+          }))
+      )
+    } else if (mode === 'server') {
+      if (state.get('mode') === 'server') {
+        /* Ignore any command passed, since there's only
+         * `run` on the server.
+         */
+        return (
+          H.readFile(H.publicKeyPath(config))
+            .flatMap(server.listen(config))
+            .map(([data, respond]) => {
+              /* Must be a public key */
+              if (typeof data === 'string') {
+                debug('Recieved public key')
+                return H.writeFile(H.publicKeyPath(config), data)
+              } else {
+                debug(`Executing command ${data.action}`)
+                const cState = H.setCommandState(state)(
+                  H.findCommand(commands, data.action, data.args)
+                )
+                if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'))
+                return cState.get('command')(state)
+              }
+            })
+        )
       }
+    }
+  })
+    .subscribe(
+      console.log,
+      console.error
     )
-}
 

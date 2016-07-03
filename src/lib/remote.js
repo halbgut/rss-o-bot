@@ -1,4 +1,4 @@
-const {getConfig, getTime, getPrivateKey} = require('./helpers')
+const H = require('./helpers')
 const uuid = require('node-uuid')
 const WebSocket = require('faye-websocket')
 const jwt = require('jsonwebtoken')
@@ -6,9 +6,11 @@ const Rx = require('rx')
 const O = Rx.Observable
 const debug = require('debug')('rss-o-bot')
 
+const JWT_EXPIRATION = 60 // Sixty seconds default JWT expiration time
+
 module.exports = {
-  send: (message, insecure) => O.create(o => {
-    const ws = new WebSocket.Client(getConfig('remote'))
+  send: (url, message, insecure) => privateKey => O.create(o => {
+    const ws = new WebSocket.Client(url)
     debug('Opening socket')
     ws.on('open', () => {
       debug('Socket has been opened')
@@ -17,8 +19,8 @@ module.exports = {
         ws.send(message)
       } else {
         jwt.sign(
-          Object.assign(message, { exp: getTime(getConfig('jwt-expiration')), jti: uuid.v4() }),
-          getPrivateKey(),
+          Object.assign(message, { exp: H.getTime(JWT_EXPIRATION), jti: uuid.v4() }),
+          privateKey,
           { algorithm: 'RS512' },
           (err, token) => {
             if (err) return o.onError(err)

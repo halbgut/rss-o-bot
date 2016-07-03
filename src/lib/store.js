@@ -81,17 +81,15 @@ const genRemoveFeed = Feed => id => O.fromPromise(
 const genListFeeds = Feed => () => O.fromPromise(Feed.findAll())
 
 module.exports = function initStore (config) {
-  const storage = 'storage' in config.database.options
-    ? config.database.options.storage
-    : null
+  const storage = config.getIn(['database', 'options', 'storage'])
   if (storage) debug(`Loading database: ${path.resolve(storage)}`)
   const sequelize = new Sequelize(
-    config.name,
-    config.username,
-    config.password,
+    config.get('name'),
+    config.get('username'),
+    config.get('password'),
     Object.assign({
       logging: () => {}
-    }, config.database.options)
+    }, config.getIn(['database', 'options']).toJS())
   )
   const Feed = sequelize.define('feed', {
     blogTitle: Sequelize.STRING,
@@ -113,7 +111,7 @@ module.exports = function initStore (config) {
         _Feed: Feed,
         _Filter: Filter,
         insertFeed: genInsertFeed(Feed, Filter),
-        getFeeds: genGetFeeds(Feed, config.interval),
+        getFeeds: genGetFeeds(Feed, config.get('interval')),
         updateLatestLink: genUpdateLatestLink(Feed),
         removeFeed: genRemoveFeed(Feed),
         listFeeds: genListFeeds(Feed),

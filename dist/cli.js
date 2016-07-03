@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
@@ -12,177 +10,175 @@ function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
  * The executable configured by the package.
  */
 
-var fs = require('fs');
-
-var _require = require('./lib/helpers');
-
-var getConfig = _require.getConfig;
-var getPrivateKey = _require.getPrivateKey;
-var getPublicKey = _require.getPublicKey;
-var setPublicKey = _require.setPublicKey;
-var transformFilter = _require.transformFilter;
-var buildMan = _require.buildMan;
-var printFeeds = _require.printFeeds;
-var getMode = _require.getMode;
-
-var config = getConfig();
 var initStore = require('./lib/store');
-var notify = require('./lib/notify')(config);
+var Notify = require('./lib/notify');
 var opml = require('./lib/opml');
 
-var _require2 = require('rx');
+var _require = require('rx');
 
-var O = _require2.Observable;
+var O = _require.Observable;
 
-var client = require('./lib/client');
+var remote = require('./lib/remote');
 var server = require('./lib/server');
-var genKeys = require('./lib/genKeys');
 var debug = require('debug')('rss-o-bot');
 
-var CLIENT_ONLY = Symbol('CLIENT_ONLY');
+/* Pure modules */
+var Config = require('./lib/config');
+var Argv = require('./lib/argv');
+var H = require('./lib/helpers');
 
 process.title = 'rss-o-bot';
 
 var commands = [['add', function (args) {
   return !!args[0];
-}, function (_ref) {
-  var _ref2 = _toArray(_ref);
+}, function (state) {
+  return O.of(state).flatMap(H.setUpEnv(initStore)).flatMap(function (_ref) {
+    var _ref2 = _toArray(_ref);
 
-  var url = _ref2[0];
+    var insertFeed = _ref2[0].insertFeed;
+    var config = _ref2[1];
+    var url = _ref2[2];
 
-  var filters = _ref2.slice(1);
+    var filters = _ref2.slice(3);
 
-  return initStore(config).flatMap(function (_ref3) {
-    var insertFeed = _ref3.insertFeed;
-    return insertFeed(url, filters.map(transformFilter));
+    return insertFeed(url, filters.map(H.transformFilter));
   });
 }], ['rm', function (args) {
   return !!args[0];
-}, function (_ref4) {
-  var _ref5 = _slicedToArray(_ref4, 1);
+}, function (state) {
+  return O.of(state).flatMap(H.setUpEnv(initStore)).flatMap(function (_ref3) {
+    var _ref4 = _slicedToArray(_ref3, 3);
 
-  var id = _ref5[0];
-  return initStore(config).flatMap(function (_ref6) {
-    var removeFeed = _ref6.removeFeed;
+    var removeFeed = _ref4[0].removeFeed;
+    var config = _ref4[1];
+    var id = _ref4[2];
     return removeFeed(id);
   });
-}], ['list', true, function () {
-  return initStore(config).flatMap(function (_ref7) {
-    var listFeeds = _ref7.listFeeds;
+}], ['list', true, function (state) {
+  return O.of(state).flatMap(H.setUpEnv(initStore)).flatMap(function (_ref5) {
+    var _ref6 = _slicedToArray(_ref5, 1);
+
+    var listFeeds = _ref6[0].listFeeds;
     return listFeeds();
-  }).flatMap(printFeeds);
-}], ['poll-feeds', true, function () {
-  return initStore(config).flatMap(function (s) {
-    return require('.').pollFeeds(s, true);
   });
-}], ['test-notification', true, function (args) {
-  return notify('Test', args[0] || 'test', 'Test Title');
+}], ['poll-feeds', true, function (state) {
+  return O.of(state).flatMap(H.setUpEnv(initStore)).flatMap(function (_ref7) {
+    var _ref8 = _slicedToArray(_ref7, 2);
+
+    var store = _ref8[0];
+    var config = _ref8[1];
+    return require('.').pollFeeds(config, store, true);
+  });
+}], ['test-notification', true, function (state) {
+  return Notify(state.get('config'))('Test', state.get('arguments').first() || 'test', 'Test Title');
 }], ['import', function (args) {
   return !!args[0];
-}, function (_ref8) {
-  var _ref9 = _slicedToArray(_ref8, 1);
+}, function (state) {
+  return O.of(state).flatMap(H.setUpEnv(initStore)).map(function (_ref9) {
+    var _ref10 = _slicedToArray(_ref9, 1);
 
-  var file = _ref9[0];
-  return initStore(config).flatMap(opml.import(file)).flatMap(printFeeds);
-}], ['export', true, function () {
-  return initStore(config).flatMap(opml.export);
-}], [['run'], true, function () {
+    var store = _ref10[0];
+    return store;
+  })
+  // TODO: Perform readFile here instead of inside opml.import
+  .flatMap(opml.import(state.get('arguments').first())).flatMap(H.printFeeds);
+}], ['export', true, function (state) {
+  return O.of(state).flatMap(H.setUpEnv(initStore)).map(function (_ref11) {
+    var _ref12 = _slicedToArray(_ref11, 2);
+
+    var config = _ref12[0];
+    var store = _ref12[1];
+    return store;
+  }).flatMap(opml.export);
+}], [['run'], true, function (state) {
   return O.create(function (o) {
     require('.')();
   });
-}], [['-h', '--help', 'help'], true, function () {
-  return O.create(function (o) {
-    o.onNext(buildMan().synopsis + 'Please refer to `man rss-o-bot`, `rss-o-bot --manual` or the README for further instructions.');
-    o.onCompleted();
+}], [['-h', '--help', 'help'], true, function (state) {
+  return O.of(state).flatMap(H.buildMan).map(function (_ref13) {
+    var synopsis = _ref13.synopsis;
+    return synopsis + 'Please refer to `man rss-o-bot`, `rss-o-bot --manual` or the README for further instructions.';
   });
-}], [['-m', '--manual', '--man', 'manual'], true, function () {
-  return O.create(function (o) {
-    o.onNext(buildMan().raw);
-    o.onCompleted();
+}], [['-m', '--manual', '--man', 'manual'], true, function (state) {
+  return O.of(state).flatMap(H.buildMan).map(function (_ref14) {
+    var raw = _ref14.raw;
+    return raw;
   });
-}], [['-v', '--version', 'version'], true, function () {
+}], [['-v', '--version', 'version'], true, function (state) {
   return O.create(function (o) {
     var packageInfo = require('../package.json');
     o.onNext('RSS-o-Bot Version: ' + packageInfo.version);
     o.onCompleted();
   });
-}], ['build-man', true, function () {
-  return O.create(function (o) {
-    fs.writeFileSync(__dirname + '/../dist/man/rss-o-bot.1', buildMan().man);
-    o.onNext('Man built');
-    o.onCompleted();
+}], ['build-man', true, function (state) {
+  return O.of(state).flatMap(H.buildMan).flatMap(function (_ref15) {
+    var man = _ref15.man;
+    return H.writeFile(__dirname + '/../dist/man/rss-o-bot.1', man);
+  }).map(function () {
+    return 'Man built';
   });
-}, CLIENT_ONLY], ['ping', true, function () {
-  return O.create(function (o) {
-    if (getMode() === 'local') {
-      o.onNext('No server configured, running in local mode. Check the configuration section of the man-page for more info.');
-      o.onCompleted();
-    } else if (getMode() === 'remote') {
-      client.send({ action: 'ping', args: [] }).subscribe(function (msg) {
-        return o.onNext(msg);
-      }, function (err) {
-        return o.onNext(err);
-      }, function () {
-        return o.onCompleted();
-      });
-    } else if (getMode() === 'server') {
-      o.onNext('pong');
-      o.onCompleted();
-    }
-  });
-}, CLIENT_ONLY]];
-
-var executeCommand = function executeCommand(commands, action, args) {
-  return command ? command[2](args) : O.create(function (o) {
-    return o.onError('Unrecognized action: ' + action + '\n ' + buildMan().synopsis);
-  });
-};
-
-var action = process.argv[2];
-var args = process.argv.slice(3);
-var findCommand = function findCommand(commands, action, args) {
-  return commands.find(function (_ref10) {
-    var _ref11 = _slicedToArray(_ref10, 3);
-
-    var command = _ref11[0];
-    var validator = _ref11[1];
-    var run = _ref11[2];
-    return ((typeof command === 'undefined' ? 'undefined' : _typeof(command)) === 'object' ? command.indexOf(action) > -1 : command === action) && (typeof validator === 'function' ? validator(args) : validator);
-  });
-};
-
-var command = findCommand(commands, action, args);
-if (getMode() === 'local' || command && command[3] === CLIENT_ONLY) {
-  debug('running command locally');
-  executeCommand(command, action, args).subscribe(console.log, console.error);
-} else if (getMode() === 'remote') {
-  debug('Sending command as remote');
-  if (!getPrivateKey()) {
-    try {
-      debug('Generating new key pair');
-      genKeys();
-      client.send({ key: getPublicKey() }, true);
-    } catch (e) {
-      throw new Error('Failed to generate key pair. Automatic generation might work if you install OpenSSL. If you have already installed it and are still unable to initialize RSS-o-Bot, please generate a keypair manually.refer to the manual for more information');
-    }
+}, true], ['ping', true, function (state) {
+  if (state.get('mode') === 'local') {
+    O.of('No server configured, running in local mode. Check the configuration section of the man-page for more info.');
+  } else if (state.get('mode') === 'remote') {
+    return H.readFile(H.privateKeyPath(state.get('config'))).flatMap(remote.send({ action: 'ping', args: [] }));
+  } else if (state.get('mode') === 'server') {
+    return O.of('pong');
   }
-  client.send({ action: action, args: args }).subscribe(console.log, console.error);
-} else if (getMode() === 'server') {
-  debug('Starting server');
-  server.listen().subscribe(function (_ref12) {
-    var _ref13 = _slicedToArray(_ref12, 2);
+}, true]];
 
-    var data = _ref13[0];
-    var respond = _ref13[1];
-
-    debug('Recieved public key');
-    if (typeof data === 'string') {
-      // Must be a public key
-      setPublicKey(data);
-    } else {
-      debug('Executing command ' + data.action);
-      var _action = findCommand(commands, data.action, data.args);
-      executeCommand(_action, data.args).subscribe(respond, respond);
-    }
+O.of(process.argv)
+/* Extract arguments */
+.map(Argv.extractArguments)
+/* Get config */
+.flatMap(function (state) {
+  return H.findExistingDirectory(Config.locations).catch(function () {
+    return O.throw('No config file found! RTFM!');
+  }).flatMap(function (location) {
+    return H.readFile(location + '/' + Config.filename).map(Config.parse(state, location));
   });
-}
+}).map(Config.applyDefaults)
+/* Define mode */
+.map(function (state) {
+  return state.set('mode', state.getIn(['configuration', 'remote']) ? 'remote' : state.getIn(['configuration', 'mode']));
+}).map(Argv.applyModeFlags).map(H.getCommand(commands))
+/* Run command */
+.flatMap(function (state) {
+  var mode = state.get('mode');
+  var config = state.get('configuration');
+  /* Execute the command locally */
+  if (mode === 'local' || state.get('localOnly')) {
+    debug('running command locally');
+    return state.get('command')(state);
+    /* Send to a server */
+  } else if (mode === 'remote') {
+      debug('Sending command as remote');
+      return H.readFile(H.privateKeyPath(config)).flatMap(remote.send(config.get('remote'), {
+        action: state.get('action'),
+        arguments: state.get('arguments').toJS()
+      }));
+    } else if (mode === 'server') {
+      if (state.get('mode') === 'server') {
+        /* Ignore any command passed, since there's only
+         * `run` on the server.
+         */
+        return H.readFile(H.publicKeyPath(config)).flatMap(server.listen(config)).map(function (_ref16) {
+          var _ref17 = _slicedToArray(_ref16, 2);
+
+          var data = _ref17[0];
+          var respond = _ref17[1];
+
+          /* Must be a public key */
+          if (typeof data === 'string') {
+            debug('Recieved public key');
+            return H.writeFile(H.publicKeyPath(config), data);
+          } else {
+            debug('Executing command ' + data.action);
+            var cState = H.setCommandState(state)(H.findCommand(commands, data.action, data.args));
+            if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'));
+            return cState.get('command')(state);
+          }
+        });
+      }
+    }
+}).subscribe(console.log, console.error);

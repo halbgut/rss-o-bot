@@ -93,11 +93,11 @@ var genListFeeds = function genListFeeds(Feed) {
 };
 
 module.exports = function initStore(config) {
-  var storage = 'storage' in config.database.options ? config.database.options.storage : null;
+  var storage = config.getIn(['database', 'options', 'storage']);
   if (storage) debug('Loading database: ' + path.resolve(storage));
-  var sequelize = new Sequelize(config.name, config.username, config.password, Object.assign({
+  var sequelize = new Sequelize(config.get('name'), config.get('username'), config.get('password'), Object.assign({
     logging: function logging() {}
-  }, config.database.options));
+  }, config.getIn(['database', 'options']).toJS()));
   var Feed = sequelize.define('feed', {
     blogTitle: Sequelize.STRING,
     url: Sequelize.STRING,
@@ -117,7 +117,7 @@ module.exports = function initStore(config) {
       _Feed: Feed,
       _Filter: Filter,
       insertFeed: genInsertFeed(Feed, Filter),
-      getFeeds: genGetFeeds(Feed, config.interval),
+      getFeeds: genGetFeeds(Feed, config.get('interval')),
       updateLatestLink: genUpdateLatestLink(Feed),
       removeFeed: genRemoveFeed(Feed),
       listFeeds: genListFeeds(Feed),
