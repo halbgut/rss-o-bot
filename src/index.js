@@ -29,6 +29,7 @@ module.exports = function runRSSOBotDaemon (state) {
 module.exports.pollFeeds = pollFeeds
 module.exports.getConfig = Config.readConfig
 
+// TODO: Clean this up, it's ugly AF
 function pollFeeds (config, {getFeeds, insertFeed, updateLatestLink, setBlogTitle}, force) {
   return (
     O.forkJoin(
