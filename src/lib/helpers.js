@@ -121,7 +121,7 @@ const Helpers = {
     )
       .map(feeds =>
         feeds.map(([id, blogTitle, url, filters]) =>
-          `${id}: ${blogTitle} – ${url} – ${filters}\n`
+          `${id}: ${blogTitle} - ${url} - ${filters}\n`
         ).join('')
       ),
 
@@ -129,7 +129,7 @@ const Helpers = {
    * Helpers for finding commands
    */
   getCommand: commands => state => {
-    const command = Helpers.findCommand(commands, state.get('action'))
+    const command = Helpers.findCommand(commands, state.get('action'), state.get('arguments'))
     if (!command) throw new Error(`No such command: ${state.get('action')}`)
     debug(`Running command ${command[0]}`)
     return Helpers.setCommandState(state)(command)

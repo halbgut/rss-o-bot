@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 /**
+ * @file
+ *
  * cli
  * The executable configured by the package.
  */
@@ -21,16 +23,18 @@ const H = require('./lib/helpers')
 const commands = [
   [
     'add',
-    args => !!args[0],
+    args => !!args.get(0),
     state =>
       O.of(state).flatMap(H.setUpEnv(initStore))
         .flatMap(([{ insertFeed }, config, url, ...filters]) =>
           insertFeed(url, filters.map(H.transformFilter))
         )
+        .map(f => [f])
+        .flatMap(H.printFeeds)
   ],
   [
     'rm',
-    args => !!args[0],
+    args => !!args.get(0),
     state =>
       O.of(state).flatMap(H.setUpEnv(initStore))
         .flatMap(([{ removeFeed }, config, id]) => removeFeed(id))
@@ -41,6 +45,7 @@ const commands = [
     state =>
       O.of(state).flatMap(H.setUpEnv(initStore))
         .flatMap(([{ listFeeds }]) => listFeeds())
+        .flatMap(H.printFeeds)
   ],
   [
     'poll-feeds',
@@ -57,7 +62,7 @@ const commands = [
   ],
   [
     'import',
-    (args) => !!args[0],
+    (args) => !!args.get(0),
     state =>
       O.of(state).flatMap(H.setUpEnv(initStore))
         .map(([store]) => store)

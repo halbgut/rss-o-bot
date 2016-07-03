@@ -32,7 +32,7 @@ const Config = {
   applyDefaults: state =>
     state.set(
       'configuration',
-      state.get('configuration').merge(Config.defaults(state.get('configuration')))
+      Config.defaults(state.get('configuration')).merge(state.get('configuration'))
     ),
 
   /* Parses the config JSON */

@@ -2,7 +2,7 @@ const Immutable = require('immutable')
 
 const Argv = {
   extractArguments: argv =>
-    Immutable.fromJS({ action: argv[2], arguments: argv.slice(2) }),
+    Immutable.fromJS({ action: argv[2], arguments: argv.slice(3) }),
   applyModeFlags: state => {
     const args = state.get('arguments')
     const modes = Immutable.List(['server', 'remote', 'local'])
