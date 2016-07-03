@@ -1,6 +1,7 @@
 node_modules
-/config.json
-/data
+/data/*.pem
+/data/*.sqlite
+/data/*.json
 *.map
 /docker/data
 /tags
