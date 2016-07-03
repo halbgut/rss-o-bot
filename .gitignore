@@ -3,4 +3,5 @@ node_modules
 /data
 *.map
 /docker/data
+/tags
 
