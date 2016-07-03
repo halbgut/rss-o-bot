@@ -44,7 +44,7 @@ const commands = [
     true,
     state =>
       O.of(state).flatMap(H.setUpEnv(initStore))
-        .flatMap(([{ listFeeds }]) => listFeeds())
+        .flatMap(H.tryCall('listFeeds'))
         .flatMap(H.printFeeds)
   ],
   [
@@ -148,13 +148,9 @@ const runCLI = (
     .map(Argv.extractArguments)
     /* Get config */
     .flatMap(state =>
-      H.findExistingDirectory(configLocations)
-        .catch(() => O.throw('No config file found! RTFM!'))
-        .flatMap(location => H.readFile(`${location}/${Config.filename}`)
-            .map(Config.parse(state, location))
-        )
+      Config.readConfig(configLocations)
+        .map(config => state.set('configuration', config))
     )
-    .map(Config.applyDefaults)
     /* Define mode */
     .map(state =>
       state.set(

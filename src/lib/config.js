@@ -1,9 +1,13 @@
 /**
+ * @file
+ *
  * Config
  * The config
  */
 const path = require('path')
 const Immutable = require('immutable')
+const {Observable: O} = require('rx')
+const H = require('./helpers')
 
 const Config = {
   locations: [
@@ -29,24 +33,28 @@ const Config = {
     }
   }),
 
-  applyDefaults: state =>
-    state.set(
-      'configuration',
-      Config.defaults(state.get('configuration')).merge(state.get('configuration'))
-    ),
+  applyDefaults: config =>
+    Config.defaults(config).merge(config),
 
   /* Parses the config JSON */
-  parse: (state, location) => configStr => {
+  parse: location => configStr => {
     try {
-      return state.set('configuration',
-        Immutable.fromJS(
-          Object.assign(JSON.parse(configStr), {location})
-        )
+      return Immutable.fromJS(
+        Object.assign(JSON.parse(configStr), {location})
       )
     } catch (e) {
       throw new Error(`Failed to parse config file: ${location}`)
     }
-  }
+  },
+
+  readConfig: (configLocations = Config.locations) =>
+    H.findExistingDirectory(configLocations)
+      .catch(() => O.throw('No config file found! RTFM!'))
+      .flatMap(location =>
+        H.readFile(`${location}/${Config.filename}`)
+          .map(Config.parse(location))
+          .map(Config.applyDefaults)
+      )
 }
 
 module.exports = Config

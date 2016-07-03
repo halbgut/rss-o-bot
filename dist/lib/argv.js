@@ -4,7 +4,7 @@ var Immutable = require('immutable');
 
 var Argv = {
   extractArguments: function extractArguments(argv) {
-    return Immutable.fromJS({ action: argv[2], arguments: argv.slice(2) });
+    return Immutable.fromJS({ action: argv[2], arguments: argv.slice(3) });
   },
   applyModeFlags: function applyModeFlags(state) {
     var args = state.get('arguments');

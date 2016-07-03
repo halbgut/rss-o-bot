@@ -149,7 +149,7 @@ var Helpers = {
         var blogTitle = _ref8[1];
         var url = _ref8[2];
         var filters = _ref8[3];
-        return id + ': ' + blogTitle + ' – ' + url + ' – ' + filters + '\n';
+        return id + ': ' + blogTitle + ' - ' + url + ' - ' + filters + '\n';
       }).join('');
     });
   },
@@ -159,7 +159,7 @@ var Helpers = {
    */
   getCommand: function getCommand(commands) {
     return function (state) {
-      var command = Helpers.findCommand(commands, state.get('action'));
+      var command = Helpers.findCommand(commands, state.get('action'), state.get('arguments'));
       if (!command) throw new Error('No such command: ' + state.get('action'));
       debug('Running command ' + command[0]);
       return Helpers.setCommandState(state)(command);

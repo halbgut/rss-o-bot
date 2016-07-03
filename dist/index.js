@@ -12,10 +12,8 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
  */
 var Rx = require('rx');
 var O = Rx.Observable;
-var Immutable = require('immutable');
 var debug = require('debug')('rss-o-bot');
 
-var H = require('./lib/helpers');
 var Config = require('./lib/config');
 var Notify = require('./lib/notify');
 var poll = require('./lib/poll');
@@ -32,15 +30,7 @@ module.exports = function runRSSOBotDaemon(state) {
 };
 
 module.exports.pollFeeds = pollFeeds;
-module.exports.getConfig = function () {
-  return H.findExistingDirectory(Config.locations).flatMap(function (location) {
-    return H.readFile(location + '/' + Config.filename).map(function (configStr) {
-      return Immutable.fromJS(JSON.parse(configStr));
-    });
-  }).map(function (config) {
-    return config.merge(Config.defaults(config));
-  });
-};
+module.exports.getConfig = Config.readConfig;
 
 function pollFeeds(config, _ref3, force) {
   var getFeeds = _ref3.getFeeds;
