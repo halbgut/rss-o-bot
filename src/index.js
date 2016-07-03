@@ -6,8 +6,11 @@
  */
 const Rx = require('rx')
 const O = Rx.Observable
+const Immutable = require('immutable')
 const debug = require('debug')('rss-o-bot')
 
+const H = require('./lib/helpers')
+const Config = require('./lib/config')
 const Notify = require('./lib/notify')
 const poll = require('./lib/poll')
 const initStore = require('./lib/store')
@@ -26,6 +29,12 @@ module.exports = function runRSSOBotDaemon (state) {
 }
 
 module.exports.pollFeeds = pollFeeds
+module.exports.getConfig = () =>
+  H.findExistingDirectory(Config.locations)
+  .flatMap(location => H.readFile(`${location}/${Config.filename}`)
+      .map(configStr => Immutable.fromJS(JSON.parse(configStr)))
+  )
+  .map(config => config.merge(Config.defaults(config)))
 
 function pollFeeds (config, {getFeeds, insertFeed, updateLatestLink, setBlogTitle}, force) {
   return (

@@ -130,7 +130,7 @@ const Helpers = {
    */
   getCommand: commands => state => {
     const command = Helpers.findCommand(commands, state.get('action'))
-    if (!command) throw new Error('No such command')
+    if (!command) throw new Error(`No such command: ${state.get('action')}`)
     debug(`Running command ${command[0]}`)
     return Helpers.setCommandState(state)(command)
   },

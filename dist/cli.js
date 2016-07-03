@@ -187,6 +187,6 @@ var runCLI = function runCLI() {
 
 module.exports = runCLI;
 
-if (!process.env['RSS-O-BOT-TESTING-MODE']) {
+if (!process.env['RSS_O_BOT_TESTING_MODE']) {
   runCLI().subscribe(console.log, console.error);
 }
