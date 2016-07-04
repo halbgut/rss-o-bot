@@ -32,6 +32,7 @@ module.exports = function runRSSOBotDaemon(state) {
 module.exports.pollFeeds = pollFeeds;
 module.exports.getConfig = Config.readConfig;
 
+// TODO: Clean this up, it's ugly AF
 function pollFeeds(config, _ref3, force) {
   var getFeeds = _ref3.getFeeds;
   var insertFeed = _ref3.insertFeed;

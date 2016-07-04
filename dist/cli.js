@@ -57,13 +57,18 @@ var commands = [['add', function (args) {
     return removeFeed(id);
   });
 }], ['list', true, function (state) {
-  return O.of(state).flatMap(H.setUpEnv(initStore)).flatMap(H.tryCall('listFeeds')).flatMap(H.printFeeds);
-}], ['poll-feeds', true, function (state) {
   return O.of(state).flatMap(H.setUpEnv(initStore)).flatMap(function (_ref5) {
-    var _ref6 = _slicedToArray(_ref5, 2);
+    var _ref6 = _slicedToArray(_ref5, 1);
 
-    var store = _ref6[0];
-    var config = _ref6[1];
+    var listFeeds = _ref6[0].listFeeds;
+    return listFeeds();
+  }).flatMap(H.printFeeds);
+}], ['poll-feeds', true, function (state) {
+  return O.of(state).flatMap(H.setUpEnv(initStore)).flatMap(function (_ref7) {
+    var _ref8 = _slicedToArray(_ref7, 2);
+
+    var store = _ref8[0];
+    var config = _ref8[1];
     return require('.').pollFeeds(config, store, true);
   });
 }], ['test-notification', true, function (state) {
@@ -71,20 +76,20 @@ var commands = [['add', function (args) {
 }], ['import', function (args) {
   return !!args.get(0);
 }, function (state) {
-  return O.of(state).flatMap(H.setUpEnv(initStore)).map(function (_ref7) {
-    var _ref8 = _slicedToArray(_ref7, 1);
+  return O.of(state).flatMap(H.setUpEnv(initStore)).map(function (_ref9) {
+    var _ref10 = _slicedToArray(_ref9, 1);
 
-    var store = _ref8[0];
+    var store = _ref10[0];
     return store;
   })
   // TODO: Perform readFile here instead of inside opml.import
   .flatMap(opml.import(state.get('arguments').first())).flatMap(H.printFeeds);
 }], ['export', true, function (state) {
-  return O.of(state).flatMap(H.setUpEnv(initStore)).map(function (_ref9) {
-    var _ref10 = _slicedToArray(_ref9, 2);
+  return O.of(state).flatMap(H.setUpEnv(initStore)).map(function (_ref11) {
+    var _ref12 = _slicedToArray(_ref11, 2);
 
-    var config = _ref10[0];
-    var store = _ref10[1];
+    var config = _ref12[0];
+    var store = _ref12[1];
     return store;
   }).flatMap(opml.export);
 }], [['run'], true, function (state) {
@@ -92,13 +97,13 @@ var commands = [['add', function (args) {
     require('.')();
   });
 }], [['-h', '--help', 'help'], true, function (state) {
-  return O.of(state).flatMap(H.buildMan).map(function (_ref11) {
-    var synopsis = _ref11.synopsis;
+  return O.of(state).flatMap(H.buildMan).map(function (_ref13) {
+    var synopsis = _ref13.synopsis;
     return synopsis + 'Please refer to `man rss-o-bot`, `rss-o-bot --manual` or the README for further instructions.';
   });
 }], [['-m', '--manual', '--man', 'manual'], true, function (state) {
-  return O.of(state).flatMap(H.buildMan).map(function (_ref12) {
-    var raw = _ref12.raw;
+  return O.of(state).flatMap(H.buildMan).map(function (_ref14) {
+    var raw = _ref14.raw;
     return raw;
   });
 }], [['-v', '--version', 'version'], true, function (state) {
@@ -108,8 +113,8 @@ var commands = [['add', function (args) {
     o.onCompleted();
   });
 }], ['build-man', true, function (state) {
-  return O.of(state).flatMap(H.buildMan).flatMap(function (_ref13) {
-    var man = _ref13.man;
+  return O.of(state).flatMap(H.buildMan).flatMap(function (_ref15) {
+    var man = _ref15.man;
     return H.writeFile(__dirname + '/../dist/man/rss-o-bot.1', man);
   }).map(function () {
     return 'Man built';
@@ -160,11 +165,11 @@ var runCLI = function runCLI() {
           /* Ignore any command passed, since there's only
            * `run` on the server.
            */
-          return H.readFile(H.publicKeyPath(config)).flatMap(server.listen(config)).map(function (_ref14) {
-            var _ref15 = _slicedToArray(_ref14, 2);
+          return H.readFile(H.publicKeyPath(config)).flatMap(server.listen(config)).map(function (_ref16) {
+            var _ref17 = _slicedToArray(_ref16, 2);
 
-            var data = _ref15[0];
-            var respond = _ref15[1];
+            var data = _ref17[0];
+            var respond = _ref17[1];
 
             /* Must be a public key */
             if (typeof data === 'string') {

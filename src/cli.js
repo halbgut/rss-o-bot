@@ -44,7 +44,7 @@ const commands = [
     true,
     state =>
       O.of(state).flatMap(H.setUpEnv(initStore))
-        .flatMap(H.tryCall('listFeeds'))
+        .flatMap(([{listFeeds}]) => listFeeds())
         .flatMap(H.printFeeds)
   ],
   [
