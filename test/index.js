@@ -10,12 +10,33 @@ const run = (a, n = 1) => f => t => {
   t.plan(n)
   const o = runCLI(['node', '', ...a], configLocations)
   f(t, o)
-    .catch(e => t.fail(e.message))
     .subscribe(
       () => {},
       console.error,
       () => t.end()
     )
+}
+
+const parsePrintedFeeds = feeds =>
+  feeds.split('\n')
+    .map(feed => {
+      if (feed.length < 1) {
+        return false
+      } else {
+        const [id, rest] = feed.split(': ')
+        const [title, setUrl, filters] = rest.split(' - ')
+        return [id, title, setUrl, filters]
+      }
+    })
+    .filter(x => !!x)
+
+const containsFeedUrl = (url, t) => feeds => {
+  const feedsMatching = feeds.filter(feed =>
+    typeof feed.get === 'function'
+      ? feed.get('url') === url
+      : feed[2] === url
+  )
+  return t.true(feedsMatching.length >= 1)
 }
 
 test.after('remove DB', t => {
@@ -50,18 +71,60 @@ test.cb('man', run(['-m'])((t, o) =>
   const filter = 'somefilter'
   test.cb('add', run(['add', url, filter], 3)((t, o) =>
     o.map(feed => {
-      const [id, rest] = feed.split('\n')[0].split(': ')
-      const [title, setUrl, filters] = rest.split(' - ')
+      const [id, title, setUrl, filters] = parsePrintedFeeds(feed)[0]
       t.deepEqual([title, setUrl, filters], ['undefined', url, filter])
       t.regex(id, /\d+/)
     })
       .flatMap(Config.readConfig(configLocations))
       .flatMap(initStore)
       .flatMap(H.tryCall('getFeeds'))
-      .map(feeds => {
-        const feedsMatching = feeds.filter(feed => feed.get('url') === url)
-        t.deepEqual(feedsMatching.length, 1)
-      })
+      .map(containsFeedUrl(url, t))
   ))
+
+  test.cb('list', t => {
+    t.plan(1)
+    Config.readConfig(configLocations)
+      .flatMap(initStore)
+      .flatMap(H.tryCall('insertFeed', url, []))
+      .flatMap(() =>
+        runCLI(['node', '', 'list'], configLocations)
+      )
+      .map(parsePrintedFeeds)
+      .map(containsFeedUrl(url, t))
+      .subscribe(
+        () => {},
+        console.error,
+        () => t.end()
+      )
+  })
+
+  test.cb('rm', t => {
+    t.plan(1)
+    const store$ =
+      Config.readConfig(configLocations)
+        .flatMap(initStore)
+
+    store$.flatMap(({ insertFeed, listFeeds }) =>
+      insertFeed(url + '2', [])
+        .flatMap(() => listFeeds())
+        .map(feeds => feeds.filter(feed => feed.get('url') === url + '2'))
+        .map(feeds => feeds[0].get('id'))
+        .flatMap(feedId =>
+          runCLI(['node', '', 'rm', feedId], configLocations)
+            .map(() => feedId)
+        )
+        .flatMap(feedId =>
+          listFeeds()
+            .map(feeds =>
+              t.deepEqual(feeds.filter(feed => feed.get('id') === feedId).length, 0)
+            )
+        )
+    )
+      .subscribe(
+        () => {},
+        console.error,
+        () => t.end()
+      )
+  })
 }
 
