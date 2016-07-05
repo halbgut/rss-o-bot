@@ -8,6 +8,7 @@ const Rx = require('rx')
 const O = Rx.Observable
 const debug = require('debug')('rss-o-bot')
 
+const H = require('./lib/helpers')
 const Config = require('./lib/config')
 const Notify = require('./lib/notify')
 const poll = require('./lib/poll')
@@ -29,45 +30,52 @@ module.exports = function runRSSOBotDaemon (state) {
 module.exports.pollFeeds = pollFeeds
 module.exports.getConfig = Config.readConfig
 
-// TODO: Clean this up, it's ugly AF
-function pollFeeds (config, {getFeeds, insertFeed, updateLatestLink, setBlogTitle}, force) {
+const queryFeed = ({updateLatestLink, setBlogTitle}) => feed => {
+  const feed$ = O.fromPromise(feed.getFilters())
+    .flatMap(filters =>
+        poll(
+          feed.get('url'),
+          filters.map(f => [f.get('keyword'), f.get('kind')])
+      ).retry(2)
+    )
+
+  return (
+    feed$
+      .flatMap(getNewLinks(feed))
+      .filter(({link}) =>
+        (link && link !== feed.get('latestLink')) || debug(`Old URL: ${link}`)
+      )
+      .flatMap(info =>
+        feed.get('blogTitle')
+          ? O.of(info)
+          : setBlogTitle(feed.get('id'), info.blogTitle)
+      )
+      .flatMap(info =>
+        updateLatestLink(feed.get('id'), info.link).map(() => info)
+      )
+      .filter(() => feed.get('latestLink'))
+      .tap(({link}) => debug(`New URL: ${link}`))
+    )
+}
+
+const notifyWrapper = notify => ({ blog, link, title }) =>
+  notify(blog, link, title)
+    .tap(() => debug('Sent notifications'))
+    .retry(2)
+
+function pollFeeds (config, store, force) {
   return (
     O.forkJoin(
       O.of(Notify(config)),
-      getFeeds(force)
+      store.getFeeds(force)
     )
-      .flatMap(([notify, feeds]) => Rx.Observable.forkJoin(
-        ...feeds.map(feed =>
-          O.fromPromise(feed.getFilters())
-            .flatMap(filters =>
-              O.onErrorResumeNext(
-                poll(feed.get('url'), filters.map(f => [f.get('keyword'), f.get('kind')]))
-                  .retry(2)
-                  .flatMap(getNewLinks(feed))
-                  .filter(({link}) =>
-                    (link && link !== feed.get('latestLink')) || debug(`Old URL: ${link}`)
-                  )
-                  .flatMap(info =>
-                    feed.get('blogTitle')
-                      ? O.of(info)
-                      : setBlogTitle(feed.get('id'), info.blogTitle)
-                  )
-                  .flatMap(info =>
-                    updateLatestLink(feed.get('id'), info.link).map(info)
-                  )
-                  .filter(() => feed.get('latestLink'))
-                  .tap(({link}) => debug(`New URL: ${link}`))
-                  .flatMap(({ blog, link, title }) =>
-                    notify(blog, link, title)
-                      .tap(() => debug('Sent notifications'))
-                      .retry(2)
-                  )
-                ),
-                O.just()
-                  .tap(() => console.error(`Failed to get ${feed.get('url')}`))
-            )
+      .flatMap(([notify, feeds]) => {
+        const queries$ = Rx.Observable.forkJoin(
+          feeds.map(queryFeed(store))
+          .flatMap(notifyWrapper(notify))
         )
-      ))
+        return H.catchAndLogErrors(queries$)
+      })
   )
 }
 

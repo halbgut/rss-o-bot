@@ -2,8 +2,6 @@
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 /**
  * index
  * This module exports a function with a config property.
@@ -14,6 +12,7 @@ var Rx = require('rx');
 var O = Rx.Observable;
 var debug = require('debug')('rss-o-bot');
 
+var H = require('./lib/helpers');
 var Config = require('./lib/config');
 var Notify = require('./lib/notify');
 var poll = require('./lib/poll');
@@ -32,48 +31,54 @@ module.exports = function runRSSOBotDaemon(state) {
 module.exports.pollFeeds = pollFeeds;
 module.exports.getConfig = Config.readConfig;
 
-// TODO: Clean this up, it's ugly AF
-function pollFeeds(config, _ref3, force) {
-  var getFeeds = _ref3.getFeeds;
-  var insertFeed = _ref3.insertFeed;
+var queryFeed = function queryFeed(_ref3) {
   var updateLatestLink = _ref3.updateLatestLink;
   var setBlogTitle = _ref3.setBlogTitle;
+  return function (feed) {
+    var feed$ = O.fromPromise(feed.getFilters()).flatMap(function (filters) {
+      return poll(feed.get('url'), filters.map(function (f) {
+        return [f.get('keyword'), f.get('kind')];
+      })).retry(2);
+    });
 
-  return O.forkJoin(O.of(Notify(config)), getFeeds(force)).flatMap(function (_ref4) {
-    var _Rx$Observable;
+    return feed$.flatMap(getNewLinks(feed)).filter(function (_ref4) {
+      var link = _ref4.link;
+      return link && link !== feed.get('latestLink') || debug('Old URL: ' + link);
+    }).flatMap(function (info) {
+      return feed.get('blogTitle') ? O.of(info) : setBlogTitle(feed.get('id'), info.blogTitle);
+    }).flatMap(function (info) {
+      return updateLatestLink(feed.get('id'), info.link).map(function () {
+        return info;
+      });
+    }).filter(function () {
+      return feed.get('latestLink');
+    }).tap(function (_ref5) {
+      var link = _ref5.link;
+      return debug('New URL: ' + link);
+    });
+  };
+};
 
-    var _ref5 = _slicedToArray(_ref4, 2);
+var notifyWrapper = function notifyWrapper(notify) {
+  return function (_ref6) {
+    var blog = _ref6.blog;
+    var link = _ref6.link;
+    var title = _ref6.title;
+    return notify(blog, link, title).tap(function () {
+      return debug('Sent notifications');
+    }).retry(2);
+  };
+};
 
-    var notify = _ref5[0];
-    var feeds = _ref5[1];
-    return (_Rx$Observable = Rx.Observable).forkJoin.apply(_Rx$Observable, _toConsumableArray(feeds.map(function (feed) {
-      return O.fromPromise(feed.getFilters()).flatMap(function (filters) {
-        return O.onErrorResumeNext(poll(feed.get('url'), filters.map(function (f) {
-          return [f.get('keyword'), f.get('kind')];
-        })).retry(2).flatMap(getNewLinks(feed)).filter(function (_ref6) {
-          var link = _ref6.link;
-          return link && link !== feed.get('latestLink') || debug('Old URL: ' + link);
-        }).flatMap(function (info) {
-          return feed.get('blogTitle') ? O.of(info) : setBlogTitle(feed.get('id'), info.blogTitle);
-        }).flatMap(function (info) {
-          return updateLatestLink(feed.get('id'), info.link).map(info);
-        }).filter(function () {
-          return feed.get('latestLink');
-        }).tap(function (_ref7) {
-          var link = _ref7.link;
-          return debug('New URL: ' + link);
-        }).flatMap(function (_ref8) {
-          var blog = _ref8.blog;
-          var link = _ref8.link;
-          var title = _ref8.title;
-          return notify(blog, link, title).tap(function () {
-            return debug('Sent notifications');
-          }).retry(2);
-        }));
-      }, O.just().tap(function () {
-        return console.error('Failed to get ' + feed.get('url'));
-      }));
-    })));
+function pollFeeds(config, store, force) {
+  return O.forkJoin(O.of(Notify(config)), store.getFeeds(force)).flatMap(function (_ref7) {
+    var _ref8 = _slicedToArray(_ref7, 2);
+
+    var notify = _ref8[0];
+    var feeds = _ref8[1];
+
+    var queries$ = Rx.Observable.forkJoin(feeds.map(queryFeed(store)).flatMap(notifyWrapper(notify)));
+    return H.catchAndLogErrors(queries$);
   });
 }
 

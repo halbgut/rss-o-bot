@@ -163,7 +163,19 @@ const Helpers = {
   /* Makes most common preparation steps for a command */
   setUpEnv: init => state =>
     init(state.get('configuration'))
-      .map(store => [store, ...Helpers.getConfigAndArgs(state)])
+      .map(store => [store, ...Helpers.getConfigAndArgs(state)]),
+
+  /*
+   * Error handling
+   */
+
+  /* Don't die when errors occure */
+  catchAndLogErrors: tag => o$ =>
+    O.onErrorResumeNext(
+      o$,
+      O.just(true)
+        .tap(() => console.error(`Failed on ${tag}`))
+    )
 }
 
 module.exports = Helpers
