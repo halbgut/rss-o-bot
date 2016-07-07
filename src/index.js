@@ -21,6 +21,11 @@ module.exports = function runRSSOBotDaemon (state) {
     Rx.Observable.interval(config.get('interval') * 1000).startWith(0)
   )
     .flatMap(([s]) => pollFeeds(s))
+    /* Restart on error */
+    .catch(err => {
+      console.error(err)
+      return runRSSOBotDaemon(state)
+    })
     .subscribe(
       () => {},
       console.error

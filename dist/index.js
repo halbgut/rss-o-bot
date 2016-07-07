@@ -25,6 +25,11 @@ module.exports = function runRSSOBotDaemon(state) {
 
     var s = _ref2[0];
     return pollFeeds(s);
+  })
+  /* Restart on error */
+  .catch(function (err) {
+    console.error(err);
+    return runRSSOBotDaemon(state);
   }).subscribe(function () {}, console.error);
 };
 
