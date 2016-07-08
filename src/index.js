@@ -8,7 +8,6 @@ const Rx = require('rx')
 const O = Rx.Observable
 const debug = require('debug')('rss-o-bot')
 
-const H = require('./lib/helpers')
 const Config = require('./lib/config')
 const Notify = require('./lib/notify')
 const poll = require('./lib/poll')
@@ -38,10 +37,16 @@ module.exports.getConfig = Config.readConfig
 const queryFeed = ({updateLatestLink, setBlogTitle}) => feed => {
   const feed$ = O.fromPromise(feed.getFilters())
     .flatMap(filters =>
-        poll(
-          feed.get('url'),
-          filters.map(f => [f.get('keyword'), f.get('kind')])
-      ).retry(2)
+      poll(
+        feed.get('url'),
+        filters.map(f => [f.get('keyword'), f.get('kind')])
+      )
+        .retry(2)
+        .catch(err => {
+          const msg = `Failed downloading "${feed.get('url')}"`
+          debug(`${msg}: ${err}`)
+          throw new Error(msg)
+        })
     )
 
   return (
@@ -60,7 +65,7 @@ const queryFeed = ({updateLatestLink, setBlogTitle}) => feed => {
       )
       .filter(() => feed.get('latestLink'))
       .tap(({link}) => debug(`New URL: ${link}`))
-    )
+  )
 }
 
 const notifyWrapper = notify => ({ blog, link, title }) =>
@@ -74,13 +79,11 @@ function pollFeeds (config, store, force) {
       O.of(Notify(config)),
       store.getFeeds(force)
     )
-      .flatMap(([notify, feeds]) => {
-        const queries$ = Rx.Observable.forkJoin(
+      .flatMap(([notify, feeds]) =>
+        Rx.Observable.merge(
           feeds.map(queryFeed(store))
-          .flatMap(notifyWrapper(notify))
-        )
-        return H.catchAndLogErrors(queries$)
-      })
+        ).flatMap(notifyWrapper(notify))
+      )
   )
 }
 

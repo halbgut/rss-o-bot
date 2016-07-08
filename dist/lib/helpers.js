@@ -195,20 +195,11 @@ var Helpers = {
         return [store].concat(_toConsumableArray(Helpers.getConfigAndArgs(state)));
       });
     };
-  },
+  }
 
   /*
    * Error handling
    */
-
-  /* Don't die when errors occure */
-  catchAndLogErrors: function catchAndLogErrors(tag) {
-    return function (o$) {
-      return O.onErrorResumeNext(o$, O.just(true).tap(function () {
-        return console.error('Failed on ' + tag);
-      }));
-    };
-  }
 };
 
 module.exports = Helpers;

@@ -12,7 +12,6 @@ var Rx = require('rx');
 var O = Rx.Observable;
 var debug = require('debug')('rss-o-bot');
 
-var H = require('./lib/helpers');
 var Config = require('./lib/config');
 var Notify = require('./lib/notify');
 var poll = require('./lib/poll');
@@ -43,7 +42,11 @@ var queryFeed = function queryFeed(_ref3) {
     var feed$ = O.fromPromise(feed.getFilters()).flatMap(function (filters) {
       return poll(feed.get('url'), filters.map(function (f) {
         return [f.get('keyword'), f.get('kind')];
-      })).retry(2);
+      })).retry(2).catch(function (err) {
+        var msg = 'Failed downloading "' + feed.get('url') + '"';
+        debug(msg + ': ' + err);
+        throw new Error(msg);
+      });
     });
 
     return feed$.flatMap(getNewLinks(feed)).filter(function (_ref4) {
@@ -81,9 +84,7 @@ function pollFeeds(config, store, force) {
 
     var notify = _ref8[0];
     var feeds = _ref8[1];
-
-    var queries$ = Rx.Observable.forkJoin(feeds.map(queryFeed(store)).flatMap(notifyWrapper(notify)));
-    return H.catchAndLogErrors(queries$);
+    return Rx.Observable.merge(feeds.map(queryFeed(store))).flatMap(notifyWrapper(notify));
   });
 }
 
