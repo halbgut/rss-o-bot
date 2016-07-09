@@ -11,7 +11,9 @@
     "build-tests": "babel --presets babel-preset-es2015 tests/src --out-dir tests/dist",
     "watch-build-tests": "watch 'npm run build-tests' tests/src",
     "watch-build": "watch 'npm run build-js -- --source-maps' src",
-    "test": "RSS_O_BOT_TESTING_MODE=1 ava tests/dist"
+    "test": "RSS_O_BOT_TESTING_MODE=1 ava tests/dist",
+    "ci-test": "RSS_O_BOT_TESTING_MODE=1 ava tests/dist && test-coverage",
+    "test-coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "repository": "https://github.com/Kriegslustig/rss-o-bot.git",
   "author": "Kriegslustig <npm@ls7.ch>",
@@ -35,6 +37,7 @@
     "ava": "^0.15.2",
     "babel-core": "^6.9.1",
     "babel-preset-es2015": "^6.9.0",
+    "coveralls": "^2.11.9",
     "nyc": "^7.0.0",
     "watch": "^0.18.0"
   },

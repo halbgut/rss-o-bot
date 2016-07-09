@@ -1,4 +1,5 @@
 language: node_js
+script: npm run ci-test
 node_js:
   - "4.4"
   - "node"
