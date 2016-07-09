@@ -1,10 +1,17 @@
 const fs = require('fs')
-const {test} = require('ava')
+const { test } = require('ava')
+
 const runCLI = require('../src/cli.js')
 const configLocations = [`${__dirname}/config/local`]
 const initStore = require('../src/lib/store')
 const Config = require('../src/lib/config')
 const H = require('../src/lib/helpers')
+
+const handleError = t => err => {
+  console.error(err)
+  t.fail('poll-feeds failed')
+  t.end()
+}
 
 const run = (a, n = 1) => f => t => {
   t.plan(n)
@@ -12,7 +19,7 @@ const run = (a, n = 1) => f => t => {
   f(t, o)
     .subscribe(
       () => {},
-      console.error,
+      handleError(t),
       () => t.end()
     )
 }
@@ -66,8 +73,18 @@ test.cb('man', run(['-m'])((t, o) =>
   )
 ))
 
-{
-  const url = 'https://github.com/Kriegslustig/rss-o-bot/commits/master.atom'
+/* function to create dummy posts */
+const createDummyPost =
+  (url, filters = []) =>
+    Config.readConfig(configLocations)
+      .flatMap(initStore)
+      .flatMap(store =>
+        store.insertFeed(url, filters)
+          .map(store)
+      )
+
+; (() => {
+  const url = 'https://lucaschmid.net/feed/rss.xml'
   const filter = 'somefilter'
   test.cb('add', run(['add', url, filter], 3)((t, o) =>
     o.map(feed => {
@@ -93,7 +110,7 @@ test.cb('man', run(['-m'])((t, o) =>
       .map(containsFeedUrl(url, t))
       .subscribe(
         () => {},
-        console.error,
+        handleError(t),
         () => t.end()
       )
   })
@@ -106,7 +123,7 @@ test.cb('man', run(['-m'])((t, o) =>
 
     store$.flatMap(({ insertFeed, listFeeds }) =>
       insertFeed(url + '2', [])
-        .flatMap(() => listFeeds())
+        .flatMap(listFeeds)
         .map(feeds => feeds.filter(feed => feed.get('url') === url + '2'))
         .map(feeds => feeds[0].get('id'))
         .flatMap(feedId =>
@@ -122,9 +139,29 @@ test.cb('man', run(['-m'])((t, o) =>
     )
       .subscribe(
         () => {},
-        console.error,
+        handleError(t),
         () => t.end()
       )
   })
-}
+})()
+
+; (() => {
+  const url = 'https://lucaschmid.net/feed/rss.xml'
+  test.cb('poll-feeds', t => {
+    createDummyPost(url)
+      .flatMap(store =>
+        runCLI(['node', '', 'poll-feeds'], configLocations)
+          .map(() => store)
+      )
+      .flatMap(({ listFeeds }) => listFeeds())
+      .tap(feeds =>
+        t.truthy(feeds[0].get('title') !== 'undefined')
+      )
+      .subscribe(
+        () => {},
+        handleError(t),
+        () => t.end()
+      )
+  })
+})()
 
