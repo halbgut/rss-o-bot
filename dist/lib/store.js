@@ -20,10 +20,11 @@ var path = require('path');
 var debug = require('debug')('rss-o-bot');
 
 var genInsertFeed = function genInsertFeed(Feed, Filter) {
-  return function (url, filters) {
+  return function (url, filters, blogTitle) {
     return O.fromPromise(Feed.create({
       url: url,
-      lastCheck: 0
+      lastCheck: 0,
+      blogTitle: blogTitle
     })).flatMap(function (feed) {
       return filters.length > 0 ? O.forkJoin(filters.map(function (f) {
         return O.fromPromise(Filter.create(f));

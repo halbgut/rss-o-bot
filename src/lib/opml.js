@@ -22,7 +22,7 @@ module.exports = {
           .pipe(saxStream)
         saxStream.on('opentag', t => {
           if (t.name !== 'OUTLINE') return
-          tasks.push(insertFeed(t.attributes.XMLURL || t.attributes.URL, []))
+          tasks.push(insertFeed(t.attributes.XMLURL || t.attributes.URL, [], t.attributes.title))
         })
         saxStream.on('end', () =>
           O.forkJoin(tasks)
@@ -46,7 +46,15 @@ module.exports = {
               {dateCreated: moment().utc().format('dd D YYYY at HH:MM:SS UTC')}
             ]},
             {body: feeds.map(f =>
-              ({ outline: [{ _attr: { xmlUrl: f.get('url') } }] })
+              ({
+                outline: [{
+                  _attr: {
+                    xmlUrl: f.get('url'),
+                    title: f.get('title'),
+                    text: f.get('title')
+                  }
+                }]
+              })
             )}
           ]
         }, {declaration: true}))

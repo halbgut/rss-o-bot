@@ -13,11 +13,12 @@ const Sequelize = require('sequelize')
 const path = require('path')
 const debug = require('debug')('rss-o-bot')
 
-const genInsertFeed = (Feed, Filter) => (url, filters) =>
+const genInsertFeed = (Feed, Filter) => (url, filters, blogTitle) =>
   O.fromPromise(Feed.create(
     {
       url,
-      lastCheck: 0
+      lastCheck: 0,
+      blogTitle
     }
   ))
   .flatMap(feed =>

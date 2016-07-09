@@ -24,7 +24,7 @@ module.exports = {
         fs.createReadStream(file).pipe(saxStream);
         saxStream.on('opentag', function (t) {
           if (t.name !== 'OUTLINE') return;
-          tasks.push(insertFeed(t.attributes.XMLURL || t.attributes.URL, []));
+          tasks.push(insertFeed(t.attributes.XMLURL || t.attributes.URL, [], t.attributes.title));
         });
         saxStream.on('end', function () {
           return O.forkJoin(tasks).subscribe(function (v) {
@@ -47,7 +47,15 @@ module.exports = {
     return listFeeds().map(function (feeds) {
       return xml({
         opml: [{ _attr: { version: '1.1' } }, { head: [{ title: 'RSS-o-Bot' }, { dateCreated: moment().utc().format('dd D YYYY at HH:MM:SS UTC') }] }, { body: feeds.map(function (f) {
-            return { outline: [{ _attr: { xmlUrl: f.get('url') } }] };
+            return {
+              outline: [{
+                _attr: {
+                  xmlUrl: f.get('url'),
+                  title: f.get('title'),
+                  text: f.get('title')
+                }
+              }]
+            };
           }) }]
       }, { declaration: true });
     });
