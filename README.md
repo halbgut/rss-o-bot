@@ -2,6 +2,10 @@
 
 # RSS-o-Bot 1.0.0-rc.0 [WIP]
 
+j
+[![Coverage Status](https://coveralls.io/repos/github/Kriegslustig/rss-o-bot/badge.svg?branch=master)](https://coveralls.io/github/Kriegslustig/rss-o-bot?branch=master)
+[![Build Status](https://travis-ci.org/Kriegslustig/rss-o-bot.svg?branch=master)](https://travis-ci.org/Kriegslustig/rss-o-bot)
+
 A super simple command-line RSS and Atom reader/client. It's not made to read Feeds (like Newsbeuter), but to notify you when new items are posted. The Web is supposed to be decentralized most readers (like RSS Bot) are built through centralized services. RSS-o-Bot is not. It's build to be run on your own machine. Notifications are managed by services that are installed separately. Notification services are available for email, desktop notifications and Telegram.
 
 ## Name
