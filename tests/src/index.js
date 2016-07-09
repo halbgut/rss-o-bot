@@ -1,11 +1,11 @@
 const fs = require('fs')
 const { test } = require('ava')
 
-const runCLI = require('../src/cli.js')
-const configLocations = [`${__dirname}/config/local`]
-const initStore = require('../src/lib/store')
-const Config = require('../src/lib/config')
-const H = require('../src/lib/helpers')
+const runCLI = require('../../dist/cli.js')
+const configLocations = [`${__dirname}/../config/local`]
+const initStore = require('../../dist/lib/store')
+const Config = require('../../dist/lib/config')
+const H = require('../../dist/lib/helpers')
 
 const handleError = t => err => {
   console.error(err)
@@ -47,7 +47,7 @@ const containsFeedUrl = (url, t) => feeds => {
 }
 
 test.after('remove DB', t => {
-  fs.unlink(`${__dirname}/../data/test_feeds.sqlite`)
+  fs.unlink(`${__dirname}/../../data/test_feeds.sqlite`)
   t.pass()
 })
 

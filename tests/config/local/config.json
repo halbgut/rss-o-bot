@@ -3,7 +3,7 @@
     "name": "data",
     "options": {
       "dialect": "sqlite",
-      "storage": "../data/test_feeds.sqlite"
+      "storage": "../../data/test_feeds.sqlite"
     }
   }
 }
