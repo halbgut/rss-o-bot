@@ -86,7 +86,7 @@ const createDummyPost =
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
   const filter = 'somefilter'
-  test.cb('add', run(['add', url, filter], 3)((t, o) =>
+  test.serial.cb('add', run(['add', url, filter], 3)((t, o) =>
     o.map(feed => {
       const [id, title, setUrl, filters] = parsePrintedFeeds(feed)[0]
       t.deepEqual([title, setUrl, filters], ['undefined', url, filter])
@@ -115,16 +115,17 @@ const createDummyPost =
       )
   })
 
-  test.cb('rm', t => {
+  const rmTestURL = 'https://lucaschmid.net/feed/atom.xml'
+  test.serial.cb('rm', t => {
     t.plan(1)
     const store$ =
       Config.readConfig(configLocations)
         .flatMap(initStore)
 
     store$.flatMap(({ insertFeed, listFeeds }) =>
-      insertFeed(url + '2', [])
+      insertFeed(rmTestURL, [])
         .flatMap(listFeeds)
-        .map(feeds => feeds.filter(feed => feed.get('url') === url + '2'))
+        .map(feeds => feeds.filter(feed => feed.get('url') === rmTestURL))
         .map(feeds => feeds[0].get('id'))
         .flatMap(feedId =>
           runCLI(['node', '', 'rm', feedId], configLocations)
