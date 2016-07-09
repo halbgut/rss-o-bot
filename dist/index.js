@@ -45,7 +45,7 @@ var queryFeed = function queryFeed(_ref3) {
       })).retry(2).catch(function (err) {
         var msg = 'Failed downloading "' + feed.get('url') + '"';
         debug(msg + ': ' + err);
-        throw new Error(msg);
+        return O.throw(err);
       });
     });
 
@@ -90,8 +90,18 @@ function pollFeeds(config, store, force) {
 
 var getNewLinks = function getNewLinks(feed) {
   return function (stream) {
-    return feed.get('latestLink') ? O.fromArray(stream.slice(0, stream.findIndex(function (e) {
-      return e.link === feed.get('latestLink');
-    })).reverse()) : O.of(stream[0]);
+    if (feed.get('latestLink')) {
+      var latestIndex = stream.findIndex(function (e) {
+        return e.link === feed.get('latestLink');
+      });
+      var newLinks = stream.slice(0, latestIndex).reverse();
+      return O.fromArray(newLinks);
+    } else if (stream[0]) {
+      return O.of(stream[0]);
+    } else if (stream.length < 1) {
+      return O.empty();
+    } else {
+      throw Error('Unexpected state: stream is not an array');
+    }
   };
 };

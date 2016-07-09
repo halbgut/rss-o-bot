@@ -45,7 +45,7 @@ const queryFeed = ({updateLatestLink, setBlogTitle}) => feed => {
         .catch(err => {
           const msg = `Failed downloading "${feed.get('url')}"`
           debug(`${msg}: ${err}`)
-          throw new Error(msg)
+          return O.throw(err)
         })
     )
 
@@ -87,11 +87,19 @@ function pollFeeds (config, store, force) {
   )
 }
 
-const getNewLinks = feed => stream =>
-  feed.get('latestLink')
-    ? O.fromArray(stream.slice(
-      0,
-      stream.findIndex(e => e.link === feed.get('latestLink'))
-    ).reverse())
-    : O.of(stream[0])
+const getNewLinks = feed => stream => {
+  if (feed.get('latestLink')) {
+    const latestIndex = stream.findIndex(e =>
+      e.link === feed.get('latestLink')
+    )
+    const newLinks = stream.slice(0, latestIndex).reverse()
+    return O.fromArray(newLinks)
+  } else if (stream[0]) {
+    return O.of(stream[0])
+  } else if (stream.length < 1) {
+    return O.empty()
+  } else {
+    throw Error('Unexpected state: stream is not an array')
+  }
+}
 

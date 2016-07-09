@@ -42,7 +42,7 @@ const get = (url, depth = 0) => O.create(o => {
       res.on('end', () => { o.onNext(body); o.onCompleted() })
       res.on('error', err => o.onError(err))
     } else {
-      o.onError(new Error(`Request failed: ${url}`))
+      o.onError(new Error(`Request failed: ${url} with ${res.statusCode}`))
     }
   })
     .on('error', err => o.onError(err))
@@ -66,43 +66,46 @@ function parse (xml) {
   })
 }
 
-module.exports =
-  function poll (url, filters) {
-    return (
-      get(url)
-        .flatMap(parse)
-        .map(([stream, meta]) => [
-          stream
-            .filter(({ title }) => {
-              const lowTitle = title.toLowerCase()
-              return filters.filter(([keyword, not]) => {
-                const lowerCase = !includesUpperCase(keyword)
-                if (not && lowerCase) {
-                  return lowTitle.indexOf(keyword) === -1
-                } else if (not && !lowerCase) {
-                  return title.indexOf(keyword) === -1
-                } else if (!not && lowerCase) {
-                  return lowTitle.indexOf(keyword) > -1
-                } else if (!not && !lowerCase) {
-                  return title.indexOf(keyword) > -1
-                } else {
-                  debug('Unexpected case in filter ${not}, ${lowerCase}')
-                }
-              }).length === 0
-            }),
-          meta
-        ])
-        .map(([stream, meta]) =>
-          stream.map(entry => ({
-            blogTitle: meta.title,
-            title: entry.title,
-            link: isAbsoluteUrl(entry.link)
-              ? entry.link
-              : getBaseUrl(url) + entry.link
-          }))
-        )
+const applyFilters = filters => ({ title }) => {
+  /* If a filter has to use smartcase */
+  const lowTitle = title.toLowerCase()
+  return filters
+    /* Filter for valid keywords */
+    .filter(([keyword]) => keyword)
+    /* Check if any filters match smartcase */
+    .filter(([keyword, not]) => {
+      const lowerCase = !includesUpperCase(keyword)
+      if (not && lowerCase) {
+        return lowTitle.indexOf(keyword) === -1
+      } else if (not && !lowerCase) {
+        return title.indexOf(keyword) === -1
+      } else if (!not && lowerCase) {
+        return lowTitle.indexOf(keyword) > -1
+      } else if (!not && !lowerCase) {
+        return title.indexOf(keyword) > -1
+      } else {
+        debug('Unexpected case in filter ${not}, ${lowerCase}')
+      }
+    }).length === 0
+}
+
+// TODO: Clean this up
+module.exports = (url, filters) =>
+  get(url)
+    .flatMap(parse)
+    .map(([stream, meta]) => [
+      stream.filter(applyFilters(filters)),
+      meta
+    ])
+    .map(([stream, meta]) =>
+      stream.map(entry => ({
+        blogTitle: meta.title,
+        title: entry.title,
+        link: isAbsoluteUrl(entry.link)
+          ? entry.link
+          : getBaseUrl(url) + entry.link
+      }))
     )
-  }
 
 function includesUpperCase (str) {
   return !!str.match(/[A-Z]/)

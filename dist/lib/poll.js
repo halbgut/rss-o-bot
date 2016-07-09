@@ -62,7 +62,7 @@ var get = function get(url) {
           return o.onError(err);
         });
       } else {
-        o.onError(new Error('Request failed: ' + url));
+        o.onError(new Error('Request failed: ' + url + ' with ' + res.statusCode));
       }
     }).on('error', function (err) {
       return o.onError(err);
@@ -95,41 +95,56 @@ function parse(xml) {
   });
 }
 
-module.exports = function poll(url, filters) {
-  return get(url).flatMap(parse).map(function (_ref) {
-    var _ref2 = _slicedToArray(_ref, 2);
+var applyFilters = function applyFilters(filters) {
+  return function (_ref) {
+    var title = _ref.title;
 
-    var stream = _ref2[0];
-    var meta = _ref2[1];
-    return [stream.filter(function (_ref3) {
-      var title = _ref3.title;
+    /* If a filter has to use smartcase */
+    var lowTitle = title.toLowerCase();
+    return filters
+    /* Filter for valid keywords */
+    .filter(function (_ref2) {
+      var _ref3 = _slicedToArray(_ref2, 1);
 
-      var lowTitle = title.toLowerCase();
-      return filters.filter(function (_ref4) {
-        var _ref5 = _slicedToArray(_ref4, 2);
+      var keyword = _ref3[0];
+      return keyword;
+    })
+    /* Check if any filters match smartcase */
+    .filter(function (_ref4) {
+      var _ref5 = _slicedToArray(_ref4, 2);
 
-        var keyword = _ref5[0];
-        var not = _ref5[1];
+      var keyword = _ref5[0];
+      var not = _ref5[1];
 
-        var lowerCase = !includesUpperCase(keyword);
-        if (not && lowerCase) {
-          return lowTitle.indexOf(keyword) === -1;
-        } else if (not && !lowerCase) {
-          return title.indexOf(keyword) === -1;
-        } else if (!not && lowerCase) {
-          return lowTitle.indexOf(keyword) > -1;
-        } else if (!not && !lowerCase) {
-          return title.indexOf(keyword) > -1;
-        } else {
-          debug('Unexpected case in filter ${not}, ${lowerCase}');
-        }
-      }).length === 0;
-    }), meta];
-  }).map(function (_ref6) {
+      var lowerCase = !includesUpperCase(keyword);
+      if (not && lowerCase) {
+        return lowTitle.indexOf(keyword) === -1;
+      } else if (not && !lowerCase) {
+        return title.indexOf(keyword) === -1;
+      } else if (!not && lowerCase) {
+        return lowTitle.indexOf(keyword) > -1;
+      } else if (!not && !lowerCase) {
+        return title.indexOf(keyword) > -1;
+      } else {
+        debug('Unexpected case in filter ${not}, ${lowerCase}');
+      }
+    }).length === 0;
+  };
+};
+
+// TODO: Clean this up
+module.exports = function (url, filters) {
+  return get(url).flatMap(parse).map(function (_ref6) {
     var _ref7 = _slicedToArray(_ref6, 2);
 
     var stream = _ref7[0];
     var meta = _ref7[1];
+    return [stream.filter(applyFilters(filters)), meta];
+  }).map(function (_ref8) {
+    var _ref9 = _slicedToArray(_ref8, 2);
+
+    var stream = _ref9[0];
+    var meta = _ref9[1];
     return stream.map(function (entry) {
       return {
         blogTitle: meta.title,
