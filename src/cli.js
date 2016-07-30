@@ -10,7 +10,7 @@
 const initStore = require('./lib/store')
 const Notify = require('./lib/notify')
 const opml = require('./lib/opml')
-const {Observable: O} = require('rx')
+const { Observable: O } = require('rx')
 const remote = require('./lib/remote')
 const server = require('./lib/server')
 const debug = require('debug')('rss-o-bot')
@@ -75,7 +75,7 @@ const commands = [
     true,
     state =>
       O.of(state).flatMap(H.setUpEnv(initStore))
-        .map(([ config, store ]) => store)
+        .map(([ store ]) => store)
         .flatMap(opml.export)
   ],
   [

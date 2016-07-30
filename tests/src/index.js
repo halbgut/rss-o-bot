@@ -1,5 +1,7 @@
 const fs = require('fs')
 const { test } = require('ava')
+const sax = require('sax')
+const { Observable: O } = require('rx')
 
 const runCLI = require('../../dist/cli.js')
 const configLocations = [`${__dirname}/../config/local`]
@@ -9,12 +11,12 @@ const H = require('../../dist/lib/helpers')
 
 const handleError = t => err => {
   console.error(err)
-  t.fail('poll-feeds failed')
+  t.fail('test failed')
   t.end()
 }
 
 const run = (a, n = 1) => f => t => {
-  t.plan(n)
+  if (n) t.plan(n)
   const o = runCLI(['node', '', ...a], configLocations)
   f(t, o)
     .subscribe(
@@ -165,4 +167,32 @@ const createDummyPost =
       )
   })
 })()
+
+test.serial.cb('export', run(['export'], false)((t, o) =>
+  o
+    .flatMap(xmlExport => O.create(o => {
+      const parser = sax.parser(true)
+      parser.onopentag = t => {
+        if (t.name !== 'outline') return
+        o.onNext([t.attributes.xmlUrl || t.attributes.url, t.attributes.title])
+      }
+      parser.onend = () => { o.onCompleted() }
+      parser.onerror = err => o.onError(err)
+      parser.write(xmlExport).close()
+    }))
+    .withLatestFrom(
+      Config.readConfig(configLocations)
+        .flatMap(initStore)
+        .flatMap(({ listFeeds }) => listFeeds())
+    )
+    .tap(([ entry, list ]) => t.true(
+      !!list.find(item =>
+        item.get('url') === entry[0] &&
+        (
+          !item.get('blogTitle') ||
+          item.get('blogTitle') === entry[1]
+        )
+      )
+    ))
+))
 

@@ -86,10 +86,9 @@ var commands = [['add', function (args) {
   .flatMap(opml.import(state.get('arguments').first())).flatMap(H.printFeeds);
 }], ['export', true, function (state) {
   return O.of(state).flatMap(H.setUpEnv(initStore)).map(function (_ref11) {
-    var _ref12 = _slicedToArray(_ref11, 2);
+    var _ref12 = _slicedToArray(_ref11, 1);
 
-    var config = _ref12[0];
-    var store = _ref12[1];
+    var store = _ref12[0];
     return store;
   }).flatMap(opml.export);
 }], [['run'], true, function (state) {
