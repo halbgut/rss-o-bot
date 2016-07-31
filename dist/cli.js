@@ -23,7 +23,7 @@ var initStore = require('./lib/store');
 var Notify = require('./lib/notify');
 var opml = require('./lib/opml');
 var remote = require('./lib/remote');
-var server = require('./lib/server');
+var Server = require('./lib/server');
 
 /* Pure modules */
 var Config = require('./lib/config');
@@ -123,11 +123,40 @@ var commands = [['add', function (args) {
   if (state.get('mode') === 'local') {
     O.of('No server configured, running in local mode. Check the configuration section of the man-page for more info.');
   } else if (state.get('mode') === 'remote') {
-    return H.readFile(H.privateKeyPath(state.get('config'))).flatMap(remote.send({ action: 'ping', args: [] }));
+    return remote.send({ action: 'ping', args: [] })(state.get('privateKey'));
   } else if (state.get('mode') === 'server') {
     return O.of('pong');
   }
 }, true]];
+
+var runCommand = function runCommand(state) {
+  var mode = state.get('mode');
+  var config = state.get('configuration');
+  /* Execute the command locally */
+  if (mode === 'local' || state.get('localOnly')) {
+    debug('running command locally');
+    return state.get('command')(state);
+    /* Send to a server */
+  } else if (mode === 'remote') {
+      debug('Sending command as remote');
+      return H.readFile(H.privateKeyPath(config)).flatMap(remote.send(config.get('remote'), {
+        action: state.get('action'),
+        arguments: state.get('arguments').toJS()
+      }));
+    } else if (mode === 'server') {
+      if (state.get('mode') === 'server') {
+        /* Ignore any command passed, since there's only
+         * `run` on the server.
+         */
+        return Server.run(state, commands);
+      }
+    }
+};
+
+var getKeys = function getKeys(state) {
+  var config = state.get('config');
+  O.combineLatest(H.readFile(H.privateKeyPath(config)), H.readFile(H.publicKeyPath(config)));
+};
 
 var runCLI = function runCLI() {
   var argv = arguments.length <= 0 || arguments[0] === undefined ? process.argv : arguments[0];
@@ -145,47 +174,17 @@ var runCLI = function runCLI() {
   /* Define mode */
   .map(function (state) {
     return state.set('mode', state.getIn(['configuration', 'remote']) ? 'remote' : state.getIn(['configuration', 'mode']));
-  }).map(Argv.applyModeFlags).map(H.getCommand(commands))
+  }).map(Argv.applyModeFlags).map(H.getCommand(commands)).flatMap(function (state) {
+    return state.get('mode') === 'server' || state.get('mode') === 'client' ? getKeys().map(function (_ref16) {
+      var _ref17 = _slicedToArray(_ref16, 2);
+
+      var pub = _ref17[0];
+      var priv = _ref17[1];
+      return state.set('publicKey', pub).set('privateKey', priv);
+    }) : O.of(state);
+  })
   /* Run command */
-  .flatMap(function (state) {
-    var mode = state.get('mode');
-    var config = state.get('configuration');
-    /* Execute the command locally */
-    if (mode === 'local' || state.get('localOnly')) {
-      debug('running command locally');
-      return state.get('command')(state);
-      /* Send to a server */
-    } else if (mode === 'remote') {
-        debug('Sending command as remote');
-        return H.readFile(H.privateKeyPath(config)).flatMap(remote.send(config.get('remote'), {
-          action: state.get('action'),
-          arguments: state.get('arguments').toJS()
-        }));
-      } else if (mode === 'server') {
-        if (state.get('mode') === 'server') {
-          /* Ignore any command passed, since there's only
-           * `run` on the server.
-           */
-          return H.readFile(H.publicKeyPath(config)).flatMap(server.listen(config)).map(function (_ref16) {
-            var _ref17 = _slicedToArray(_ref16, 2);
-
-            var data = _ref17[0];
-            var respond = _ref17[1];
-
-            /* Must be a public key */
-            if (typeof data === 'string') {
-              debug('Recieved public key');
-              return H.writeFile(H.publicKeyPath(config), data);
-            } else {
-              debug('Executing command ' + data.action);
-              var cState = H.setCommandState(state)(H.findCommand(commands, data.action, data.args));
-              if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'));
-              return cState.get('command')(state);
-            }
-          });
-        }
-      }
-  });
+  .flatMap(runCommand);
 };
 
 module.exports = runCLI;

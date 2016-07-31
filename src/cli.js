@@ -15,7 +15,7 @@ const initStore = require('./lib/store')
 const Notify = require('./lib/notify')
 const opml = require('./lib/opml')
 const remote = require('./lib/remote')
-const server = require('./lib/server')
+const Server = require('./lib/server')
 
 /* Pure modules */
 const Config = require('./lib/config')
@@ -129,10 +129,7 @@ const commands = [
       if (state.get('mode') === 'local') {
         O.of('No server configured, running in local mode. Check the configuration section of the man-page for more info.')
       } else if (state.get('mode') === 'remote') {
-        return (
-          H.readFile(H.privateKeyPath(state.get('config')))
-            .flatMap(remote.send({ action: 'ping', args: [] }))
-        )
+        return remote.send({ action: 'ping', args: [] })(state.get('privateKey'))
       } else if (state.get('mode') === 'server') {
         return O.of('pong')
       }
@@ -140,6 +137,41 @@ const commands = [
     true
   ]
 ]
+
+const runCommand = state => {
+  const mode = state.get('mode')
+  const config = state.get('configuration')
+  /* Execute the command locally */
+  if (mode === 'local' || state.get('localOnly')) {
+    debug('running command locally')
+    return state.get('command')(state)
+  /* Send to a server */
+  } else if (mode === 'remote') {
+    debug('Sending command as remote')
+    return (
+      H.readFile(H.privateKeyPath(config))
+        .flatMap(remote.send(config.get('remote'), {
+          action: state.get('action'),
+          arguments: state.get('arguments').toJS()
+        }))
+    )
+  } else if (mode === 'server') {
+    if (state.get('mode') === 'server') {
+      /* Ignore any command passed, since there's only
+       * `run` on the server.
+       */
+      return Server.run(state, commands)
+    }
+  }
+}
+
+const getKeys = (state) => {
+  const config = state.get('config')
+  O.combineLatest(
+    H.readFile(H.privateKeyPath(config)),
+    H.readFile(H.publicKeyPath(config))
+  )
+}
 
 const runCLI = (
   argv = process.argv,
@@ -168,50 +200,18 @@ const runCLI = (
     )
     .map(Argv.applyModeFlags)
     .map(H.getCommand(commands))
-    /* Run command */
-    .flatMap(state => {
-      const mode = state.get('mode')
-      const config = state.get('configuration')
-      /* Execute the command locally */
-      if (mode === 'local' || state.get('localOnly')) {
-        debug('running command locally')
-        return state.get('command')(state)
-      /* Send to a server */
-      } else if (mode === 'remote') {
-        debug('Sending command as remote')
-        return (
-          H.readFile(H.privateKeyPath(config))
-            .flatMap(remote.send(config.get('remote'), {
-              action: state.get('action'),
-              arguments: state.get('arguments').toJS()
-            }))
+    .flatMap(state =>
+      state.get('mode') === 'server' ||
+      state.get('mode') === 'client'
+        ? getKeys().map(([pub, priv]) =>
+          state
+            .set('publicKey', pub)
+            .set('privateKey', priv)
         )
-      } else if (mode === 'server') {
-        if (state.get('mode') === 'server') {
-          /* Ignore any command passed, since there's only
-           * `run` on the server.
-           */
-          return (
-            H.readFile(H.publicKeyPath(config))
-              .flatMap(server.listen(config))
-              .map(([data, respond]) => {
-                /* Must be a public key */
-                if (typeof data === 'string') {
-                  debug('Recieved public key')
-                  return H.writeFile(H.publicKeyPath(config), data)
-                } else {
-                  debug(`Executing command ${data.action}`)
-                  const cState = H.setCommandState(state)(
-                    H.findCommand(commands, data.action, data.args)
-                  )
-                  if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'))
-                  return cState.get('command')(state)
-                }
-              })
-          )
-        }
-      }
-    })
+        : O.of(state)
+    )
+    /* Run command */
+    .flatMap(runCommand)
 
 module.exports = runCLI
 
