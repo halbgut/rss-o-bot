@@ -120,7 +120,13 @@ var getStoreAndListFeeds = getStoreAnd(function (_ref) {
 });
 
 test.after('remove DB', function (t) {
-  databases.forEach(fs.unlinkSync);
+  databases.forEach(function (db) {
+    try {
+      fs.unlinkSync(db);
+    } catch (e) {
+      /* Ignore errors, since some tests don't ever ope na db */
+    }
+  });
   t.pass();
 });
 

@@ -77,7 +77,13 @@ const getStoreAnd = cb => config =>
 const getStoreAndListFeeds = getStoreAnd(({ listFeeds }) => listFeeds())
 
 test.after('remove DB', t => {
-  databases.forEach(fs.unlinkSync)
+  databases.forEach(db => {
+    try {
+      fs.unlinkSync(db)
+    } catch (e) {
+      /* Ignore errors, since some tests don't ever ope na db */
+    }
+  })
   t.pass()
 })
 
