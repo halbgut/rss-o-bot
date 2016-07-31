@@ -17,12 +17,38 @@ var _require2 = require('rx');
 
 var O = _require2.Observable;
 
+var Immutable = require('immutable');
 
 var runCLI = require('../../dist/cli.js');
-var configLocations = [__dirname + '/../config/local'];
 var initStore = require('../../dist/lib/store');
 var Config = require('../../dist/lib/config');
 var H = require('../../dist/lib/helpers');
+var databases = [];
+
+var getConfig = function () {
+  var id = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+  return function () {
+    var db = __dirname + '/../../data/test_feeds-' + ++id + '.sqlite';
+    databases.push(db);
+    return {
+      'database': {
+        'name': 'data',
+        'options': {
+          'dialect': 'sqlite',
+          'storage': db
+        }
+      }
+    };
+  };
+}();
+
+var toConfig = function toConfig(object) {
+  return Config.applyDefaults(Immutable.fromJS(object));
+};
+
+var getConfigWithDefaults = function getConfigWithDefaults() {
+  return toConfig(getConfig());
+};
 
 var handleError = function handleError(t) {
   return function (err) {
@@ -37,8 +63,9 @@ var run = function run(a) {
   return function (f) {
     return function (t) {
       if (n) t.plan(n);
-      var o = runCLI(['node', ''].concat(_toConsumableArray(a)), configLocations);
-      f(t, o).subscribe(function () {}, handleError(t), function () {
+      var config = toConfig(getConfig());
+      var o = runCLI(['node', ''].concat(_toConsumableArray(a)), null, config);
+      f(t, o, config).subscribe(function () {}, handleError(t), function () {
         return t.end();
       });
     };
@@ -82,8 +109,8 @@ var containsFeedUrl = function containsFeedUrl(url, t) {
 };
 
 var getStoreAnd = function getStoreAnd(cb) {
-  return function () {
-    return Config.readConfig(configLocations).flatMap(initStore).flatMap(cb);
+  return function (name) {
+    return initStore(getConfigWithDefaults()).flatMap(cb);
   };
 };
 
@@ -93,7 +120,7 @@ var getStoreAndListFeeds = getStoreAnd(function (_ref) {
 });
 
 test.after('remove DB', function (t) {
-  fs.unlink(__dirname + '/../../data/test_feeds.sqlite');
+  databases.forEach(fs.unlinkSync);
   t.pass();
 });
 
@@ -116,15 +143,15 @@ test.cb('man', run(['-m'])(function (t, o) {
 }));
 
 /* function to create dummy posts */
-var createDummyPost = function createDummyPost(url) {
-  var filters = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-  return Config.readConfig(configLocations).flatMap(initStore).flatMap(function (store) {
+var createDummyPost = function createDummyPost(name, url) {
+  var filters = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+  return initStore(getConfigWithDefaults()).flatMap(function (store) {
     return store.insertFeed(url, filters).map(store);
   });
 };(function () {
   var url = 'https://lucaschmid.net/feed/rss.xml';
   var filter = 'somefilter';
-  test.serial.cb('add', run(['add', url, filter], 3)(function (t, o) {
+  test.cb('add', run(['add', url, filter], 3)(function (t, o, config) {
     return o.map(function (feed) {
       var _parsePrintedFeeds$ = _slicedToArray(parsePrintedFeeds(feed)[0], 4);
 
@@ -135,22 +162,26 @@ var createDummyPost = function createDummyPost(url) {
 
       t.deepEqual([title, setUrl, filters], ['undefined', url, filter]);
       t.regex(id, /\d+/);
-    }).flatMap(Config.readConfig(configLocations)).flatMap(initStore).flatMap(H.tryCall('getFeeds')).map(containsFeedUrl(url, t));
+    }).flatMap(function () {
+      return initStore(config);
+    }).flatMap(H.tryCall('getFeeds')).map(containsFeedUrl(url, t));
   }));
 
   test.cb('list', function (t) {
+    var config = getConfig();
     t.plan(1);
-    Config.readConfig(configLocations).flatMap(initStore).flatMap(H.tryCall('insertFeed', url, [])).flatMap(function () {
-      return runCLI(['node', '', 'list'], configLocations);
+    initStore(toConfig(config)).flatMap(H.tryCall('insertFeed', url, [])).flatMap(function () {
+      return runCLI(['node', '', 'list'], null, config);
     }).map(parsePrintedFeeds).map(containsFeedUrl(url, t)).subscribe(function () {}, handleError(t), function () {
       return t.end();
     });
   });
 
   var rmTestURL = 'https://lucaschmid.net/feed/atom.xml';
-  test.serial.cb('rm', function (t) {
+  test.cb('rm', function (t) {
+    var config = getConfig();
     t.plan(1);
-    var store$ = Config.readConfig(configLocations).flatMap(initStore);
+    var store$ = initStore(toConfig(config));
 
     store$.flatMap(function (_ref2) {
       var insertFeed = _ref2.insertFeed;
@@ -162,7 +193,7 @@ var createDummyPost = function createDummyPost(url) {
       }).map(function (feeds) {
         return feeds[0].get('id');
       }).flatMap(function (feedId) {
-        return runCLI(['node', '', 'rm', feedId], configLocations).map(function () {
+        return runCLI(['node', '', 'rm', feedId], null, config).map(function () {
           return feedId;
         });
       }).flatMap(function (feedId) {
@@ -179,8 +210,8 @@ var createDummyPost = function createDummyPost(url) {
 })();(function () {
   var url = 'https://lucaschmid.net/feed/rss.xml';
   test.cb('poll-feeds', function (t) {
-    createDummyPost(url).flatMap(function (store) {
-      return runCLI(['node', '', 'poll-feeds'], configLocations).map(function () {
+    createDummyPost('poll-feeds', url).flatMap(function (store) {
+      return runCLI(['node', '', 'poll-feeds'], null, getConfig()).map(function () {
         return store;
       });
     }).flatMap(function (_ref3) {
@@ -195,10 +226,8 @@ var createDummyPost = function createDummyPost(url) {
 })();
 
 /* Checks if the exported elements contain all elements inside the feed list.
- * The test needs to be serial, to insure, that no entries are added/destroyed
- * between `export` and `listFeeds`.
  */
-test.serial.cb('export', run(['export'], false)(function (t, o) {
+test.cb('export', run(['export'], false)(function (t, o) {
   return o.flatMap(function (xmlExport) {
     return O.create(function (o) {
       var parser = sax.parser(true);
@@ -214,7 +243,7 @@ test.serial.cb('export', run(['export'], false)(function (t, o) {
       };
       parser.write(xmlExport).close();
     });
-  }).withLatestFrom(getStoreAndListFeeds()).tap(function (_ref4) {
+  }).withLatestFrom(getStoreAndListFeeds('export')).tap(function (_ref4) {
     var _ref5 = _slicedToArray(_ref4, 2);
 
     var entry = _ref5[0];
@@ -227,7 +256,7 @@ test.serial.cb('export', run(['export'], false)(function (t, o) {
 
 var importFile = path.resolve(__dirname, '..', 'data', 'export.xml');
 test.cb('import', run(['import', importFile], 2)(function (t, o) {
-  return o.withLatestFrom(getStoreAndListFeeds()).tap(function (_ref6) {
+  return o.withLatestFrom(getStoreAndListFeeds('import')).tap(function (_ref6) {
     var _ref7 = _slicedToArray(_ref6, 2);
 
     var result = _ref7[0];
@@ -238,6 +267,6 @@ test.cb('import', run(['import', importFile], 2)(function (t, o) {
     }).length);
     t.true(list.filter(function (item) {
       return item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-email/commits/master.atom' || item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-desktop/commits/master.atom';
-    }).length >= 2);
+    }).length === 2);
   });
 }));

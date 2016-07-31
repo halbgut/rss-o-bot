@@ -3,12 +3,32 @@ const fs = require('fs')
 const { test } = require('ava')
 const sax = require('sax')
 const { Observable: O } = require('rx')
+const Immutable = require('immutable')
 
 const runCLI = require('../../dist/cli.js')
-const configLocations = [`${__dirname}/../config/local`]
 const initStore = require('../../dist/lib/store')
 const Config = require('../../dist/lib/config')
 const H = require('../../dist/lib/helpers')
+const databases = []
+
+const getConfig = ((id = 0) => () => {
+  const db = `${__dirname}/../../data/test_feeds-${++id}.sqlite`
+  databases.push(db)
+  return {
+    'database': {
+      'name': 'data',
+      'options': {
+        'dialect': 'sqlite',
+        'storage': db
+      }
+    }
+  }
+})()
+
+const toConfig = object =>
+  Config.applyDefaults(Immutable.fromJS(object))
+
+const getConfigWithDefaults = () => toConfig(getConfig())
 
 const handleError = t => err => {
   console.error(err)
@@ -18,8 +38,9 @@ const handleError = t => err => {
 
 const run = (a, n = 1) => f => t => {
   if (n) t.plan(n)
-  const o = runCLI(['node', '', ...a], configLocations)
-  f(t, o)
+  const config = toConfig(getConfig())
+  const o = runCLI(['node', '', ...a], null, config)
+  f(t, o, config)
     .subscribe(
       () => {},
       handleError(t),
@@ -49,15 +70,14 @@ const containsFeedUrl = (url, t) => feeds => {
   return t.true(feedsMatching.length >= 1)
 }
 
-const getStoreAnd = cb => () =>
-  Config.readConfig(configLocations)
-    .flatMap(initStore)
+const getStoreAnd = cb => name =>
+  initStore(getConfigWithDefaults())
     .flatMap(cb)
 
 const getStoreAndListFeeds = getStoreAnd(({ listFeeds }) => listFeeds())
 
 test.after('remove DB', t => {
-  fs.unlink(`${__dirname}/../../data/test_feeds.sqlite`)
+  databases.forEach(fs.unlinkSync)
   t.pass()
 })
 
@@ -85,9 +105,8 @@ test.cb('man', run(['-m'])((t, o) =>
 
 /* function to create dummy posts */
 const createDummyPost =
-  (url, filters = []) =>
-    Config.readConfig(configLocations)
-      .flatMap(initStore)
+  (name, url, filters = []) =>
+    initStore(getConfigWithDefaults())
       .flatMap(store =>
         store.insertFeed(url, filters)
           .map(store)
@@ -96,25 +115,24 @@ const createDummyPost =
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
   const filter = 'somefilter'
-  test.serial.cb('add', run(['add', url, filter], 3)((t, o) =>
+  test.cb('add', run(['add', url, filter], 3)((t, o, config) =>
     o.map(feed => {
       const [id, title, setUrl, filters] = parsePrintedFeeds(feed)[0]
       t.deepEqual([title, setUrl, filters], ['undefined', url, filter])
       t.regex(id, /\d+/)
     })
-      .flatMap(Config.readConfig(configLocations))
-      .flatMap(initStore)
+      .flatMap(() => initStore(config))
       .flatMap(H.tryCall('getFeeds'))
       .map(containsFeedUrl(url, t))
   ))
 
   test.cb('list', t => {
+    const config = getConfig()
     t.plan(1)
-    Config.readConfig(configLocations)
-      .flatMap(initStore)
+    initStore(toConfig(config))
       .flatMap(H.tryCall('insertFeed', url, []))
       .flatMap(() =>
-        runCLI(['node', '', 'list'], configLocations)
+        runCLI(['node', '', 'list'], null, config)
       )
       .map(parsePrintedFeeds)
       .map(containsFeedUrl(url, t))
@@ -126,11 +144,10 @@ const createDummyPost =
   })
 
   const rmTestURL = 'https://lucaschmid.net/feed/atom.xml'
-  test.serial.cb('rm', t => {
+  test.cb('rm', t => {
+    const config = getConfig()
     t.plan(1)
-    const store$ =
-      Config.readConfig(configLocations)
-        .flatMap(initStore)
+    const store$ = initStore(toConfig(config))
 
     store$.flatMap(({ insertFeed, listFeeds }) =>
       insertFeed(rmTestURL, [])
@@ -138,7 +155,7 @@ const createDummyPost =
         .map(feeds => feeds.filter(feed => feed.get('url') === rmTestURL))
         .map(feeds => feeds[0].get('id'))
         .flatMap(feedId =>
-          runCLI(['node', '', 'rm', feedId], configLocations)
+          runCLI(['node', '', 'rm', feedId], null, config)
             .map(() => feedId)
         )
         .flatMap(feedId =>
@@ -159,9 +176,9 @@ const createDummyPost =
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
   test.cb('poll-feeds', t => {
-    createDummyPost(url)
+    createDummyPost('poll-feeds', url)
       .flatMap(store =>
-        runCLI(['node', '', 'poll-feeds'], configLocations)
+        runCLI(['node', '', 'poll-feeds'], null, getConfig())
           .map(() => store)
       )
       .flatMap(({ listFeeds }) => listFeeds())
@@ -177,22 +194,19 @@ const createDummyPost =
 })()
 
 /* Checks if the exported elements contain all elements inside the feed list.
- * The test needs to be serial, to insure, that no entries are added/destroyed
- * between `export` and `listFeeds`.
  */
-test.serial.cb('export', run(['export'], false)((t, o) =>
-  o
-    .flatMap(xmlExport => O.create(o => {
-      const parser = sax.parser(true)
-      parser.onopentag = t => {
-        if (t.name !== 'outline') return
-        o.onNext([t.attributes.xmlUrl || t.attributes.url, t.attributes.title])
-      }
-      parser.onend = () => { o.onCompleted() }
-      parser.onerror = err => o.onError(err)
-      parser.write(xmlExport).close()
-    }))
-    .withLatestFrom(getStoreAndListFeeds())
+test.cb('export', run(['export'], false)((t, o) =>
+  o.flatMap(xmlExport => O.create(o => {
+    const parser = sax.parser(true)
+    parser.onopentag = t => {
+      if (t.name !== 'outline') return
+      o.onNext([t.attributes.xmlUrl || t.attributes.url, t.attributes.title])
+    }
+    parser.onend = () => { o.onCompleted() }
+    parser.onerror = err => o.onError(err)
+    parser.write(xmlExport).close()
+  }))
+    .withLatestFrom(getStoreAndListFeeds('export'))
     .tap(([ entry, list ]) => t.true(
       !!list.find(item =>
         item.get('url') === entry[0] &&
@@ -206,14 +220,14 @@ test.serial.cb('export', run(['export'], false)((t, o) =>
 
 const importFile = path.resolve(__dirname, '..', 'data', 'export.xml')
 test.cb('import', run(['import', importFile], 2)((t, o) =>
-  o.withLatestFrom(getStoreAndListFeeds())
+  o.withLatestFrom(getStoreAndListFeeds('import'))
     .tap(([result, list]) => {
       t.deepEqual(2, result.split('\n').filter(x => !!x).length)
       t.true(
         list.filter(item =>
           item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-email/commits/master.atom' ||
           item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-desktop/commits/master.atom'
-        ).length >= 2
+        ).length === 2
       )
     })
 ))

@@ -7,13 +7,15 @@
  * The executable configured by the package.
  */
 
+const { Observable: O } = require('rx')
+const Immutable = require('immutable')
+const debug = require('debug')('rss-o-bot')
+
 const initStore = require('./lib/store')
 const Notify = require('./lib/notify')
 const opml = require('./lib/opml')
-const { Observable: O } = require('rx')
 const remote = require('./lib/remote')
 const server = require('./lib/server')
-const debug = require('debug')('rss-o-bot')
 
 /* Pure modules */
 const Config = require('./lib/config')
@@ -141,14 +143,18 @@ const commands = [
 
 const runCLI = (
   argv = process.argv,
-  configLocations = Config.locations
+  configLocations = Config.locations,
+  config
 ) =>
   O.of(argv)
     /* Extract arguments */
     .map(Argv.extractArguments)
     /* Get config */
     .flatMap(state =>
-      Config.readConfig(configLocations)
+      (config
+        ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults)
+        : Config.readConfig(configLocations)
+      )
         .map(config => state.set('configuration', config))
     )
     /* Define mode */

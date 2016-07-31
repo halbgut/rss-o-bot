@@ -12,17 +12,18 @@ function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
  * The executable configured by the package.
  */
 
-var initStore = require('./lib/store');
-var Notify = require('./lib/notify');
-var opml = require('./lib/opml');
-
 var _require = require('rx');
 
 var O = _require.Observable;
 
+var Immutable = require('immutable');
+var debug = require('debug')('rss-o-bot');
+
+var initStore = require('./lib/store');
+var Notify = require('./lib/notify');
+var opml = require('./lib/opml');
 var remote = require('./lib/remote');
 var server = require('./lib/server');
-var debug = require('debug')('rss-o-bot');
 
 /* Pure modules */
 var Config = require('./lib/config');
@@ -131,12 +132,13 @@ var commands = [['add', function (args) {
 var runCLI = function runCLI() {
   var argv = arguments.length <= 0 || arguments[0] === undefined ? process.argv : arguments[0];
   var configLocations = arguments.length <= 1 || arguments[1] === undefined ? Config.locations : arguments[1];
+  var config = arguments[2];
   return O.of(argv)
   /* Extract arguments */
   .map(Argv.extractArguments)
   /* Get config */
   .flatMap(function (state) {
-    return Config.readConfig(configLocations).map(function (config) {
+    return (config ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults) : Config.readConfig(configLocations)).map(function (config) {
       return state.set('configuration', config);
     });
   })
