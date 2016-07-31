@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<opml version="1.1">
+  <head>
+    <title>RSS-o-Bot</title>
+    <dateCreated>Sa 30 2016 pmt 16:07:97 UTC</dateCreated>
+  </head>
+  <body>
+    <outline xmlUrl="https://github.com/Kriegslustig/rss-o-bot-email/commits/master.atom"/>
+    <outline xmlUrl="https://github.com/Kriegslustig/rss-o-bot-desktop/commits/master.atom"/>
+  </body>
+</opml>

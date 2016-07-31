@@ -1,3 +1,4 @@
+const path = require('path')
 const fs = require('fs')
 const { test } = require('ava')
 const sax = require('sax')
@@ -10,7 +11,6 @@ const Config = require('../../dist/lib/config')
 const H = require('../../dist/lib/helpers')
 
 const handleError = t => err => {
-  console.error(err)
   t.fail('test failed')
   t.end()
 }
@@ -48,7 +48,15 @@ const containsFeedUrl = (url, t) => feeds => {
   return t.true(feedsMatching.length >= 1)
 }
 
+const getStoreAnd = cb => () =>
+  Config.readConfig(configLocations)
+    .flatMap(initStore)
+    .flatMap(cb)
+
+const getStoreAndListFeeds = getStoreAnd(({ listFeeds }) => listFeeds())
+
 test.after('remove DB', t => {
+  console.log('unlinking!')
   fs.unlink(`${__dirname}/../../data/test_feeds.sqlite`)
   t.pass()
 })
@@ -168,6 +176,10 @@ const createDummyPost =
   })
 })()
 
+/* Checks if the exported elements contain all elements inside the feed list.
+ * The test needs to be serial, to insure, that no entries are added/destroyed
+ * between `export` and `listFeeds`.
+ */
 test.serial.cb('export', run(['export'], false)((t, o) =>
   o
     .flatMap(xmlExport => O.create(o => {
@@ -180,11 +192,7 @@ test.serial.cb('export', run(['export'], false)((t, o) =>
       parser.onerror = err => o.onError(err)
       parser.write(xmlExport).close()
     }))
-    .withLatestFrom(
-      Config.readConfig(configLocations)
-        .flatMap(initStore)
-        .flatMap(({ listFeeds }) => listFeeds())
-    )
+    .withLatestFrom(getStoreAndListFeeds())
     .tap(([ entry, list ]) => t.true(
       !!list.find(item =>
         item.get('url') === entry[0] &&
@@ -194,5 +202,19 @@ test.serial.cb('export', run(['export'], false)((t, o) =>
         )
       )
     ))
+))
+
+const importFile = path.resolve(__dirname, '..', 'data', 'export.xml')
+test.cb('import', run(['import', importFile], 2)((t, o) =>
+  o.withLatestFrom(getStoreAndListFeeds())
+    .tap(([result, list]) => {
+      t.deepEqual(2, result.split('\n').filter(x => !!x).length)
+      t.true(
+        list.filter(item =>
+          item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-email/commits/master.atom' ||
+          item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-desktop/commits/master.atom'
+        ).length >= 2
+      )
+    })
 ))
 
