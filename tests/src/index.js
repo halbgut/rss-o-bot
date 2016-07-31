@@ -11,6 +11,7 @@ const Config = require('../../dist/lib/config')
 const H = require('../../dist/lib/helpers')
 
 const handleError = t => err => {
+  console.error(err)
   t.fail('test failed')
   t.end()
 }
@@ -56,7 +57,6 @@ const getStoreAnd = cb => () =>
 const getStoreAndListFeeds = getStoreAnd(({ listFeeds }) => listFeeds())
 
 test.after('remove DB', t => {
-  console.log('unlinking!')
   fs.unlink(`${__dirname}/../../data/test_feeds.sqlite`)
   t.pass()
 })

@@ -4,6 +4,7 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
+var path = require('path');
 var fs = require('fs');
 
 var _require = require('ava');
@@ -80,6 +81,17 @@ var containsFeedUrl = function containsFeedUrl(url, t) {
   };
 };
 
+var getStoreAnd = function getStoreAnd(cb) {
+  return function () {
+    return Config.readConfig(configLocations).flatMap(initStore).flatMap(cb);
+  };
+};
+
+var getStoreAndListFeeds = getStoreAnd(function (_ref) {
+  var listFeeds = _ref.listFeeds;
+  return listFeeds();
+});
+
 test.after('remove DB', function (t) {
   fs.unlink(__dirname + '/../../data/test_feeds.sqlite');
   t.pass();
@@ -140,9 +152,9 @@ var createDummyPost = function createDummyPost(url) {
     t.plan(1);
     var store$ = Config.readConfig(configLocations).flatMap(initStore);
 
-    store$.flatMap(function (_ref) {
-      var insertFeed = _ref.insertFeed;
-      var listFeeds = _ref.listFeeds;
+    store$.flatMap(function (_ref2) {
+      var insertFeed = _ref2.insertFeed;
+      var listFeeds = _ref2.listFeeds;
       return insertFeed(rmTestURL, []).flatMap(listFeeds).map(function (feeds) {
         return feeds.filter(function (feed) {
           return feed.get('url') === rmTestURL;
@@ -171,8 +183,8 @@ var createDummyPost = function createDummyPost(url) {
       return runCLI(['node', '', 'poll-feeds'], configLocations).map(function () {
         return store;
       });
-    }).flatMap(function (_ref2) {
-      var listFeeds = _ref2.listFeeds;
+    }).flatMap(function (_ref3) {
+      var listFeeds = _ref3.listFeeds;
       return listFeeds();
     }).tap(function (feeds) {
       return t.truthy(feeds[0].get('title') !== 'undefined');
@@ -182,6 +194,10 @@ var createDummyPost = function createDummyPost(url) {
   });
 })();
 
+/* Checks if the exported elements contain all elements inside the feed list.
+ * The test needs to be serial, to insure, that no entries are added/destroyed
+ * between `export` and `listFeeds`.
+ */
 test.serial.cb('export', run(['export'], false)(function (t, o) {
   return o.flatMap(function (xmlExport) {
     return O.create(function (o) {
@@ -198,10 +214,7 @@ test.serial.cb('export', run(['export'], false)(function (t, o) {
       };
       parser.write(xmlExport).close();
     });
-  }).withLatestFrom(Config.readConfig(configLocations).flatMap(initStore).flatMap(function (_ref3) {
-    var listFeeds = _ref3.listFeeds;
-    return listFeeds();
-  })).tap(function (_ref4) {
+  }).withLatestFrom(getStoreAndListFeeds()).tap(function (_ref4) {
     var _ref5 = _slicedToArray(_ref4, 2);
 
     var entry = _ref5[0];
@@ -209,5 +222,22 @@ test.serial.cb('export', run(['export'], false)(function (t, o) {
     return t.true(!!list.find(function (item) {
       return item.get('url') === entry[0] && (!item.get('blogTitle') || item.get('blogTitle') === entry[1]);
     }));
+  });
+}));
+
+var importFile = path.resolve(__dirname, '..', 'data', 'export.xml');
+test.cb('import', run(['import', importFile], 2)(function (t, o) {
+  return o.withLatestFrom(getStoreAndListFeeds()).tap(function (_ref6) {
+    var _ref7 = _slicedToArray(_ref6, 2);
+
+    var result = _ref7[0];
+    var list = _ref7[1];
+
+    t.deepEqual(2, result.split('\n').filter(function (x) {
+      return !!x;
+    }).length);
+    t.true(list.filter(function (item) {
+      return item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-email/commits/master.atom' || item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-desktop/commits/master.atom';
+    }).length >= 2);
   });
 }));
