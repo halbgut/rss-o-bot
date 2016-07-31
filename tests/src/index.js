@@ -70,8 +70,8 @@ const containsFeedUrl = (url, t) => feeds => {
   return t.true(feedsMatching.length >= 1)
 }
 
-const getStoreAnd = cb => name =>
-  initStore(getConfigWithDefaults())
+const getStoreAnd = cb => config =>
+  initStore(config)
     .flatMap(cb)
 
 const getStoreAndListFeeds = getStoreAnd(({ listFeeds }) => listFeeds())
@@ -195,7 +195,7 @@ const createDummyPost =
 
 /* Checks if the exported elements contain all elements inside the feed list.
  */
-test.cb('export', run(['export'], false)((t, o) =>
+test.cb('export', run(['export'], false)((t, o, config) =>
   o.flatMap(xmlExport => O.create(o => {
     const parser = sax.parser(true)
     parser.onopentag = t => {
@@ -206,7 +206,7 @@ test.cb('export', run(['export'], false)((t, o) =>
     parser.onerror = err => o.onError(err)
     parser.write(xmlExport).close()
   }))
-    .withLatestFrom(getStoreAndListFeeds('export'))
+    .withLatestFrom(getStoreAndListFeeds(config))
     .tap(([ entry, list ]) => t.true(
       !!list.find(item =>
         item.get('url') === entry[0] &&
@@ -219,15 +219,15 @@ test.cb('export', run(['export'], false)((t, o) =>
 ))
 
 const importFile = path.resolve(__dirname, '..', 'data', 'export.xml')
-test.cb('import', run(['import', importFile], 2)((t, o) =>
-  o.withLatestFrom(getStoreAndListFeeds('import'))
+test.cb('import', run(['import', importFile], 2)((t, o, config) =>
+  o.flatMap(a => getStoreAndListFeeds(config).map(b => [a, b]))
     .tap(([result, list]) => {
       t.deepEqual(2, result.split('\n').filter(x => !!x).length)
       t.true(
         list.filter(item =>
           item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-email/commits/master.atom' ||
           item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-desktop/commits/master.atom'
-        ).length === 2
+        ).length >= 2
       )
     })
 ))

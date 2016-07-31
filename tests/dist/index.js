@@ -109,8 +109,8 @@ var containsFeedUrl = function containsFeedUrl(url, t) {
 };
 
 var getStoreAnd = function getStoreAnd(cb) {
-  return function (name) {
-    return initStore(getConfigWithDefaults()).flatMap(cb);
+  return function (config) {
+    return initStore(config).flatMap(cb);
   };
 };
 
@@ -227,7 +227,7 @@ var createDummyPost = function createDummyPost(name, url) {
 
 /* Checks if the exported elements contain all elements inside the feed list.
  */
-test.cb('export', run(['export'], false)(function (t, o) {
+test.cb('export', run(['export'], false)(function (t, o, config) {
   return o.flatMap(function (xmlExport) {
     return O.create(function (o) {
       var parser = sax.parser(true);
@@ -243,7 +243,7 @@ test.cb('export', run(['export'], false)(function (t, o) {
       };
       parser.write(xmlExport).close();
     });
-  }).withLatestFrom(getStoreAndListFeeds('export')).tap(function (_ref4) {
+  }).withLatestFrom(getStoreAndListFeeds(config)).tap(function (_ref4) {
     var _ref5 = _slicedToArray(_ref4, 2);
 
     var entry = _ref5[0];
@@ -255,8 +255,12 @@ test.cb('export', run(['export'], false)(function (t, o) {
 }));
 
 var importFile = path.resolve(__dirname, '..', 'data', 'export.xml');
-test.cb('import', run(['import', importFile], 2)(function (t, o) {
-  return o.withLatestFrom(getStoreAndListFeeds('import')).tap(function (_ref6) {
+test.cb('import', run(['import', importFile], 2)(function (t, o, config) {
+  return o.flatMap(function (a) {
+    return getStoreAndListFeeds(config).map(function (b) {
+      return [a, b];
+    });
+  }).tap(function (_ref6) {
     var _ref7 = _slicedToArray(_ref6, 2);
 
     var result = _ref7[0];
@@ -267,6 +271,6 @@ test.cb('import', run(['import', importFile], 2)(function (t, o) {
     }).length);
     t.true(list.filter(function (item) {
       return item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-email/commits/master.atom' || item.get('url') === 'https://github.com/Kriegslustig/rss-o-bot-desktop/commits/master.atom';
-    }).length === 2);
+    }).length >= 2);
   });
 }));
