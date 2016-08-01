@@ -238,3 +238,14 @@ test.cb('import', run(['import', importFile], 2)((t, o, config) =>
     })
 ))
 
+test.cb('readConfig', t => {
+  Config.readConfig([ `${__dirname}/../config` ])
+    .flatMap(initStore)
+    .flatMap(({ listFeeds }) => listFeeds())
+    .subscribe(
+      res => { t.true(Array.prototype.isPrototypeOf(res)) },
+      handleError(t),
+      () => t.end()
+    )
+})
+

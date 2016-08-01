@@ -280,3 +280,14 @@ test.cb('import', run(['import', importFile], 2)(function (t, o, config) {
     }).length >= 2);
   });
 }));
+
+test.cb('readConfig', function (t) {
+  Config.readConfig([__dirname + '/../config']).flatMap(initStore).flatMap(function (_ref8) {
+    var listFeeds = _ref8.listFeeds;
+    return listFeeds();
+  }).subscribe(function (res) {
+    t.true(Array.prototype.isPrototypeOf(res));
+  }, handleError(t), function () {
+    return t.end();
+  });
+});

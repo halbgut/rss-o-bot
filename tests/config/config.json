@@ -1,0 +1,10 @@
+{
+  "database": {
+    "name": "data",
+    "options": {
+      "dialect": "sqlite",
+      "storage": "../../data/test_feeds-configured.sqlite"
+    }
+  }
+}
+
