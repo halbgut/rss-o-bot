@@ -12,8 +12,8 @@
     "watch-build-tests": "watch 'npm run build-tests' tests/src",
     "watch-build": "watch 'npm run build-js -- --source-maps' src",
     "test": "RSS_O_BOT_TESTING_MODE=1 ava tests/dist/*.js",
-    "watch-test": "npm run test -- --watch",
-    "ci-test": "RSS_O_BOT_TESTING_MODE=1 ava tests/dist && npm run test-coverage",
+    "watch-test": "RSS_O_BOT_TESTING_MODE=1 ava tests/src/*.js --watch",
+    "ci-test": "npm run test && npm run test-coverage",
     "test-coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "repository": "https://github.com/Kriegslustig/rss-o-bot.git",
