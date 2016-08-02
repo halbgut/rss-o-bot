@@ -1,5 +1,5 @@
 /**
- * poll
+ * @file poll.js
  * This module downloads XML feeds, parses them, filters them by
  * defined keywords and extracts relevant data from entries.
  */
@@ -89,7 +89,6 @@ const applyFilters = filters => ({ title }) => {
     }).length === 0
 }
 
-// TODO: Clean this up
 module.exports = (url, filters) =>
   get(url)
     .flatMap(parse)
