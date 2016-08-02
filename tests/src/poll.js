@@ -14,14 +14,10 @@ const isValidEntry = t => e => {
   t.truthy(e.link.match(/https?:\/\/.*/))
 }
 
-test.cb('poll rss', t => {
+test.cb('poll rss', t => T.testObservable(
   Poll('https://lucaschmid.net/feed/rss.xml', [])
-    .subscribe(
-      entries => {
-        entries.forEach(isValidEntry(t))
-      },
-      T.handleError(t),
-      () => t.end()
-    )
-})
+    .tap(entries => {
+      entries.forEach(isValidEntry(t))
+    })
+)(t))
 

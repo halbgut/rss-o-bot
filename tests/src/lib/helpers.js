@@ -93,3 +93,11 @@ module.exports.getStoreAnd = getStoreAnd
 const getStoreAndListFeeds = getStoreAnd(({ listFeeds }) => listFeeds())
 module.exports.getStoreAndListFeeds = getStoreAndListFeeds
 
+const testObservable = o => t =>
+  o.subscribe(
+    () => {},
+    handleError(t),
+    () => t.end()
+  )
+module.exports.testObservable = testObservable
+

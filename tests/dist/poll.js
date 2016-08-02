@@ -21,9 +21,7 @@ var isValidEntry = function isValidEntry(t) {
 };
 
 test.cb('poll rss', function (t) {
-  Poll('https://lucaschmid.net/feed/rss.xml', []).subscribe(function (entries) {
+  return T.testObservable(Poll('https://lucaschmid.net/feed/rss.xml', []).tap(function (entries) {
     entries.forEach(isValidEntry(t));
-  }, T.handleError(t), function () {
-    return t.end();
-  });
+  }))(t);
 });

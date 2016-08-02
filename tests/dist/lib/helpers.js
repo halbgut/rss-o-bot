@@ -127,3 +127,12 @@ var getStoreAndListFeeds = getStoreAnd(function (_ref) {
   return listFeeds();
 });
 module.exports.getStoreAndListFeeds = getStoreAndListFeeds;
+
+var testObservable = function testObservable(o) {
+  return function (t) {
+    return o.subscribe(function () {}, handleError(t), function () {
+      return t.end();
+    });
+  };
+};
+module.exports.testObservable = testObservable;
