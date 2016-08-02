@@ -118,13 +118,13 @@ var applyFilters = function applyFilters(filters) {
 
       var lowerCase = !includesUpperCase(keyword);
       if (not && lowerCase) {
-        return lowTitle.indexOf(keyword) === -1;
-      } else if (not && !lowerCase) {
-        return title.indexOf(keyword) === -1;
-      } else if (!not && lowerCase) {
         return lowTitle.indexOf(keyword) > -1;
-      } else if (!not && !lowerCase) {
+      } else if (not && !lowerCase) {
         return title.indexOf(keyword) > -1;
+      } else if (!not && lowerCase) {
+        return lowTitle.indexOf(keyword) === -1;
+      } else if (!not && !lowerCase) {
+        return title.indexOf(keyword) === -1;
       } else {
         debug('Unexpected case in filter ${not}, ${lowerCase}');
       }
