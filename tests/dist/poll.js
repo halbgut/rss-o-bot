@@ -48,10 +48,23 @@ test.cb('poll negative rss filter', function (t) {
   }))(t);
 });
 
-test.cb('poll negative rss filter', function (t) {
+test.cb('poll positive rss filter', function (t) {
   return T.testObservable(
   /* Testing inverted filters */
   Poll('https://lucaschmid.net/feed/rss.xml', [['a'], ['e']]).tap(function (entries) {
-    return t.true(entries.length > 0);
+    return t.true(entries.length > -1);
+  }))(t);
+});
+
+test.cb('poll case-sensitive positive rss filter', function (t) {
+  return T.testObservable(
+  /* Testing inverted filters */
+  Poll('https://lucaschmid.net/feed/rss.xml', []).flatMap(function (entries) {
+    return(
+      /* I'm assuming, that all entries have some upper-case letters in them */
+      Poll('https://lucaschmid.net/feed/rss.xml', [entries[0].title])
+    );
+  }).tap(function (entries) {
+    return t.true(entries.length === 1);
   }))(t);
 });
