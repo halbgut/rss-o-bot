@@ -5,7 +5,8 @@ var _require = require('ava');
 var test = _require.test;
 // const { Observable: O } = require('rx')
 
-var Poll = require('../../dist/lib/poll.js');
+var Helpers = require('../../dist/lib/helpers.js');
+var Poll = require('../../dist/lib/pollFeeds/lib/poll.js')(Helpers);
 
 var T = require('./lib/helpers');
 

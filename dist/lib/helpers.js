@@ -95,6 +95,7 @@ var Helpers = {
   isAbsoluteUrl: function isAbsoluteUrl(str) {
     return !!str.match(new RegExp('^' + protoRegex + '|' + domainRegex));
   },
+
   getBaseUrl: function getBaseUrl(url) {
     var match = url.match(new RegExp('(' + protoRegex + ')?' + domainRegex));
     if (!match) return '';
@@ -102,6 +103,19 @@ var Helpers = {
   },
 
 
+  /*
+   * HTTP helpers
+   */
+  isResponseRedirect: function isResponseRedirect(res) {
+    return res.statusCode >= 300 && res.statusCode <= 399 && res.headers.location;
+  },
+  isResponseSuccessful: function isResponseSuccessful(res) {
+    return res.statusCode >= 200 && res.statusCode < 400;
+  },
+
+  /*
+   * Man helpers
+   */
   buildMan: function buildMan(state) {
     return O.forkJoin(Helpers.readFile(__dirname + '/../../src/man/man.md'), Helpers.readFile(__dirname + '/../../src/man/synopsis.md')).map(function (_ref) {
       var _ref2 = _slicedToArray(_ref, 2);
@@ -195,11 +209,14 @@ var Helpers = {
         return [store].concat(_toConsumableArray(Helpers.getConfigAndArgs(state)));
       });
     };
-  }
+  },
 
   /*
-   * Error handling
+   * Others
    */
+  includesUpperCase: function includesUpperCase(str) {
+    return !!str.match(/[A-Z]/);
+  }
 };
 
 module.exports = Helpers;

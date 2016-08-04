@@ -74,9 +74,8 @@ const Helpers = {
   /*
    * URL manipulation
    */
-  isAbsoluteUrl (str) {
-    return !!str.match(new RegExp(`^${protoRegex}|${domainRegex}`))
-  },
+  isAbsoluteUrl: str =>
+    !!str.match(new RegExp(`^${protoRegex}|${domainRegex}`)),
 
   getBaseUrl (url) {
     const match = url.match(new RegExp(`(${protoRegex})?${domainRegex}`))
@@ -84,6 +83,17 @@ const Helpers = {
     return match[0]
   },
 
+  /*
+   * HTTP helpers
+   */
+  isResponseRedirect: res =>
+    res.statusCode >= 300 && res.statusCode <= 399 && res.headers.location,
+  isResponseSuccessful: res =>
+    res.statusCode >= 200 && res.statusCode < 400,
+
+  /*
+   * Man helpers
+   */
   buildMan: state =>
     O.forkJoin(
       Helpers.readFile(`${__dirname}/../../src/man/man.md`),
@@ -163,11 +173,12 @@ const Helpers = {
   /* Makes most common preparation steps for a command */
   setUpEnv: init => state =>
     init(state.get('configuration'))
-      .map(store => [store, ...Helpers.getConfigAndArgs(state)])
+      .map(store => [store, ...Helpers.getConfigAndArgs(state)]),
 
   /*
-   * Error handling
+   * Others
    */
+  includesUpperCase: str => !!str.match(/[A-Z]/)
 }
 
 module.exports = Helpers

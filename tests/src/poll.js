@@ -1,7 +1,8 @@
 const { test } = require('ava')
 // const { Observable: O } = require('rx')
 
-const Poll = require('../../dist/lib/poll.js')
+const Helpers = require('../../dist/lib/helpers.js')
+const Poll = require('../../dist/lib/pollFeeds/lib/poll.js')(Helpers)
 
 const T = require('./lib/helpers')
 
