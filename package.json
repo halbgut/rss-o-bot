@@ -14,7 +14,7 @@
     "test": "RSS_O_BOT_TESTING_MODE=1 ava tests/dist/*.js",
     "watch-test": "RSS_O_BOT_TESTING_MODE=1 ava tests/src/*.js --watch",
     "ci-test": "npm run test && npm run test-coverage",
-    "test-coverage": "nyc npm test && nyc report --include dist/ --reporter=text-lcov | coveralls"
+    "test-coverage": "nyc --include dist/ npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "repository": "https://github.com/Kriegslustig/rss-o-bot.git",
   "author": "Kriegslustig <npm@ls7.ch>",
