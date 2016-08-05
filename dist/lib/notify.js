@@ -4,7 +4,6 @@
  * notifiy
  * This module notifies about new entries users.
  */
-
 var _require = require('rx');
 
 var O = _require.Observable;
@@ -49,7 +48,7 @@ module.exports = function (H) {
       }
 
     return function (blog, link, title) {
-      return(
+      return (
         /* Call all registered notifiers */
         O.forkJoin(sends.map(function (f) {
           return f(blog, link, title);

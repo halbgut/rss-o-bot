@@ -8,7 +8,6 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
  * The main function takes no parameters and simply runs
  * the daemon process.
  */
-
 var _require = require('rx');
 
 var O = _require.Observable;
