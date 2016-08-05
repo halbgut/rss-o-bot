@@ -131,8 +131,8 @@ Logo created by [mala23](https://github.com/mala23)
 
 ## TODO
 
-* Implement tests for remote
-* Integrate Istanbul
+* Implement genKeys action
+* Implement tests for remote & server
 * Document the installation options somewhere else
 * Test the docker container
 * Completions
