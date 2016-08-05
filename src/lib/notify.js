@@ -5,7 +5,7 @@
 const { Observable: O } = require('rx')
 const debug = require('debug')('rss-o-bot')
 
-module.exports = (config) => {
+module.exports = H => config => {
   let sends
   const setMethods = config.get('notification-methods')
   if (setMethods && setMethods.length > 0) {

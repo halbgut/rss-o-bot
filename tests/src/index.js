@@ -4,11 +4,10 @@ const sax = require('sax')
 const { Observable: O } = require('rx')
 
 const runCLI = require('../../dist/cli.js')
-const initStore = require('../../dist/lib/store')
 const H = require('../../dist/lib/helpers')
-const Config = require('../../dist/lib/config')
-
-const T = require('./lib/helpers')
+const initStore = require('../../dist/lib/store')(H)
+const Config = require('../../dist/lib/config')(H)
+const T = require('./lib/helpers')({ runCLI, initStore, Config })
 
 test.after('remove DB', T.removeDatabases)
 

@@ -1,10 +1,12 @@
 const { test } = require('ava')
-// const { Observable: O } = require('rx')
 
-const Helpers = require('../../dist/lib/helpers.js')
-const Poll = require('../../dist/lib/pollFeeds/lib/poll.js')(Helpers)
+const runCLI = require('../../dist/cli.js')
+const H = require('../../dist/lib/helpers')
+const initStore = require('../../dist/lib/store')(H)
+const Config = require('../../dist/lib/config')(H)
+const T = require('./lib/helpers')({ runCLI, initStore, Config })
 
-const T = require('./lib/helpers')
+const Poll = require('../../dist/lib/pollFeeds/lib/poll.js')(H)
 
 const isValidEntry = t => e => {
   t.true(typeof e.blogTitle === 'string')

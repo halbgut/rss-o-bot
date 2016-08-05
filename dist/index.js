@@ -14,11 +14,11 @@ var _require = require('rx');
 var O = _require.Observable;
 
 
-var Config = require('./lib/config');
 var Helpers = require('./lib/helpers');
-var initStore = require('./lib/store');
+var Config = require('./lib/config')(Helpers);
+var initStore = require('./lib/store')(Helpers);
 var pollFeeds = require('./lib/pollFeeds')(Helpers);
-var Notify = require('./lib/notify');
+var Notify = require('./lib/notify')(Helpers);
 
 module.exports = function runRSSOBotDaemon(state) {
   var config = state.get('configuration');

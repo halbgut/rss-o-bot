@@ -6,11 +6,11 @@
  */
 const { Observable: O } = require('rx')
 
-const Config = require('./lib/config')
 const Helpers = require('./lib/helpers')
-const initStore = require('./lib/store')
+const Config = require('./lib/config')(Helpers)
+const initStore = require('./lib/store')(Helpers)
 const pollFeeds = require('./lib/pollFeeds')(Helpers)
-const Notify = require('./lib/notify')
+const Notify = require('./lib/notify')(Helpers)
 
 module.exports = function runRSSOBotDaemon (state) {
   const config = state.get('configuration')

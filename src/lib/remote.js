@@ -1,14 +1,12 @@
-const H = require('./helpers')
 const uuid = require('node-uuid')
 const WebSocket = require('faye-websocket')
 const jwt = require('jsonwebtoken')
-const Rx = require('rx')
-const O = Rx.Observable
+const { Observable: O } = require('rx')
 const debug = require('debug')('rss-o-bot')
 
 const JWT_EXPIRATION = 60 // Sixty seconds default JWT expiration time
 
-module.exports = {
+module.exports = H => ({
   send: (url, message, insecure) => privateKey => O.create(o => {
     const ws = new WebSocket.Client(url)
     debug('Opening socket')
@@ -33,5 +31,5 @@ module.exports = {
     ws.on('error', err => o.onError(err))
     ws.on('close', () => o.onCompleted())
   })
-}
+})
 

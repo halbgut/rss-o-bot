@@ -16,11 +16,10 @@ var O = _require2.Observable;
 
 
 var runCLI = require('../../dist/cli.js');
-var initStore = require('../../dist/lib/store');
 var H = require('../../dist/lib/helpers');
-var Config = require('../../dist/lib/config');
-
-var T = require('./lib/helpers');
+var initStore = require('../../dist/lib/store')(H);
+var Config = require('../../dist/lib/config')(H);
+var T = require('./lib/helpers')({ runCLI: runCLI, initStore: initStore, Config: Config });
 
 test.after('remove DB', T.removeDatabases);
 

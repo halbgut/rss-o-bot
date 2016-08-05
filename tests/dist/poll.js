@@ -3,12 +3,15 @@
 var _require = require('ava');
 
 var test = _require.test;
-// const { Observable: O } = require('rx')
 
-var Helpers = require('../../dist/lib/helpers.js');
-var Poll = require('../../dist/lib/pollFeeds/lib/poll.js')(Helpers);
 
-var T = require('./lib/helpers');
+var runCLI = require('../../dist/cli.js');
+var H = require('../../dist/lib/helpers');
+var initStore = require('../../dist/lib/store')(H);
+var Config = require('../../dist/lib/config')(H);
+var T = require('./lib/helpers')({ runCLI: runCLI, initStore: initStore, Config: Config });
+
+var Poll = require('../../dist/lib/pollFeeds/lib/poll.js')(H);
 
 var isValidEntry = function isValidEntry(t) {
   return function (e) {

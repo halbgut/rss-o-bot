@@ -19,16 +19,16 @@ var O = _require.Observable;
 var Immutable = require('immutable');
 var debug = require('debug')('rss-o-bot');
 
-var initStore = require('./lib/store');
-var Notify = require('./lib/notify');
-var opml = require('./lib/opml');
-var remote = require('./lib/remote');
-var Server = require('./lib/server');
+var H = require('./lib/helpers');
+var initStore = require('./lib/store')(H);
+var Notify = require('./lib/notify')(H);
+var opml = require('./lib/opml')(H);
+var remote = require('./lib/remote')(H);
+var Server = require('./lib/server')(H);
 
 /* Pure modules */
-var Config = require('./lib/config');
+var Config = require('./lib/config')(H);
 var Argv = require('./lib/argv');
-var H = require('./lib/helpers');
 
 var commands = [['add', function (args) {
   return !!args.get(0);
@@ -150,6 +150,8 @@ var runCommand = function runCommand(state) {
          */
         return Server.run(state, commands);
       }
+    } else {
+      throw new Error('Unexpected state mode is set to ' + mode);
     }
 };
 
@@ -167,8 +169,8 @@ var runCLI = function runCLI() {
   .map(Argv.extractArguments)
   /* Get config */
   .flatMap(function (state) {
-    return (config ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults) : Config.readConfig(configLocations)).map(function (config) {
-      return state.set('configuration', config);
+    return (config ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults) : Config.readConfig(configLocations)).map(function (c) {
+      return state.set('configuration', c);
     });
   })
   /* Define mode */

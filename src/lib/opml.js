@@ -9,10 +9,9 @@ const sax = require('sax')
 const fs = require('fs')
 const xml = require('xml')
 const moment = require('moment')
-const Rx = require('rx')
-const O = Rx.Observable
+const { Observable: O } = require('rx')
 
-module.exports = {
+module.exports = H => ({
   import (file) {
     return ({ insertFeed }) =>
       O.create(o => {
@@ -35,6 +34,7 @@ module.exports = {
         saxStream.on('error', err => o.onError(err))
       })
   },
+
   export ({ listFeeds }) {
     return (
       listFeeds()
@@ -60,5 +60,5 @@ module.exports = {
         }, {declaration: true}))
     )
   }
-}
+})
 

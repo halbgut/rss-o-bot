@@ -11,16 +11,16 @@ const { Observable: O } = require('rx')
 const Immutable = require('immutable')
 const debug = require('debug')('rss-o-bot')
 
-const initStore = require('./lib/store')
-const Notify = require('./lib/notify')
-const opml = require('./lib/opml')
-const remote = require('./lib/remote')
-const Server = require('./lib/server')
+const H = require('./lib/helpers')
+const initStore = require('./lib/store')(H)
+const Notify = require('./lib/notify')(H)
+const opml = require('./lib/opml')(H)
+const remote = require('./lib/remote')(H)
+const Server = require('./lib/server')(H)
 
 /* Pure modules */
-const Config = require('./lib/config')
+const Config = require('./lib/config')(H)
 const Argv = require('./lib/argv')
-const H = require('./lib/helpers')
 
 const commands = [
   [
@@ -162,6 +162,8 @@ const runCommand = state => {
        */
       return Server.run(state, commands)
     }
+  } else {
+    throw new Error(`Unexpected state mode is set to ${mode}`)
   }
 }
 
@@ -187,7 +189,7 @@ const runCLI = (
         ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults)
         : Config.readConfig(configLocations)
       )
-        .map(config => state.set('configuration', config))
+        .map(c => state.set('configuration', c))
     )
     /* Define mode */
     .map(state =>
