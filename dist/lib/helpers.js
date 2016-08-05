@@ -31,7 +31,14 @@ var Helpers = {
   writeFile: O.fromNodeCallback(fs.writeFile),
   stat: O.fromNodeCallback(fs.stat),
   isDirectory: function isDirectory(path) {
-    return Helpers.stat(path).map(Helpers.tryCall('isDirectory'));
+    return Helpers.stat(path).map(Helpers.tryCall('isDirectory')).map(function () {
+      return path;
+    });
+  },
+  isFile: function isFile(path) {
+    return Helpers.stat(path).map(Helpers.tryCall('isFile')).map(function () {
+      return path;
+    });
   },
   findExistingDirectory: function findExistingDirectory(locations) {
     return O.of(locations[0]).flatMap(function (l) {

@@ -19,40 +19,28 @@ module.exports = function (H) {
        * Map over all configured notification methods and check if there
        * are installed modules by that name.
        */
-      sends = setMethods.map(function (m) {
-        var configObj = config.toJS();
-        var module = 'rss-o-bot-' + m;
-        var msg = 'Successfully loaded notifier: ' + module;
-        try {
-          try {
-            /* Attempt local require */
-            var send = require(module)(configObj);
-            debug(msg);
-            return send;
-          } catch (e) {
-            /* Attempt global require */
-            var _send = require(__dirname + '/../../../' + module)(configObj);
-            debug(msg);
-            return _send;
-          }
-        } catch (e) {
-          /* Notifier not found */
-          console.error(e);
-          debug('Failed to load notifier: ' + module);
-        }
-      }).filter(function (f) {
-        return f;
-      }); /* Exclude all notifiers, that weren't found */
+      sends = setMethods.map(function (module) {
+        O.onErrorResumeNext(H.isDirectory(module), H.isDirectory(__dirname + '/../../../rss-o-bot-' + module).map(require), H.isDirectory(__dirname + '/../../../' + module).map(require), O.of(module).map(require), O.of('rss-o-bot-' + module).map(require)).map(function (f) {
+          return config.toJS();
+        }).catch(function () {
+          console.error('Failed to load notifier ' + module);
+        }).filter(function (f) {
+          return f;
+        }) /* Exclude all notifiers, that weren't found */
+        .tap(function () {
+          return debug('Successfully loaded notifier: ' + module);
+        });
+      });
     } else {
-        sends = [O.of];
-      }
+      sends = [O.of];
+    }
 
     return function (blog, link, title) {
       return (
         /* Call all registered notifiers */
-        O.forkJoin(sends.map(function (f) {
+        sends.flatMap(function (f) {
           return f(blog, link, title);
-        }))
+        }).last()
       );
     };
   };

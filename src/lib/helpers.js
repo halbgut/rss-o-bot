@@ -18,7 +18,8 @@ const Helpers = {
   readFile: O.fromNodeCallback(fs.readFile),
   writeFile: O.fromNodeCallback(fs.writeFile),
   stat: O.fromNodeCallback(fs.stat),
-  isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')),
+  isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')).map(() => path),
+  isFile: path => Helpers.stat(path).map(Helpers.tryCall('isFile')).map(() => path),
   findExistingDirectory: locations =>
     O.of(locations[0])
       .flatMap(l =>
