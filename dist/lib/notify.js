@@ -1,5 +1,7 @@
 'use strict';
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 /**
  * notifiy
  * This module notifies about new entries users.
@@ -12,36 +14,43 @@ var debug = require('debug')('rss-o-bot');
 
 module.exports = function (H) {
   return function (config) {
-    var sends = void 0;
-    var setMethods = config.get('notification-methods');
-    if (setMethods && setMethods.length > 0) {
-      /**
-       * Map over all configured notification methods and check if there
-       * are installed modules by that name.
-       */
-      sends = setMethods.map(function (module) {
-        O.onErrorResumeNext(H.isDirectory(module), H.isDirectory(__dirname + '/../../../rss-o-bot-' + module).map(require), H.isDirectory(__dirname + '/../../../' + module).map(require), O.of(module).map(require), O.of('rss-o-bot-' + module).map(require)).map(function (f) {
-          return config.toJS();
-        }).catch(function () {
-          console.error('Failed to load notifier ' + module);
-        }).filter(function (f) {
-          return f;
-        }) /* Exclude all notifiers, that weren't found */
-        .tap(function () {
-          return debug('Successfully loaded notifier: ' + module);
-        });
-      });
-    } else {
-      sends = [O.of];
-    }
+    var setMethods = config.get('notification-methods') || [];
+    var notifierFunctions = getNotifierFunctions(H, config, setMethods);
 
     return function (blog, link, title) {
-      return (
-        /* Call all registered notifiers */
-        sends.flatMap(function (f) {
-          return f(blog, link, title);
-        }).last()
-      );
+      return console.log(link) ||
+      /* Call all registered notifiers */
+      O.merge.apply(O, _toConsumableArray(notifierFunctions)).flatMap(function (f) {
+        return f(blog, link, title);
+      })
+      /* The results should be ignored here */
+      .last().map(function () {
+        return null;
+      });
     };
   };
+};
+
+var isFunction = function isFunction(x) {
+  if (typeof x === 'function') return x;
+  throw new Error('x is not a function.');
+};
+
+var getNotifierFunctions = function getNotifierFunctions(H, config, setMethods) {
+  return (
+    /* Map over all configured notification methods and check if there
+     * are installed modules by that name. require and isDirectory both
+     * throw errors if the directory or module doesn't exist.
+     */
+    setMethods.map(function (module) {
+      O.onErrorResumeNext(O.of(module).map(isFunction), H.isDirectory(__dirname + '/../../../rss-o-bot-' + module).map(require), H.isDirectory(__dirname + '/../../../' + module).map(require), O.of(module).map(require), O.of('rss-o-bot-' + module).map(require), H.isDirectory(module).map(require)).catch(function () {
+        console.error('Failed to load notifier ' + module);
+      }).filter(function (f) {
+        return f;
+      }) /* Exclude all notifiers, that weren't found */
+      .tap(function () {
+        return debug('Successfully loaded notifier: ' + module);
+      });
+    })
+  );
 };
