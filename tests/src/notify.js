@@ -18,19 +18,19 @@ const createDummyEntryAndPoll = (config, url) =>
         )
     )
 
-// test.cb('notifier injection', t => {
-//   const url = 'https://lucaschmid.net/feed/rss.xml'
-//   const config = T.getConfigWithDefaults({
-//     'notification-methods': [`${__dirname}/lib/notifier.js`]
-//   })
-//   global.NOTIFIER_TEST_OBJECT = t
-//   createDummyEntryAndPoll(config, url)
-//     .flatMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
-//     .subscribe(
-//       () => {},
-//       T.handleError(t)
-//     )
-// })
+test.cb('notifier injection', t => {
+  const url = 'https://lucaschmid.net/feed/rss.xml'
+  const config = T.getConfigWithDefaults({
+    'notification-methods': [`${__dirname}/lib/notifier.js`]
+  })
+  global.NOTIFIER_TEST_OBJECT = t
+  createDummyEntryAndPoll(config, url)
+    .flatMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
+    .subscribe(
+      () => {},
+      T.handleError(t)
+    )
+})
 
 test.cb('notifiers/poll-feeds order', t => {
   let latestItem
