@@ -32,11 +32,6 @@ module.exports = function (H) {
   };
 };
 
-var isFunction = function isFunction(x) {
-  if (typeof x === 'function') return x;
-  throw new Error('x is not a function.');
-};
-
 var getNotifierFunctions = function getNotifierFunctions(H, config, setMethods) {
   return (
     /* Map over all configured notification methods and check if there
@@ -44,7 +39,7 @@ var getNotifierFunctions = function getNotifierFunctions(H, config, setMethods) 
      * throw errors if the directory or module doesn't exist.
      */
     setMethods.map(function (module) {
-      return O.onErrorResumeNext(O.of(module).map(isFunction), H.isDirectory(__dirname + '/../../../rss-o-bot-' + module).map(require), H.isDirectory(__dirname + '/../../../' + module).map(require), O.of(module).map(require), O.of('rss-o-bot-' + module).map(require), H.isDirectory(module).map(require)).catch(function () {
+      return typeof module === 'function' ? O.of(module(config)) : O.onErrorResumeNext(H.isDirectory(__dirname + '/../../../rss-o-bot-' + module).map(require), H.isDirectory(__dirname + '/../../../' + module).map(require), O.of(module).map(require), O.of('rss-o-bot-' + module).map(require), H.isDirectory(module).map(require)).catch(function () {
         console.error('Failed to load notifier ' + module);
       }).filter(function (f) {
         return f;

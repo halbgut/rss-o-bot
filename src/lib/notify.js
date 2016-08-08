@@ -18,28 +18,24 @@ module.exports = H => config => {
       .map(() => null)
 }
 
-const isFunction = x => {
-  if (typeof x === 'function') return x
-  throw new Error('x is not a function.')
-}
-
 const getNotifierFunctions = (H, config, setMethods) =>
   /* Map over all configured notification methods and check if there
    * are installed modules by that name. require and isDirectory both
    * throw errors if the directory or module doesn't exist.
    */
   setMethods.map(module =>
-    O.onErrorResumeNext(
-      O.of(module).map(isFunction),
-      H.isDirectory(`${__dirname}/../../../rss-o-bot-${module}`).map(require),
-      H.isDirectory(`${__dirname}/../../../${module}`).map(require),
-      O.of(module).map(require),
-      O.of(`rss-o-bot-${module}`).map(require),
-      H.isDirectory(module).map(require)
-    )
-      .catch(() => { console.error(`Failed to load notifier ${module}`) })
-      .filter(f => f) /* Exclude all notifiers, that weren't found */
-      .map(f => f(config))
-      .tap(() => debug(`Successfully loaded notifier: ${module}`))
+    typeof module === 'function'
+      ? O.of(module(config))
+      : O.onErrorResumeNext(
+        H.isDirectory(`${__dirname}/../../../rss-o-bot-${module}`).map(require),
+        H.isDirectory(`${__dirname}/../../../${module}`).map(require),
+        O.of(module).map(require),
+        O.of(`rss-o-bot-${module}`).map(require),
+        H.isDirectory(module).map(require)
+      )
+        .catch(() => { console.error(`Failed to load notifier ${module}`) })
+        .filter(f => f) /* Exclude all notifiers, that weren't found */
+        .map(f => f(config))
+        .tap(() => debug(`Successfully loaded notifier: ${module}`))
   )
 
