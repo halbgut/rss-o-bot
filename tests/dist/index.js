@@ -21,7 +21,7 @@ var initStore = require('../../dist/lib/store')(H);
 var Config = require('../../dist/lib/config')(H);
 var T = require('./lib/helpers')({ runCLI: runCLI, initStore: initStore, Config: Config });
 
-test.after('remove DB', T.removeDatabases);
+test.before('remove DB', T.removeDatabases);
 
 test.cb('version', T.run(['-v'])(function (t, o) {
   return o.map(function (version) {
@@ -39,15 +39,7 @@ test.cb('man', T.run(['-m'])(function (t, o) {
   return o.map(function (man) {
     return man.length > 1000 ? t.pass() : t.fail();
   });
-}));
-
-/* function to create dummy posts */
-var createDummyPost = function createDummyPost(name, url) {
-  var filters = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
-  return initStore(T.getConfigWithDefaults()).flatMap(function (store) {
-    return store.insertFeed(url, filters).map(store);
-  });
-};(function () {
+}));(function () {
   var url = 'https://lucaschmid.net/feed/rss.xml';
   var filter = 'somefilter';
   test.cb('add', T.run(['add', url, filter], 3)(function (t, o, config) {
@@ -109,7 +101,7 @@ var createDummyPost = function createDummyPost(name, url) {
 })();(function () {
   var url = 'https://lucaschmid.net/feed/rss.xml';
   test.cb('poll-feeds', function (t) {
-    createDummyPost('poll-feeds', url).flatMap(function (store) {
+    T.createDummyEntry(url).flatMap(function (store) {
       return runCLI(['node', '', 'poll-feeds'], null, T.getConfig()).map(function () {
         return store;
       });

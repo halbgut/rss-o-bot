@@ -1,5 +1,7 @@
 'use strict';
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var _require = require('rx');
 
 var O = _require.Observable;
@@ -11,16 +13,17 @@ var poll = require('./lib/poll');
 /* Extracts blog, link and title from a feed-item */
 var callbackWrapper = function callbackWrapper(callback) {
   return function (_ref) {
-    var blog = _ref.blog;
+    var blogTitle = _ref.blogTitle;
     var link = _ref.link;
     var title = _ref.title;
-    return callback(blog, link, title).tap(function () {
+    return callback(blogTitle, link, title).tap(function () {
       return debug('Sent notifications');
     }).retry(2);
   };
 };
 
 module.exports = function (H) {
+  var Poll = poll(H);
   /* Takes a store and a feed entity and returns an observable of new links
    * found on that feed.
    */
@@ -29,7 +32,7 @@ module.exports = function (H) {
     var setBlogTitle = _ref2.setBlogTitle;
     return function (feed) {
       var feed$ = O.fromPromise(feed.getFilters()).flatMap(function (filters) {
-        return poll(feed.get('url'), filters.map(function (f) {
+        return Poll(feed.get('url'), filters.map(function (f) {
           return [f.get('keyword'), f.get('kind')];
         })).retry(2).catch(function (err) {
           var msg = 'Failed downloading "' + feed.get('url') + '"';
@@ -41,11 +44,9 @@ module.exports = function (H) {
         var link = _ref3.link;
         return link && link !== feed.get('latestLink') || debug('Old URL: ' + link);
       }).flatMap(function (info) {
-        return feed.get('blogTitle') ? O.of(info) : setBlogTitle(feed.get('id'), info.blogTitle);
+        return feed.get('blogTitle') ? O.of(info) : setBlogTitle(feed.get('id'), info.blogTitle).map(info);
       }).flatMap(function (info) {
-        return updateLatestLink(feed.get('id'), info.link).map(function () {
-          return info;
-        });
+        return updateLatestLink(feed.get('id'), info.link).map(info);
       }).filter(function () {
         return feed.get('latestLink');
       }).tap(function (_ref4) {
@@ -79,7 +80,7 @@ module.exports = function (H) {
   var PollFeeds = function PollFeeds(callback) {
     return function (store, force) {
       return store.getFeeds(force).flatMap(function (feeds) {
-        return O.merge(feeds.map(queryFeed(store))).flatMap(callbackWrapper(callback));
+        return O.merge.apply(O, _toConsumableArray(feeds.map(queryFeed(store)))).flatMap(callbackWrapper(callback));
       });
     };
   };

@@ -100,6 +100,7 @@ module.exports = H => {
             : H.getBaseUrl(url) + entry.link
         }))
       )
+
   return Poll
 }
 

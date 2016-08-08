@@ -4,19 +4,20 @@ const debug = require('debug')('rss-o-bot')
 const poll = require('./lib/poll')
 
 /* Extracts blog, link and title from a feed-item */
-const callbackWrapper = callback => ({ blog, link, title }) =>
-  callback(blog, link, title)
+const callbackWrapper = callback => ({ blogTitle, link, title }) =>
+  callback(blogTitle, link, title)
     .tap(() => debug('Sent notifications'))
     .retry(2)
 
 module.exports = H => {
+  const Poll = poll(H)
   /* Takes a store and a feed entity and returns an observable of new links
    * found on that feed.
    */
   const queryFeed = ({updateLatestLink, setBlogTitle}) => feed => {
     const feed$ = O.fromPromise(feed.getFilters())
       .flatMap(filters =>
-        poll(
+        Poll(
           feed.get('url'),
           filters.map(f => [f.get('keyword'), f.get('kind')])
         )
@@ -36,10 +37,10 @@ module.exports = H => {
         .flatMap(info =>
           feed.get('blogTitle')
             ? O.of(info)
-            : setBlogTitle(feed.get('id'), info.blogTitle)
+            : setBlogTitle(feed.get('id'), info.blogTitle).map(info)
         )
         .flatMap(info =>
-          updateLatestLink(feed.get('id'), info.link).map(() => info)
+          updateLatestLink(feed.get('id'), info.link).map(info)
         )
         .filter(() => feed.get('latestLink'))
         .tap(({link}) => debug(`New URL: ${link}`))
@@ -68,9 +69,8 @@ module.exports = H => {
   const PollFeeds = callback => (store, force) =>
     store.getFeeds(force)
       .flatMap(feeds =>
-        O.merge(
-          feeds.map(queryFeed(store))
-        ).flatMap(callbackWrapper(callback))
+        O.merge(...feeds.map(queryFeed(store)))
+          .flatMap(callbackWrapper(callback))
       )
   return PollFeeds
 }

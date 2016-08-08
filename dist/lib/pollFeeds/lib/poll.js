@@ -144,5 +144,6 @@ module.exports = function (H) {
       });
     });
   };
+
   return Poll;
 };

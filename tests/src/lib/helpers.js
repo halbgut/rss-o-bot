@@ -1,10 +1,23 @@
 const fs = require('fs')
 
 const Immutable = require('immutable')
+const databases = []
+
+const getConfig = ((id = 0) => (extend = {}) => {
+  const db = `${__dirname}/../../../data/test_feeds-${++id}.sqlite`
+  databases.push(db)
+  return Object.assign({
+    'database': {
+      'name': 'data',
+      'options': {
+        'dialect': 'sqlite',
+        'storage': db
+      }
+    }
+  }, extend)
+})()
 
 module.exports = ({ runCLI, initStore, Config }) => {
-  const databases = []
-
   const removeDatabases = t => {
     databases.forEach(db => {
       try {
@@ -16,33 +29,19 @@ module.exports = ({ runCLI, initStore, Config }) => {
     t.pass()
   }
 
-  const getConfig = ((id = 0) => () => {
-    const db = `${__dirname}/../../../data/test_feeds-${++id}.sqlite`
-    databases.push(db)
-    return {
-      'database': {
-        'name': 'data',
-        'options': {
-          'dialect': 'sqlite',
-          'storage': db
-        }
-      }
-    }
-  })()
-
   const toConfig = object =>
     Config.applyDefaults(Immutable.fromJS(object))
 
-  const getConfigWithDefaults = () => toConfig(getConfig())
+  const getConfigWithDefaults = extend => toConfig(getConfig(extend))
 
   const handleError = t => err => {
     t.fail(`test failed: ${err.message}`)
     t.end()
   }
 
-  const run = (a, n = 1) => f => t => {
+  const run = (a, n = 1) => (f, configExtend) => t => {
     if (n) t.plan(n)
-    const config = toConfig(getConfig())
+    const config = toConfig(getConfig(configExtend))
     const o = runCLI(['node', '', ...a], null, config)
     f(t, o, config)
       .subscribe(
@@ -87,6 +86,15 @@ module.exports = ({ runCLI, initStore, Config }) => {
       () => t.end()
     )
 
+  /* function to create dummy posts */
+  const createDummyEntry =
+    (url, filters = [], config = getConfigWithDefaults(), storeAndEntity) =>
+      initStore(config)
+        .flatMap(store =>
+          store.insertFeed(url, filters)
+            .map(feed => storeAndEntity ? [store, feed] : store)
+        )
+
   return {
     removeDatabases,
     getConfig,
@@ -98,7 +106,8 @@ module.exports = ({ runCLI, initStore, Config }) => {
     containsFeedUrl,
     getStoreAnd,
     getStoreAndListFeeds,
-    testObservable
+    testObservable,
+    createDummyEntry
   }
 }
 

@@ -7,13 +7,31 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var fs = require('fs');
 
 var Immutable = require('immutable');
+var databases = [];
+
+var getConfig = function () {
+  var id = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+  return function () {
+    var extend = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+    var db = __dirname + '/../../../data/test_feeds-' + ++id + '.sqlite';
+    databases.push(db);
+    return Object.assign({
+      'database': {
+        'name': 'data',
+        'options': {
+          'dialect': 'sqlite',
+          'storage': db
+        }
+      }
+    }, extend);
+  };
+}();
 
 module.exports = function (_ref) {
   var runCLI = _ref.runCLI;
   var initStore = _ref.initStore;
   var Config = _ref.Config;
-
-  var databases = [];
 
   var removeDatabases = function removeDatabases(t) {
     databases.forEach(function (db) {
@@ -26,29 +44,12 @@ module.exports = function (_ref) {
     t.pass();
   };
 
-  var getConfig = function () {
-    var id = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-    return function () {
-      var db = __dirname + '/../../../data/test_feeds-' + ++id + '.sqlite';
-      databases.push(db);
-      return {
-        'database': {
-          'name': 'data',
-          'options': {
-            'dialect': 'sqlite',
-            'storage': db
-          }
-        }
-      };
-    };
-  }();
-
   var toConfig = function toConfig(object) {
     return Config.applyDefaults(Immutable.fromJS(object));
   };
 
-  var getConfigWithDefaults = function getConfigWithDefaults() {
-    return toConfig(getConfig());
+  var getConfigWithDefaults = function getConfigWithDefaults(extend) {
+    return toConfig(getConfig(extend));
   };
 
   var handleError = function handleError(t) {
@@ -60,10 +61,10 @@ module.exports = function (_ref) {
 
   var run = function run(a) {
     var n = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
-    return function (f) {
+    return function (f, configExtend) {
       return function (t) {
         if (n) t.plan(n);
-        var config = toConfig(getConfig());
+        var config = toConfig(getConfig(configExtend));
         var o = runCLI(['node', ''].concat(_toConsumableArray(a)), null, config);
         f(t, o, config).subscribe(function () {}, handleError(t), function () {
           return t.end();
@@ -127,6 +128,18 @@ module.exports = function (_ref) {
     };
   };
 
+  /* function to create dummy posts */
+  var createDummyEntry = function createDummyEntry(url) {
+    var filters = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+    var config = arguments.length <= 2 || arguments[2] === undefined ? getConfigWithDefaults() : arguments[2];
+    var storeAndEntity = arguments[3];
+    return initStore(config).flatMap(function (store) {
+      return store.insertFeed(url, filters).map(function (feed) {
+        return storeAndEntity ? [store, feed] : store;
+      });
+    });
+  };
+
   return {
     removeDatabases: removeDatabases,
     getConfig: getConfig,
@@ -138,6 +151,7 @@ module.exports = function (_ref) {
     containsFeedUrl: containsFeedUrl,
     getStoreAnd: getStoreAnd,
     getStoreAndListFeeds: getStoreAndListFeeds,
-    testObservable: testObservable
+    testObservable: testObservable,
+    createDummyEntry: createDummyEntry
   };
 };

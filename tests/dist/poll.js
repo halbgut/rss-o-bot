@@ -64,7 +64,7 @@ test.cb('poll case-sensitive positive rss filter', function (t) {
   return T.testObservable(
   /* Testing inverted filters */
   Poll('https://lucaschmid.net/feed/rss.xml', []).flatMap(function (entries) {
-    return(
+    return (
       /* I'm assuming, that all entries have some upper-case letters in them */
       Poll('https://lucaschmid.net/feed/rss.xml', [entries[0].title])
     );

@@ -18,15 +18,16 @@ module.exports = function (H) {
     var notifierFunctions = getNotifierFunctions(H, config, setMethods);
 
     return function (blog, link, title) {
-      return console.log(link) ||
-      /* Call all registered notifiers */
-      O.merge.apply(O, _toConsumableArray(notifierFunctions)).flatMap(function (f) {
-        return f(blog, link, title);
-      })
-      /* The results should be ignored here */
-      .last().map(function () {
-        return null;
-      });
+      return (
+        /* Call all registered notifiers */
+        O.merge.apply(O, _toConsumableArray(notifierFunctions)).flatMap(function (f) {
+          return f(blog, link, title);
+        })
+        /* The results should be ignored here */
+        .last().map(function () {
+          return null;
+        })
+      );
     };
   };
 };
@@ -43,12 +44,14 @@ var getNotifierFunctions = function getNotifierFunctions(H, config, setMethods) 
      * throw errors if the directory or module doesn't exist.
      */
     setMethods.map(function (module) {
-      O.onErrorResumeNext(O.of(module).map(isFunction), H.isDirectory(__dirname + '/../../../rss-o-bot-' + module).map(require), H.isDirectory(__dirname + '/../../../' + module).map(require), O.of(module).map(require), O.of('rss-o-bot-' + module).map(require), H.isDirectory(module).map(require)).catch(function () {
+      return O.onErrorResumeNext(O.of(module).map(isFunction), H.isDirectory(__dirname + '/../../../rss-o-bot-' + module).map(require), H.isDirectory(__dirname + '/../../../' + module).map(require), O.of(module).map(require), O.of('rss-o-bot-' + module).map(require), H.isDirectory(module).map(require)).catch(function () {
         console.error('Failed to load notifier ' + module);
       }).filter(function (f) {
         return f;
       }) /* Exclude all notifiers, that weren't found */
-      .tap(function () {
+      .map(function (f) {
+        return f(config);
+      }).tap(function () {
         return debug('Successfully loaded notifier: ' + module);
       });
     })

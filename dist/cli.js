@@ -70,7 +70,7 @@ var commands = [['add', function (args) {
 
     var store = _ref8[0];
     var config = _ref8[1];
-    return require('.').pollFeeds(config, store, true);
+    return require('.').pollFeeds(Notify(config))(store, true);
   });
 }], ['test-notification', true, function (state) {
   return Notify(state.get('config'))('Test', state.get('arguments').first() || 'test', 'Test Title');

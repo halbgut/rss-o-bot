@@ -9,7 +9,7 @@ const initStore = require('../../dist/lib/store')(H)
 const Config = require('../../dist/lib/config')(H)
 const T = require('./lib/helpers')({ runCLI, initStore, Config })
 
-test.after('remove DB', T.removeDatabases)
+test.before('remove DB', T.removeDatabases)
 
 test.cb('version', T.run(['-v'])((t, o) =>
   o.map(version =>
@@ -32,15 +32,6 @@ test.cb('man', T.run(['-m'])((t, o) =>
       : t.fail()
   )
 ))
-
-/* function to create dummy posts */
-const createDummyPost =
-  (name, url, filters = []) =>
-    initStore(T.getConfigWithDefaults())
-      .flatMap(store =>
-        store.insertFeed(url, filters)
-          .map(store)
-      )
 
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
@@ -106,7 +97,7 @@ const createDummyPost =
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
   test.cb('poll-feeds', t => {
-    createDummyPost('poll-feeds', url)
+    T.createDummyEntry(url)
       .flatMap(store =>
         runCLI(['node', '', 'poll-feeds'], null, T.getConfig())
           .map(() => store)

@@ -9,7 +9,7 @@ module.exports = H => config => {
   const setMethods = config.get('notification-methods') || []
   const notifierFunctions = getNotifierFunctions(H, config, setMethods)
 
-  return (blog, link, title) => console.log(link) ||
+  return (blog, link, title) =>
     /* Call all registered notifiers */
     O.merge(...notifierFunctions)
       .flatMap(f => f(blog, link, title))
@@ -28,7 +28,7 @@ const getNotifierFunctions = (H, config, setMethods) =>
    * are installed modules by that name. require and isDirectory both
    * throw errors if the directory or module doesn't exist.
    */
-  setMethods.map(module => {
+  setMethods.map(module =>
     O.onErrorResumeNext(
       O.of(module).map(isFunction),
       H.isDirectory(`${__dirname}/../../../rss-o-bot-${module}`).map(require),
@@ -39,6 +39,7 @@ const getNotifierFunctions = (H, config, setMethods) =>
     )
       .catch(() => { console.error(`Failed to load notifier ${module}`) })
       .filter(f => f) /* Exclude all notifiers, that weren't found */
+      .map(f => f(config))
       .tap(() => debug(`Successfully loaded notifier: ${module}`))
-  })
+  )
 

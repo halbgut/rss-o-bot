@@ -54,7 +54,10 @@ const commands = [
     true,
     state =>
       O.of(state).flatMap(H.setUpEnv(initStore))
-        .flatMap(([store, config]) => require('.').pollFeeds(config, store, true))
+        .flatMap(([store, config]) =>
+          require('.')
+            .pollFeeds(Notify(config))(store, true)
+        )
   ],
   [
     'test-notification',
