@@ -7,6 +7,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var fs = require('fs');
 
 var Immutable = require('immutable');
+
+var runCLI = require('../../../dist/cli.js');
+var H = require('../../../dist/lib/helpers');
+var initStore = require('../../../dist/lib/store')(H);
+var Config = require('../../../dist/lib/config')(H);
+
 var databases = [];
 
 var getConfig = function () {
@@ -28,130 +34,124 @@ var getConfig = function () {
   };
 }();
 
-module.exports = function (_ref) {
-  var runCLI = _ref.runCLI;
-  var initStore = _ref.initStore;
-  var Config = _ref.Config;
-
-  var removeDatabases = function removeDatabases(t) {
-    databases.forEach(function (db) {
-      try {
-        fs.unlinkSync(db);
-      } catch (e) {
-        /* Ignore errors, since some tests don't ever ope na db */
-      }
-    });
-    t.pass();
-  };
-
-  var toConfig = function toConfig(object) {
-    return Config.applyDefaults(Immutable.fromJS(object));
-  };
-
-  var getConfigWithDefaults = function getConfigWithDefaults(extend) {
-    return toConfig(getConfig(extend));
-  };
-
-  var handleError = function handleError(t) {
-    return function (err) {
-      t.fail('test failed: ' + err.message);
-      t.end();
-    };
-  };
-
-  var run = function run(a) {
-    var n = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
-    return function (f, configExtend) {
-      return function (t) {
-        if (n) t.plan(n);
-        var config = toConfig(getConfig(configExtend));
-        var o = runCLI(['node', ''].concat(_toConsumableArray(a)), null, config);
-        f(t, o, config).subscribe(function () {}, handleError(t), function () {
-          return t.end();
-        });
-      };
-    };
-  };
-
-  var parsePrintedFeeds = function parsePrintedFeeds(feeds) {
-    return feeds.split('\n').map(function (feed) {
-      if (feed.length < 1) {
-        return false;
-      } else {
-        var _feed$split = feed.split(': ');
-
-        var _feed$split2 = _slicedToArray(_feed$split, 2);
-
-        var id = _feed$split2[0];
-        var rest = _feed$split2[1];
-
-        var _rest$split = rest.split(' - ');
-
-        var _rest$split2 = _slicedToArray(_rest$split, 3);
-
-        var title = _rest$split2[0];
-        var setUrl = _rest$split2[1];
-        var filters = _rest$split2[2];
-
-        return [id, title, setUrl, filters];
-      }
-    }).filter(function (x) {
-      return !!x;
-    });
-  };
-
-  var containsFeedUrl = function containsFeedUrl(url, t) {
-    return function (feeds) {
-      var feedsMatching = feeds.filter(function (feed) {
-        return typeof feed.get === 'function' ? feed.get('url') === url : feed[2] === url;
-      });
-      return t.true(feedsMatching.length >= 1);
-    };
-  };
-
-  var getStoreAnd = function getStoreAnd(cb) {
-    return function (config) {
-      return initStore(config).flatMap(cb);
-    };
-  };
-
-  var getStoreAndListFeeds = getStoreAnd(function (_ref2) {
-    var listFeeds = _ref2.listFeeds;
-    return listFeeds();
+var removeDatabases = function removeDatabases(t) {
+  databases.forEach(function (db) {
+    try {
+      fs.unlinkSync(db);
+    } catch (e) {
+      /* Ignore errors, since some tests don't ever ope na db */
+    }
   });
+  t.pass();
+};
 
-  var testObservable = function testObservable(o) {
+var toConfig = function toConfig(object) {
+  return Config.applyDefaults(Immutable.fromJS(object));
+};
+
+var getConfigWithDefaults = function getConfigWithDefaults(extend) {
+  return toConfig(getConfig(extend));
+};
+
+var handleError = function handleError(t) {
+  return function (err) {
+    t.fail('test failed: ' + err.message);
+    t.end();
+  };
+};
+
+var run = function run(a) {
+  var n = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+  return function (f, configExtend) {
     return function (t) {
-      return o.subscribe(function () {}, handleError(t), function () {
+      if (n) t.plan(n);
+      var config = toConfig(getConfig(configExtend));
+      var o = runCLI(['node', ''].concat(_toConsumableArray(a)), null, config);
+      f(t, o, config).subscribe(function () {}, handleError(t), function () {
         return t.end();
       });
     };
   };
+};
 
-  /* function to create dummy posts */
-  var createDummyEntry = function createDummyEntry(url) {
-    var filters = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-    var config = arguments.length <= 2 || arguments[2] === undefined ? getConfigWithDefaults() : arguments[2];
-    var storeAndEntity = arguments[3];
-    return initStore(config).flatMap(function (store) {
-      return store.insertFeed(url, filters).map(function (feed) {
-        return storeAndEntity ? [store, feed] : store;
-      });
+var parsePrintedFeeds = function parsePrintedFeeds(feeds) {
+  return feeds.split('\n').map(function (feed) {
+    if (feed.length < 1) {
+      return false;
+    } else {
+      var _feed$split = feed.split(': ');
+
+      var _feed$split2 = _slicedToArray(_feed$split, 2);
+
+      var id = _feed$split2[0];
+      var rest = _feed$split2[1];
+
+      var _rest$split = rest.split(' - ');
+
+      var _rest$split2 = _slicedToArray(_rest$split, 3);
+
+      var title = _rest$split2[0];
+      var setUrl = _rest$split2[1];
+      var filters = _rest$split2[2];
+
+      return [id, title, setUrl, filters];
+    }
+  }).filter(function (x) {
+    return !!x;
+  });
+};
+
+var containsFeedUrl = function containsFeedUrl(url, t) {
+  return function (feeds) {
+    var feedsMatching = feeds.filter(function (feed) {
+      return typeof feed.get === 'function' ? feed.get('url') === url : feed[2] === url;
+    });
+    return t.true(feedsMatching.length >= 1);
+  };
+};
+
+var getStoreAnd = function getStoreAnd(cb) {
+  return function (config) {
+    return initStore(config).flatMap(cb);
+  };
+};
+
+var getStoreAndListFeeds = getStoreAnd(function (_ref) {
+  var listFeeds = _ref.listFeeds;
+  return listFeeds();
+});
+
+var testObservable = function testObservable(o) {
+  return function (t) {
+    return o.subscribe(function () {}, handleError(t), function () {
+      return t.end();
     });
   };
+};
 
-  return {
-    removeDatabases: removeDatabases,
-    getConfig: getConfig,
-    toConfig: toConfig,
-    getConfigWithDefaults: getConfigWithDefaults,
-    handleError: handleError,
-    run: run,
-    parsePrintedFeeds: parsePrintedFeeds,
-    containsFeedUrl: containsFeedUrl,
-    getStoreAnd: getStoreAnd,
-    getStoreAndListFeeds: getStoreAndListFeeds,
-    testObservable: testObservable,
-    createDummyEntry: createDummyEntry
-  };
+/* function to create dummy posts */
+var createDummyEntry = function createDummyEntry(url) {
+  var filters = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+  var config = arguments.length <= 2 || arguments[2] === undefined ? getConfigWithDefaults() : arguments[2];
+  var storeAndEntity = arguments[3];
+  return initStore(config).flatMap(function (store) {
+    return store.insertFeed(url, filters).map(function (feed) {
+      return storeAndEntity ? [store, feed] : store;
+    });
+  });
+};
+
+module.exports = {
+  removeDatabases: removeDatabases,
+  getConfig: getConfig,
+  toConfig: toConfig,
+  getConfigWithDefaults: getConfigWithDefaults,
+  handleError: handleError,
+  run: run,
+  parsePrintedFeeds: parsePrintedFeeds,
+  containsFeedUrl: containsFeedUrl,
+  getStoreAnd: getStoreAnd,
+  getStoreAndListFeeds: getStoreAndListFeeds,
+  testObservable: testObservable,
+  createDummyEntry: createDummyEntry
 };

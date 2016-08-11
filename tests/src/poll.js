@@ -1,10 +1,7 @@
 const { test } = require('ava')
 
-const runCLI = require('../../dist/cli.js')
 const H = require('../../dist/lib/helpers')
-const initStore = require('../../dist/lib/store')(H)
-const Config = require('../../dist/lib/config')(H)
-const T = require('./lib/helpers')({ runCLI, initStore, Config })
+const T = require('./lib/helpers')
 
 const Poll = require('../../dist/lib/pollFeeds/lib/poll.js')(H)
 

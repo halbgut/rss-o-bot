@@ -17,10 +17,8 @@ var O = _require2.Observable;
 
 var runCLI = require('../../dist/cli.js');
 var H = require('../../dist/lib/helpers');
-var initStore = require('../../dist/lib/store')(H);
-var Config = require('../../dist/lib/config')(H);
 var Poll = require('../../dist/lib/pollFeeds/lib/poll.js')(H);
-var T = require('./lib/helpers')({ runCLI: runCLI, initStore: initStore, Config: Config });
+var T = require('./lib/helpers');
 
 var createDummyEntryAndPoll = function createDummyEntryAndPoll(config, url) {
   var offset = arguments.length <= 2 || arguments[2] === undefined ? 2 : arguments[2];

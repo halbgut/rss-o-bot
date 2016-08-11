@@ -19,7 +19,7 @@ var runCLI = require('../../dist/cli.js');
 var H = require('../../dist/lib/helpers');
 var initStore = require('../../dist/lib/store')(H);
 var Config = require('../../dist/lib/config')(H);
-var T = require('./lib/helpers')({ runCLI: runCLI, initStore: initStore, Config: Config });
+var T = require('./lib/helpers');
 
 test.before('remove DB', T.removeDatabases);
 
