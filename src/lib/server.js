@@ -5,6 +5,8 @@ const Rx = require('rx')
 const debug = require('debug')('rss-o-bot')
 const O = Rx.Observable
 
+const startup = Symbol('startup')
+
 module.exports = H => {
   const isTokenValid = (() => {
     let cache = []
@@ -61,25 +63,31 @@ module.exports = H => {
           }
         })
         .listen(port)
+      /* Send the startup message */
+      o.onNext([startup])
     }),
 
     run: commands => state => {
       const config = state.get('configuration')
-      Server.listen(config)
-        .map(([data, respond]) => {
-          /* Must be a public key */
-          if (typeof data === 'string') {
-            debug('Recieved public key')
-            return H.writeFile(H.publicKeyPath(config), data)
-          } else {
-            debug(`Executing command ${data.action}`)
-            const cState = H.setCommandState(state)(
-              H.findCommand(commands, data.action, data.args)
-            )
-            if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'))
-            return cState.get('command')(state)
-          }
-        })
+      return (
+        Server.listen(config)
+          .map(([data, respond]) => {
+            /* Just let it through if it's the start up message */
+            if (data === startup) return 'Server started!'
+            /* Must be a public key */
+            if (typeof data === 'string') {
+              debug('Recieved public key')
+              return H.writeFile(H.publicKeyPath(config), data)
+            } else {
+              debug(`Executing command ${data.action}`)
+              const cState = H.setCommandState(state)(
+                H.findCommand(commands, data.action, data.args)
+              )
+              if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'))
+              return cState.get('command')(state)
+            }
+          })
+      )
     }
   }
 

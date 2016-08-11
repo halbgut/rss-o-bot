@@ -9,6 +9,8 @@ var Rx = require('rx');
 var debug = require('debug')('rss-o-bot');
 var O = Rx.Observable;
 
+var startup = Symbol('startup');
+
 module.exports = function (H) {
   var isTokenValid = function () {
     var cache = [];
@@ -69,6 +71,8 @@ module.exports = function (H) {
               })();
             }
           }).listen(port);
+          /* Send the startup message */
+          o.onNext([startup]);
         });
       };
     },
@@ -76,12 +80,14 @@ module.exports = function (H) {
     run: function run(commands) {
       return function (state) {
         var config = state.get('configuration');
-        Server.listen(config).map(function (_ref) {
+        return Server.listen(config).map(function (_ref) {
           var _ref2 = _slicedToArray(_ref, 2);
 
           var data = _ref2[0];
           var respond = _ref2[1];
 
+          /* Just let it through if it's the start up message */
+          if (data === startup) return 'Server started!';
           /* Must be a public key */
           if (typeof data === 'string') {
             debug('Recieved public key');
