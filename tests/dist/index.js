@@ -39,6 +39,12 @@ test.cb('man', T.run(['-m'])(function (t, o) {
   return o.map(function (man) {
     return man.length > 1000 ? t.pass() : t.fail();
   });
+}));
+
+test.cb('help with mode-flag', T.run(['-h', '--local'])(function (t, o) {
+  return o.map(function (help) {
+    return help.length > 100 ? t.pass() : t.fail();
+  });
 }));(function () {
   var url = 'https://lucaschmid.net/feed/rss.xml';
   var filter = 'somefilter';

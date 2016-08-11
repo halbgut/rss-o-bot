@@ -33,6 +33,14 @@ test.cb('man', T.run(['-m'])((t, o) =>
   )
 ))
 
+test.cb('help with mode-flag', T.run(['-h', '--local'])((t, o) =>
+  o.map(help =>
+    help.length > 100
+      ? t.pass()
+      : t.fail()
+  )
+))
+
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
   const filter = 'somefilter'

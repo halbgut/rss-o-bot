@@ -7,10 +7,13 @@ const Argv = {
     const args = state.get('arguments')
     const modes = Immutable.List(['server', 'remote', 'local'])
     const newMode =
-      args.filter(arg =>
-        typeof arg === 'string' &&
-        modes.includes(arg.substr(2))
-      ).first() || state.get('mode')
+      args
+        .filter(x => typeof x === 'string')
+        .map(x => x.substr(2))
+        .filter(arg =>
+          typeof arg === 'string' &&
+          modes.includes(arg)
+        ).first() || state.get('mode')
     return (
       state
         .set('mode', newMode)
