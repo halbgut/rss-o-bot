@@ -144,20 +144,18 @@ var runCommand = function runCommand(state) {
         arguments: state.get('arguments').toJS()
       }));
     } else if (mode === 'server') {
-      if (state.get('mode') === 'server') {
-        /* Ignore any command passed, since there's only
-         * `run` on the server.
-         */
-        return Server.run(state, commands);
-      }
+      /* Ignore any command passed, since there's only
+       * `run` on the server.
+       */
+      return Server.run(commands)(state);
     } else {
       throw new Error('Unexpected state mode is set to ' + mode);
     }
 };
 
 var getKeys = function getKeys(state) {
-  var config = state.get('config');
-  O.combineLatest(H.readFile(H.privateKeyPath(config)), H.readFile(H.publicKeyPath(config)));
+  var config = state.get('configuration');
+  return O.combineLatest(H.readFile(H.privateKeyPath(config)), H.readFile(H.publicKeyPath(config)));
 };
 
 var runCLI = function runCLI() {
@@ -177,7 +175,7 @@ var runCLI = function runCLI() {
   .map(function (state) {
     return state.set('mode', state.getIn(['configuration', 'remote']) ? 'remote' : state.getIn(['configuration', 'mode']));
   }).map(Argv.applyModeFlags).map(H.getCommand(commands)).flatMap(function (state) {
-    return state.get('mode') === 'server' || state.get('mode') === 'client' ? getKeys().map(function (_ref16) {
+    return state.get('mode') === 'server' || state.get('mode') === 'client' ? getKeys(state).map(function (_ref16) {
       var _ref17 = _slicedToArray(_ref16, 2);
 
       var pub = _ref17[0];

@@ -159,20 +159,18 @@ const runCommand = state => {
         }))
     )
   } else if (mode === 'server') {
-    if (state.get('mode') === 'server') {
-      /* Ignore any command passed, since there's only
-       * `run` on the server.
-       */
-      return Server.run(state, commands)
-    }
+    /* Ignore any command passed, since there's only
+     * `run` on the server.
+     */
+    return Server.run(commands)(state)
   } else {
     throw new Error(`Unexpected state mode is set to ${mode}`)
   }
 }
 
-const getKeys = (state) => {
-  const config = state.get('config')
-  O.combineLatest(
+const getKeys = state => {
+  const config = state.get('configuration')
+  return O.combineLatest(
     H.readFile(H.privateKeyPath(config)),
     H.readFile(H.publicKeyPath(config))
   )
@@ -208,7 +206,7 @@ const runCLI = (
     .flatMap(state =>
       state.get('mode') === 'server' ||
       state.get('mode') === 'client'
-        ? getKeys().map(([pub, priv]) =>
+        ? getKeys(state).map(([pub, priv]) =>
           state
             .set('publicKey', pub)
             .set('privateKey', priv)

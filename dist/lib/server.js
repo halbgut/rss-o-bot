@@ -80,7 +80,7 @@ module.exports = function (H) {
     run: function run(commands) {
       return function (state) {
         var config = state.get('configuration');
-        return Server.listen(config).map(function (_ref) {
+        return Server.listen(config)(state.get('publicKey')).map(function (_ref) {
           var _ref2 = _slicedToArray(_ref, 2);
 
           var data = _ref2[0];

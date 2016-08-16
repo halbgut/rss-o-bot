@@ -70,7 +70,7 @@ module.exports = H => {
     run: commands => state => {
       const config = state.get('configuration')
       return (
-        Server.listen(config)
+        Server.listen(config)(state.get('publicKey'))
           .map(([data, respond]) => {
             /* Just let it through if it's the start up message */
             if (data === startup) return 'Server started!'
