@@ -190,7 +190,7 @@ const runCLI = (
     .flatMap(state =>
       (config
         ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults)
-        : Config.readConfig(configLocations)
+        : Config.readConfig(state.getIn(['switches', 'config']) || configLocations)
       )
         .map(c => state.set('configuration', c))
     )

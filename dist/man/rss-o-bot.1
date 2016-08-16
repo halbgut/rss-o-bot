@@ -7,7 +7,7 @@
 .SH VERSION
 .P
 [[VERSION]]
-.SH FLAGS
+.SH FLAGS/SWITCHES
 .SS help, \-h, \-\-help
 .P
 Displays the synopsis\.
@@ -17,6 +17,9 @@ Display the whole man page\.
 .SS version, \-v, \-\-version
 .P
 Display the current version\.
+.SS \-\-config=\fI/path/to/configDirectory\fR
+.P
+The path to a directory containing configuration files\. See CONFIGURATION for further information\.
 .SH ACTIONS
 .SS [run]
 .P
@@ -55,7 +58,7 @@ DEBUG=rss\-o\-bot rss\-o\-bot
 For further information check the debug\-package's docs \fIhttps://www\.npmjs\.com/package/debug\fR\|\. It's the debugging utitlity this tool uses\.
 .SH CONFIGURATION
 .P
-RSS\-o\-Bot checks three places for configuration files\. \fB$HOME/\.rss\-o\-bot/config\.json\fP, or \fB%USERPROFILE%\\\.rss\-o\-bot\\config\.json\fP on windows and \fB${__dirname}/data/config\.json\fP\|\. The last is the root directory of the NPM package\. It is only meant for development puposes\. The files are check for their existance in that order (except for \fBconfig\.json\fP which is checked first)\.
+RSS\-o\-Bot checks three places for configuration files\. \fB$HOME/\.rss\-o\-bot/config\.json\fP, or \fB%USERPROFILE%\\\.rss\-o\-bot\\config\.json\fP on windows and \fB${__dirname}/data/config\.json\fP\|\. The last is the root directory of the NPM package\. It is only meant for development purposes\. The files are check for their existence in that order (except for \fBconfig\.json\fP which is checked first)\. These configuration paths may be overridden using the \fB\-\-config\fP switch\. See \fIFLAGS/SWITCHES\fR for more information\.
 .P
 The configuration file should contain a single JSON\-object on the root level\. Use the example configuration inside the README as a reference\. These are the available configuration options:
 .SS notification\-methods

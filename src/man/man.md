@@ -6,7 +6,7 @@
 ## VERSION
 [[VERSION]]
 
-## FLAGS
+## FLAGS/SWITCHES
 
 ### help, -h, --help
 Displays the synopsis.
@@ -16,6 +16,9 @@ Display the whole man page.
 
 ### version, -v, --version
 Display the current version.
+
+### --config=_/path/to/configDirectory_
+The path to a directory containing configuration files. See CONFIGURATION for further information.
 
 ## ACTIONS
 ### [run]
@@ -52,7 +55,7 @@ DEBUG=rss-o-bot rss-o-bot
 For further information check [the debug-package's docs](https://www.npmjs.com/package/debug). It's the debugging utitlity this tool uses.
 
 ## CONFIGURATION
-RSS-o-Bot checks three places for configuration files. `$HOME/.rss-o-bot/config.json`, or `%USERPROFILE%\.rss-o-bot\config.json` on windows and `${__dirname}/data/config.json`. The last is the root directory of the NPM package. It is only meant for development puposes. The files are check for their existance in that order (except for `config.json` which is checked first).
+RSS-o-Bot checks three places for configuration files. `$HOME/.rss-o-bot/config.json`, or `%USERPROFILE%\.rss-o-bot\config.json` on windows and `${__dirname}/data/config.json`. The last is the root directory of the NPM package. It is only meant for development purposes. The files are check for their existence in that order (except for `config.json` which is checked first). These configuration paths may be overridden using the `--config` switch. See *FLAGS/SWITCHES* for more information.
 
 The configuration file should contain a single JSON-object on the root level. Use the example configuration inside the README as a reference. These are the available configuration options:
 

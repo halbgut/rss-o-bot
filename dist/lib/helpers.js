@@ -40,7 +40,9 @@ var Helpers = {
       return path;
     });
   },
-  findExistingDirectory: function findExistingDirectory(locations) {
+
+  findExistingDirectory: function findExistingDirectory(strOrArrLocations) {
+    var locations = Array.prototype.isPrototypeOf(strOrArrLocations) ? strOrArrLocations : [strOrArrLocations];
     return O.of(locations[0]).flatMap(function (l) {
       return l ? Helpers.isDirectory(l).flatMap(function (is) {
         return is ? O.of(l) : Helpers.findExistingDirectory(locations.slice(1));

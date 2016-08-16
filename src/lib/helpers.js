@@ -20,17 +20,22 @@ const Helpers = {
   stat: O.fromNodeCallback(fs.stat),
   isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')).map(() => path),
   isFile: path => Helpers.stat(path).map(Helpers.tryCall('isFile')).map(() => path),
-  findExistingDirectory: locations =>
-    O.of(locations[0])
-      .flatMap(l =>
-        l
-          ? Helpers.isDirectory(l).flatMap(is =>
-            is
-              ? O.of(l)
-              : Helpers.findExistingDirectory(locations.slice(1))
+
+  findExistingDirectory: strOrArrLocations => {
+    const locations = Array.prototype.isPrototypeOf(strOrArrLocations)
+      ? strOrArrLocations
+      : [strOrArrLocations]
+    return (
+      O.of(locations[0])
+        .flatMap(l => l
+          ? Helpers.isDirectory(l).flatMap(is => is
+            ? O.of(l)
+            : Helpers.findExistingDirectory(locations.slice(1))
           )
           : O.throw('None of those directories exist')
-      ),
+        )
+    )
+  },
 
   /*
    * Functional helpers

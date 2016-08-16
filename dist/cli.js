@@ -169,7 +169,7 @@ var runCLI = function runCLI() {
   .map(Argv.extractArguments)
   /* Get config */
   .flatMap(function (state) {
-    return (config ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults) : Config.readConfig(configLocations)).map(function (c) {
+    return (config ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults) : Config.readConfig(state.getIn(['switches', 'config']) || configLocations)).map(function (c) {
       return state.set('configuration', c);
     });
   })
