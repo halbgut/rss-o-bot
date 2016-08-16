@@ -44,9 +44,11 @@ const handleError = t => err => {
   t.end()
 }
 
-const run = (a, n = 1) => (f, configExtend) => t => {
+const run = (a, n = 1, passConfig = true) => (f, configExtend) => t => {
   if (n) t.plan(n)
-  const config = toConfig(getConfig(configExtend))
+  const config = passConfig
+    ? toConfig(getConfig(configExtend))
+    : null
   const o = runCLI(['node', '', ...a], null, config)
   f(t, o, config)
     .subscribe(

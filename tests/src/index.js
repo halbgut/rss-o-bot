@@ -41,6 +41,13 @@ test.cb('help with mode-flag', T.run(['-h', '--local'])((t, o) =>
   )
 ))
 
+test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1, false)((t, o) =>
+  o.catch(() => {
+    t.pass()
+    return O.just()
+  })
+))
+
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
   const filter = 'somefilter'
