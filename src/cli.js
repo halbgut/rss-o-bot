@@ -132,7 +132,10 @@ const commands = [
       if (state.get('mode') === 'local') {
         O.of('No server configured, running in local mode. Check the configuration section of the man-page for more info.')
       } else if (state.get('mode') === 'remote') {
-        return remote.send({ action: 'ping', args: [] })(state.get('privateKey'))
+        return remote.send(
+          state.getIn(['configuration', 'remove']),
+          { action: 'ping', args: [] }
+        )(state.get('privateKey'))
       } else if (state.get('mode') === 'server') {
         return O.of('pong')
       }
