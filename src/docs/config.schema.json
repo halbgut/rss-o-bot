@@ -1,33 +1,61 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "RSS-O-Bot Configuration File",
-  "description": "RSS-O-Bot Configuration File (config.json)",
   "type": "object",
+  "description": "RSS-O-Bot Configuration File (config.json)",
   "properties": {
     "nofification-methods": {
-      "description": "Names of notification packages that should be used.",
       "type": "array",
-      "items": { "type": "string" }
+      "description": "Names of notification packages that should be used.",
+      "items": { "type": "string" },
+      "default": []
     },
     "interval": {
-      "description": "The interval in which the Feed-URLs should be polled in.",
-      "type": "number"
+      "type": "number",
+      "description": "The interval (in seconds) in which the Feed-URLs should be polled in.",
+      "default": 600
     },
     "database": {
-      "description": "Configuration object that defines a database to store data in.",
       "type": "object",
+      "description": "Configuration object that defines a database to store data in.",
       "properties": {
         "name": {
-          "description": "The name of the database",
-          "type": "string"
+          "type": "string",
+          "description": "The name of the database"
         },
         "options": {
-          "description": "A sequelize configuration object",
           "type": "object",
+          "description": "A sequelize configuration object",
           "properties": { "$ref": "https://github.com/sequelize/sequelize/blob/3e5b8772ef75169685fc96024366bca9958fee63/lib/sequelize.js#L57-L89" }
         }
       },
+      "default": {
+        "name": "rss-o-bot",
+        "options": {
+          "dialect": "sqlite",
+          "storage": "~/.rss-o-bot/feeds.sqlite"
+        }
+      },
       "required": ["name", "options"]
+    },
+    "mode": {
+      "type": "string",
+      "descript": "Set the mode in which RSS-O-Bot should operate",
+      "pattern": "local|remote|server",
+      "default": "local"
+    },
+    "port": {
+      "type": "number",
+      "description": "The port number that should be used when in server-mode",
+      "minimum": 0,
+      "maximum" : 65535,
+      "default": 3645
+    },
+    "jwt-expiration": {
+      "type": "number",
+      "desscription": "The number of seconds it should take for",
+      "minimum": 1,
+      "default": 60
     }
   }
 }
