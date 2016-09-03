@@ -27,9 +27,8 @@
           "properties": { "$ref": "https://github.com/sequelize/sequelize/blob/3e5b8772ef75169685fc96024366bca9958fee63/lib/sequelize.js#L57-L89" }
         }
       },
-      "required": ["name"]
+      "required": ["name", "options"]
     }
-  },
-  "required": ["notification-methods"]
+  }
 }
 
