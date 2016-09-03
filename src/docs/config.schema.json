@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "RSS-O-Bot Configuration File",
+  "description": "RSS-O-Bot Configuration File (config.json)",
+  "type": "object",
+  "properties": {
+    "nofification-methods": {
+      "description": "Names of notification packages that should be used.",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "interval": {
+      "description": "The interval in which the Feed-URLs should be polled in.",
+      "type": "number"
+    },
+    "database": {
+      "description": "Configuration object that defines a database to store data in.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the database",
+          "type": "string"
+        },
+        "options": {
+          "description": "A sequelize configuration object",
+          "type": "object",
+          "properties": { "$ref": "https://github.com/sequelize/sequelize/blob/3e5b8772ef75169685fc96024366bca9958fee63/lib/sequelize.js#L57-L89" }
+        }
+      },
+      "required": ["name"]
+    }
+  },
+  "required": ["notification-methods"]
+}
+
