@@ -102,8 +102,8 @@ const Helpers = {
    */
   buildMan: state =>
     O.forkJoin(
-      Helpers.readFile(`${__dirname}/../../src/man/man.md`),
-      Helpers.readFile(`${__dirname}/../../src/man/synopsis.md`)
+      Helpers.readFile(`${__dirname}/../../src/docs/man.md`),
+      Helpers.readFile(`${__dirname}/../../src/docs/synopsis.md`)
     )
       .map(([f1, f2]) => [f1.toString(), f2.toString()])
       .map(args => [...args, require('../../package.json')])

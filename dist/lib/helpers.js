@@ -126,7 +126,7 @@ var Helpers = {
    * Man helpers
    */
   buildMan: function buildMan(state) {
-    return O.forkJoin(Helpers.readFile(__dirname + '/../../src/man/man.md'), Helpers.readFile(__dirname + '/../../src/man/synopsis.md')).map(function (_ref) {
+    return O.forkJoin(Helpers.readFile(__dirname + '/../../src/docs/man.md'), Helpers.readFile(__dirname + '/../../src/docs/synopsis.md')).map(function (_ref) {
       var _ref2 = _slicedToArray(_ref, 2);
 
       var f1 = _ref2[0];

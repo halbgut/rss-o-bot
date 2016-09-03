@@ -4,7 +4,7 @@
   "description": "A FOSS RSS Bot alternative",
   "main": "dist",
   "bin": "dist/cli.js",
-  "man": "dist/man/rss-o-bot.1",
+  "man": "dist/docs/rss-o-bot.1",
   "scripts": {
     "build": "npm run build-js && ./src/cli.js build-man",
     "build-js": "babel --presets babel-preset-es2015 src --out-dir dist",

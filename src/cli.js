@@ -121,7 +121,7 @@ const commands = [
     state =>
       O.of(state)
         .flatMap(H.buildMan)
-        .flatMap(({ man }) => H.writeFile(`${__dirname}/../dist/man/rss-o-bot.1`, man))
+        .flatMap(({ man }) => H.writeFile(`${__dirname}/../dist/docs/rss-o-bot.1`, man))
         .map(() => 'Man built'),
     true
   ],

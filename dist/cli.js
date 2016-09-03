@@ -115,7 +115,7 @@ var commands = [['add', function (args) {
 }], ['build-man', true, function (state) {
   return O.of(state).flatMap(H.buildMan).flatMap(function (_ref15) {
     var man = _ref15.man;
-    return H.writeFile(__dirname + '/../dist/man/rss-o-bot.1', man);
+    return H.writeFile(__dirname + '/../dist/docs/rss-o-bot.1', man);
   }).map(function () {
     return 'Man built';
   });
