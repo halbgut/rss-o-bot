@@ -56,6 +56,11 @@
       "desscription": "The number of seconds it should take for",
       "minimum": 1,
       "default": 60
+    },
+    "remote": {
+      "type": "string",
+      "description": "The hostname (most likely the domain) of the RSS-O-Bot server",
+      "format": "hostname"
     }
   }
 }
