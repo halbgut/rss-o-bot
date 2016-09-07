@@ -45,7 +45,9 @@ module.exports = function (H) {
     allowedOverrides: ['interval', 'mode', 'port', 'jwt-expiration', 'remote'],
     applyOverrides: function applyOverrides(overrides) {
       return function (config) {
-        return overrides.reduce(function (m, v, k) {
+        return overrides.filter(function (x, k) {
+          return Config.allowedOverrides.indexOf(k) > -1;
+        }).reduce(function (m, v, k) {
           return m.set(k, v);
         }, config);
       };
