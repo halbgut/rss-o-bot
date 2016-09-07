@@ -136,4 +136,7 @@ Logo created by [mala23](https://github.com/mala23)
 * Document the installation options somewhere else
 * Test the docker container
 * Completions
+* add ramda
+* use typescript
+* upgrade rx
 
