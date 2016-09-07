@@ -89,6 +89,8 @@ const Helpers = {
     return match[0]
   },
 
+  getRemoteUrl: configuration => `${configuration.get('remote')}:${configuration.get('port')}`,
+
   /*
    * HTTP helpers
    */

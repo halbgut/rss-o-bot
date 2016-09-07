@@ -24,20 +24,6 @@ var Argv = {
       return split.length === 1 ? map.set(split[0], true) : map.set(split[0], split[1]);
     }, Immutable.Map({}));
     return Immutable.fromJS({ action: argv[2], arguments: args, switches: switches });
-  },
-
-  applyModeFlags: function applyModeFlags(state) {
-    var switches = state.get('switches');
-    var mode = void 0;
-    if (switches.get('local')) {
-      mode = 'local';
-    } else if (switches.get('remote')) {
-      mode = 'remote';
-    } else if (switches.get('server')) {
-      mode = 'server';
-    }
-
-    return mode ? state.set('mode', mode) : state;
   }
 };
 

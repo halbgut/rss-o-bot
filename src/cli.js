@@ -133,7 +133,7 @@ const commands = [
         O.of('No server configured, running in local mode. Check the configuration section of the man-page for more info.')
       } else if (state.get('mode') === 'remote') {
         return remote.send(
-          state.getIn(['configuration', 'remove']),
+          H.getRemoteUrl(state.get('configuration')),
           { action: 'ping', args: [] }
         )(state.get('privateKey'))
       } else if (state.get('mode') === 'server') {
@@ -156,7 +156,7 @@ const runCommand = state => {
     debug('Sending command as remote')
     return (
       H.readFile(H.privateKeyPath(config))
-        .flatMap(remote.send(config.get('remote'), {
+        .flatMap(remote.send(H.getRemoteUrl(config), {
           action: state.get('action'),
           arguments: state.get('arguments').toJS()
         }))
@@ -193,6 +193,7 @@ const runCLI = (
         ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults)
         : Config.readConfig(state.getIn(['switches', 'config']) || configLocations)
       )
+        .map(Config.applyOverrides(state.get('switches')))
         .map(c => state.set('configuration', c))
     )
     /* Define mode */
@@ -204,7 +205,6 @@ const runCLI = (
           : state.getIn(['configuration', 'mode'])
       )
     )
-    .map(Argv.applyModeFlags)
     .map(H.getCommand(commands))
     .flatMap(state =>
       state.get('mode') === 'server' ||

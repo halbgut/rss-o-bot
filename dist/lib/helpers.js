@@ -112,6 +112,10 @@ var Helpers = {
   },
 
 
+  getRemoteUrl: function getRemoteUrl(configuration) {
+    return configuration.get('remote') + ':' + configuration.get('port');
+  },
+
   /*
    * HTTP helpers
    */

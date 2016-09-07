@@ -42,6 +42,15 @@ module.exports = function (H) {
       return Config.defaults(config).merge(config);
     },
 
+    allowedOverrides: ['interval', 'mode', 'port', 'jwt-expiration', 'remote'],
+    applyOverrides: function applyOverrides(overrides) {
+      return function (config) {
+        return overrides.reduce(function (m, v, k) {
+          return m.set(k, v);
+        }, config);
+      };
+    },
+
     /* Parses the config JSON */
     parse: function parse(location) {
       return function (configStr) {

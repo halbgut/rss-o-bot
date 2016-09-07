@@ -123,7 +123,7 @@ var commands = [['add', function (args) {
   if (state.get('mode') === 'local') {
     O.of('No server configured, running in local mode. Check the configuration section of the man-page for more info.');
   } else if (state.get('mode') === 'remote') {
-    return remote.send(state.getIn(['configuration', 'remove']), { action: 'ping', args: [] })(state.get('privateKey'));
+    return remote.send(H.getRemoteUrl(state.get('configuration')), { action: 'ping', args: [] })(state.get('privateKey'));
   } else if (state.get('mode') === 'server') {
     return O.of('pong');
   }
@@ -139,7 +139,7 @@ var runCommand = function runCommand(state) {
     /* Send to a server */
   } else if (mode === 'remote') {
       debug('Sending command as remote');
-      return H.readFile(H.privateKeyPath(config)).flatMap(remote.send(config.get('remote'), {
+      return H.readFile(H.privateKeyPath(config)).flatMap(remote.send(H.getRemoteUrl(config), {
         action: state.get('action'),
         arguments: state.get('arguments').toJS()
       }));
@@ -167,14 +167,14 @@ var runCLI = function runCLI() {
   .map(Argv.extractArguments)
   /* Get config */
   .flatMap(function (state) {
-    return (config ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults) : Config.readConfig(state.getIn(['switches', 'config']) || configLocations)).map(function (c) {
+    return (config ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults) : Config.readConfig(state.getIn(['switches', 'config']) || configLocations)).map(Config.applyOverrides(state.get('switches'))).map(function (c) {
       return state.set('configuration', c);
     });
   })
   /* Define mode */
   .map(function (state) {
     return state.set('mode', state.getIn(['configuration', 'remote']) ? 'remote' : state.getIn(['configuration', 'mode']));
-  }).map(Argv.applyModeFlags).map(H.getCommand(commands)).flatMap(function (state) {
+  }).map(H.getCommand(commands)).flatMap(function (state) {
     return state.get('mode') === 'server' || state.get('mode') === 'client' ? getKeys(state).map(function (_ref16) {
       var _ref17 = _slicedToArray(_ref16, 2);
 

@@ -21,20 +21,6 @@ const Argv = {
       Immutable.Map({})
     )
     return Immutable.fromJS({ action: argv[2], arguments: args, switches })
-  },
-
-  applyModeFlags: state => {
-    const switches = state.get('switches')
-    let mode
-    if (switches.get('local')) {
-      mode = 'local'
-    } else if (switches.get('remote')) {
-      mode = 'remote'
-    } else if (switches.get('server')) {
-      mode = 'server'
-    }
-
-    return mode ? state.set('mode', mode) : state
   }
 }
 

@@ -36,6 +36,9 @@ module.exports = H => {
     applyDefaults: config =>
       Config.defaults(config).merge(config),
 
+    allowedOverrides: ['interval', 'mode', 'port', 'jwt-expiration', 'remote'],
+    applyOverrides: overrides => config => overrides.reduce((m, v, k) => m.set(k, v), config),
+
     /* Parses the config JSON */
     parse: location => configStr => {
       try {
