@@ -14,6 +14,7 @@
     "test": "RSS_O_BOT_TESTING_MODE=1 ava tests/dist/*.js",
     "watch-test": "RSS_O_BOT_TESTING_MODE=1 ava tests/src/*.js --watch",
     "ci-test": "npm run test && npm run test-coverage",
+    "debug-test": "DEBUG=rss-o-bot RSS_O_BOT_TESTING_MODE=1 ava",
     "test-coverage": "nyc --include dist/ npm test && nyc report --reporter=text-lcov | coveralls",
     "build-deps-graph": "madge -i ./dependency-graph.svg src "
   },
