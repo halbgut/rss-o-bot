@@ -21,7 +21,7 @@ var initStore = require('../../dist/lib/store')(H);
 var Config = require('../../dist/lib/config')(H);
 var T = require('./lib/helpers');
 
-test.before('remove DB', T.removeDatabases);
+test.always.after('remove DB', T.removeDatabases);
 
 test.cb('version', T.run(['-v'])(function (t, o) {
   return o.map(function (version) {
@@ -41,9 +41,16 @@ test.cb('man', T.run(['-m'])(function (t, o) {
   });
 }));
 
-test.cb('help with mode-flag', T.run(['-h', '--local'])(function (t, o) {
+test.cb('help with mode-flag', T.run(['-h', '--mode=local'])(function (t, o) {
   return o.map(function (help) {
     return help.length > 100 ? t.pass() : t.fail();
+  });
+}));
+
+test.cb('--config', T.run(['help', '--config=' + __dirname + '/../config/failing'], 1, false)(function (t, o) {
+  return o.catch(function () {
+    t.pass();
+    return O.just();
   });
 }));(function () {
   var url = 'https://lucaschmid.net/feed/rss.xml';
@@ -173,7 +180,7 @@ test.cb('import', T.run(['import', importFile], 2)(function (t, o, config) {
 }));
 
 test.cb('readConfig', function (t) {
-  Config.readConfig([__dirname + '/../config']).flatMap(initStore).flatMap(function (_ref7) {
+  Config.readConfig([__dirname + '/../config/succeding']).flatMap(initStore).flatMap(function (_ref7) {
     var listFeeds = _ref7.listFeeds;
     return listFeeds();
   }).subscribe(function (res) {

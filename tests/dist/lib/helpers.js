@@ -62,10 +62,11 @@ var handleError = function handleError(t) {
 
 var run = function run(a) {
   var n = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
+  var passConfig = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
   return function (f, configExtend) {
     return function (t) {
       if (n) t.plan(n);
-      var config = toConfig(getConfig(configExtend));
+      var config = passConfig ? toConfig(getConfig(configExtend)) : null;
       var o = runCLI(['node', ''].concat(_toConsumableArray(a)), null, config);
       f(t, o, config).subscribe(function () {}, handleError(t), function () {
         return t.end();

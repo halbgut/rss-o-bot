@@ -9,7 +9,7 @@ const initStore = require('../../dist/lib/store')(H)
 const Config = require('../../dist/lib/config')(H)
 const T = require('./lib/helpers')
 
-test.before('remove DB', T.removeDatabases)
+test.always.after('remove DB', T.removeDatabases)
 
 test.cb('version', T.run(['-v'])((t, o) =>
   o.map(version =>
@@ -33,7 +33,7 @@ test.cb('man', T.run(['-m'])((t, o) =>
   )
 ))
 
-test.cb('help with mode-flag', T.run(['-h', '--local'])((t, o) =>
+test.cb('help with mode-flag', T.run(['-h', '--mode=local'])((t, o) =>
   o.map(help =>
     help.length > 100
       ? t.pass()
@@ -169,7 +169,7 @@ test.cb('import', T.run(['import', importFile], 2)((t, o, config) =>
 ))
 
 test.cb('readConfig', t => {
-  Config.readConfig([ `${__dirname}/../config` ])
+  Config.readConfig([ `${__dirname}/../config/succeding` ])
     .flatMap(initStore)
     .flatMap(({ listFeeds }) => listFeeds())
     .subscribe(
