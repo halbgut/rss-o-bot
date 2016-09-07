@@ -87,7 +87,7 @@ const commands = [
     ['run'],
     true,
     state => O.create(o => {
-      require('.')()
+      require('.')(state)
     })
   ],
   [

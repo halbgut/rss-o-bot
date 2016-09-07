@@ -94,7 +94,7 @@ var commands = [['add', function (args) {
   }).flatMap(opml.export);
 }], [['run'], true, function (state) {
   return O.create(function (o) {
-    require('.')();
+    require('.')(state);
   });
 }], [['-h', '--help', 'help'], true, function (state) {
   return O.of(state).flatMap(H.buildMan).map(function (_ref13) {
