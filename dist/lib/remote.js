@@ -21,8 +21,8 @@ module.exports = function (H) {
           debug('Opening socket');
           ws.on('open', function () {
             debug('Socket has been opened');
+            // Should be a GPG public key
             if (insecure) {
-              console.log(message);
               ws.send(message);
             } else {
               jwt.sign(Object.assign(message, { exp: H.getTime(JWT_EXPIRATION), jti: uuid.v4() }), privateKey, { algorithm: 'RS512' }, function (err, token) {

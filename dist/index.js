@@ -12,6 +12,7 @@ var _require = require('rx');
 
 var O = _require.Observable;
 
+var debug = require('debug')('rss-o-bot');
 
 var Helpers = require('./lib/helpers');
 var Config = require('./lib/config')(Helpers);
@@ -21,14 +22,15 @@ var Notify = require('./lib/notify')(Helpers);
 
 module.exports = function runRSSOBotDaemon(state) {
   var config = state.get('configuration');
-  O.combineLatest(initStore(config), O.interval(config.get('interval') * 1000).startWith(0), function (_ref) {
+  O.combineLatest(initStore(config), O.interval(config.get('interval') * 1000).startWith(0)).map(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 1);
 
-    var s = _ref2[0];
-    return s;
+    var store = _ref2[0];
+    return store;
   }).flatMap(pollFeeds(Notify(config)))
   /* Restart on error */
   .catch(function (err) {
+    debug(state);
     console.error(err);
     return runRSSOBotDaemon(state);
   }).subscribe(function () {}, console.error);

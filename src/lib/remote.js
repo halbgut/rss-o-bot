@@ -12,8 +12,8 @@ module.exports = H => ({
     debug('Opening socket')
     ws.on('open', () => {
       debug('Socket has been opened')
+      // Should be a GPG public key
       if (insecure) {
-        console.log(message)
         ws.send(message)
       } else {
         jwt.sign(

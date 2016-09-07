@@ -108,7 +108,9 @@ module.exports = function (H) {
     });
     Feed.hasMany(Filter);
 
+    debug('Database loaded; synchronizing model');
     return O.fromPromise(sequelize.sync()).map(function () {
+      debug('Model applied creating store object');
       return {
         _Feed: Feed,
         _Filter: Filter,

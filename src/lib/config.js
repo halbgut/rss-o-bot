@@ -55,7 +55,7 @@ module.exports = H => {
 
     readConfig: (configLocations = Config.locations) =>
       H.findExistingDirectory(configLocations)
-        .catch(() => O.throw('No config file found! RTFM!'))
+        .catch(() => O.throw(`No config file found! RTFM! Searched in ${configLocations.toString()}`))
         .flatMap(location =>
           H.readFile(`${location}/${Config.filename}`)
             .map(Config.parse(location))

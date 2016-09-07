@@ -105,18 +105,22 @@ module.exports = H => {
     })
     Feed.hasMany(Filter)
 
+    debug('Database loaded; synchronizing model')
     return (
       O.fromPromise(sequelize.sync())
-        .map(() => ({
-          _Feed: Feed,
-          _Filter: Filter,
-          insertFeed: genInsertFeed(Feed, Filter),
-          getFeeds: genGetFeeds(Feed, config.get('interval')),
-          updateLatestLink: genUpdateLatestLink(Feed),
-          removeFeed: genRemoveFeed(Feed),
-          listFeeds: genListFeeds(Feed),
-          setBlogTitle: genSetBlogTitle(Feed)
-        }))
+        .map(() => {
+          debug('Model applied creating store object')
+          return {
+            _Feed: Feed,
+            _Filter: Filter,
+            insertFeed: genInsertFeed(Feed, Filter),
+            getFeeds: genGetFeeds(Feed, config.get('interval')),
+            updateLatestLink: genUpdateLatestLink(Feed),
+            removeFeed: genRemoveFeed(Feed),
+            listFeeds: genListFeeds(Feed),
+            setBlogTitle: genSetBlogTitle(Feed)
+          }
+        })
     )
   }
 

@@ -174,8 +174,9 @@ const runCommand = state => {
 const getKeys = state => {
   const config = state.get('configuration')
   return O.combineLatest(
-    H.readFile(H.privateKeyPath(config)),
-    H.readFile(H.publicKeyPath(config))
+    /* If a keyfile can't be opended, simply assume it isn't there */
+    H.readFile(H.privateKeyPath(config)).catch(O.of(undefined)),
+    H.readFile(H.publicKeyPath(config)).catch(O.of(undefined))
   )
 }
 

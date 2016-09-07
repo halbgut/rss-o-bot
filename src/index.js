@@ -5,6 +5,7 @@
  * the daemon process.
  */
 const { Observable: O } = require('rx')
+const debug = require('debug')('rss-o-bot')
 
 const Helpers = require('./lib/helpers')
 const Config = require('./lib/config')(Helpers)
@@ -16,12 +17,13 @@ module.exports = function runRSSOBotDaemon (state) {
   const config = state.get('configuration')
   O.combineLatest(
     initStore(config),
-    O.interval(config.get('interval') * 1000).startWith(0),
-    ([s]) => s
+    O.interval(config.get('interval') * 1000).startWith(0)
   )
+    .map(([store]) => store)
     .flatMap(pollFeeds(Notify(config)))
     /* Restart on error */
     .catch(err => {
+      debug(state)
       console.error(err)
       return runRSSOBotDaemon(state)
     })

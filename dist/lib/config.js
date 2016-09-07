@@ -67,7 +67,7 @@ module.exports = function (H) {
     readConfig: function readConfig() {
       var configLocations = arguments.length <= 0 || arguments[0] === undefined ? Config.locations : arguments[0];
       return H.findExistingDirectory(configLocations).catch(function () {
-        return O.throw('No config file found! RTFM!');
+        return O.throw('No config file found! RTFM! Searched in ' + configLocations.toString());
       }).flatMap(function (location) {
         return H.readFile(location + '/' + Config.filename).map(Config.parse(location)).map(Config.applyDefaults);
       });
