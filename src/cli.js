@@ -130,12 +130,14 @@ const commands = [
     true,
     state => {
       if (state.get('mode') === 'local') {
-        O.of('No server configured, running in local mode. Check the configuration section of the man-page for more info.')
+        return O.throw(new Error('No server configured, running in local mode. Check the configuration section of the man-page for more info.'))
       } else if (state.get('mode') === 'remote') {
+        const privK = state.get('privateKey')
+        if(!privK) return O.throw(new Error('No private key found please generate a keypair first using `rss-o-bot gen-keys` (see manual for more details).'))
         return remote.send(
           H.getRemoteUrl(state.get('configuration')),
           { action: 'ping', args: [] }
-        )(state.get('privateKey'))
+        )(privK)
       } else if (state.get('mode') === 'server') {
         return O.of('pong')
       }
