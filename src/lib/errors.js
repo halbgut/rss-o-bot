@@ -1,3 +1,4 @@
+const R = require('ramda')
 const { Observable: O } = require('rx')
 
 const Errors = {
@@ -9,8 +10,9 @@ const Errors = {
   },
   tranlate: error => Errors.messages[error.message],
   log: error => console.error(Errors.translate(error)),
-  throw: error => { throw new Error(error) },
-  throwO: error => O.throw(Errors.throw(error))
+  throw: error => { throw Errors.create(error) },
+  create: error => new Error(error),
+  throwO: error => R.pipe(Error.create, Errors.throw)
 }
 
 module.exports = Errors

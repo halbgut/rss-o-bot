@@ -1,5 +1,7 @@
 'use strict';
 
+var R = require('ramda');
+
 var _require = require('rx');
 
 var O = _require.Observable;
@@ -19,10 +21,13 @@ var Errors = {
     return console.error(Errors.translate(error));
   },
   throw: function _throw(error) {
-    throw new Error(error);
+    throw Errors.create(error);
+  },
+  create: function create(error) {
+    return new Error(error);
   },
   throwO: function throwO(error) {
-    return O.throw(Errors.throw(error));
+    return R.pipe(Error.create, Errors.throw);
   }
 };
 
