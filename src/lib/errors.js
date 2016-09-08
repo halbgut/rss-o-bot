@@ -12,7 +12,7 @@ const Errors = {
   log: error => console.error(Errors.translate(error)),
   throw: error => { throw Errors.create(error) },
   create: error => new Error(error),
-  throwO: error => R.pipe(Error.create, Errors.throw)
+  throwO: R.pipe(Error.create, O.throw)
 }
 
 module.exports = Errors
