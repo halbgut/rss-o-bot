@@ -14,7 +14,6 @@ test.before.cb(t => {
   })
   server.stdout.on('data', out => {
     if (out.toString() === 'Server started!\n') t.end()
-    console.log(out.toString())
   })
 })
 
@@ -24,7 +23,10 @@ test.after.always(() => {
 
 test.cb('ping/pong', T.run(['ping'])(
   (t, o) => {
-    setTimeout(t.fail.bind(t), 2000)
+    setTimeout(() => {
+      t.fail('Time out')
+      t.end()
+    }, 2000)
     return o.tap(console.log)
   },
   config

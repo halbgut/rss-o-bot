@@ -15,10 +15,8 @@ test.cb('start a server', t => {
     if (outStr === 'Server started!\n') {
       /* Server successfully started */
       t.pass()
-      setTimeout(() => {
-        server.kill()
-        t.end()
-      }, 2000)
+      server.kill()
+      t.end()
     } else {
       console.log(outStr)
     }

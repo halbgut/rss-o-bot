@@ -180,7 +180,7 @@ test.cb('import', T.run(['import', importFile], 2)(function (t, o, config) {
 }));
 
 test.cb('readConfig', function (t) {
-  Config.readConfig([__dirname + '/../config/succeding']).flatMap(initStore).flatMap(function (_ref7) {
+  Config.readConfig([__dirname + '/../config/succeeding']).flatMap(initStore).flatMap(function (_ref7) {
     var listFeeds = _ref7.listFeeds;
     return listFeeds();
   }).subscribe(function (res) {

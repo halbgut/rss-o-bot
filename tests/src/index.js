@@ -169,7 +169,7 @@ test.cb('import', T.run(['import', importFile], 2)((t, o, config) =>
 ))
 
 test.cb('readConfig', t => {
-  Config.readConfig([ `${__dirname}/../config/succeding` ])
+  Config.readConfig([ `${__dirname}/../config/succeeding` ])
     .flatMap(initStore)
     .flatMap(({ listFeeds }) => listFeeds())
     .subscribe(

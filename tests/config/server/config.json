@@ -1,4 +1,5 @@
 {
+  "mode": "server",
   "database": {
     "name": "data",
     "options": {

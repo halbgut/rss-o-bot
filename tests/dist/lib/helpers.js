@@ -7,6 +7,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var fs = require('fs');
 
 var Immutable = require('immutable');
+var uuid = require('node-uuid');
 
 var runCLI = require('../../../dist/cli.js');
 var H = require('../../../dist/lib/helpers');
@@ -20,7 +21,7 @@ var getConfig = function () {
   return function () {
     var extend = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-    var db = __dirname + '/../../../data/test_feeds-' + ++id + '.sqlite';
+    var db = __dirname + '/../../../data/test_feeds-' + uuid.v4() + '.sqlite';
     databases.push(db);
     return Object.assign({
       'database': {

@@ -22,7 +22,6 @@ test.before.cb(function (t) {
   });
   server.stdout.on('data', function (out) {
     if (out.toString() === 'Server started!\n') t.end();
-    console.log(out.toString());
   });
 });
 
@@ -31,6 +30,9 @@ test.after.always(function () {
 });
 
 test.cb('ping/pong', T.run(['ping'])(function (t, o) {
-  setTimeout(t.fail.bind(t), 2000);
+  setTimeout(function () {
+    t.fail('Time out');
+    t.end();
+  }, 2000);
   return o.tap(console.log);
 }, config));

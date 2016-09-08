@@ -1,6 +1,7 @@
 const fs = require('fs')
 
 const Immutable = require('immutable')
+const uuid = require('node-uuid')
 
 const runCLI = require('../../../dist/cli.js')
 const H = require('../../../dist/lib/helpers')
@@ -10,7 +11,7 @@ const Config = require('../../../dist/lib/config')(H)
 const databases = []
 
 const getConfig = ((id = 0) => (extend = {}) => {
-  const db = `${__dirname}/../../../data/test_feeds-${++id}.sqlite`
+  const db = `${__dirname}/../../../data/test_feeds-${uuid.v4()}.sqlite`
   databases.push(db)
   return Object.assign({
     'database': {
