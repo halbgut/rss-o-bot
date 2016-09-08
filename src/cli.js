@@ -12,6 +12,8 @@ const Immutable = require('immutable')
 const debug = require('debug')('rss-o-bot')
 
 const H = require('./lib/helpers')
+const Errors = require('./lib/errors')
+const { throwO, NO_PRIVATE_KEY_FOUND, NO_REMOTE_CONFIGURED } = Errors
 const initStore = require('./lib/store')(H)
 const Notify = require('./lib/notify')(H)
 const opml = require('./lib/opml')(H)
@@ -130,10 +132,10 @@ const commands = [
     true,
     state => {
       if (state.get('mode') === 'local') {
-        return O.throw(new Error('No server configured, running in local mode. Check the configuration section of the man-page for more info.'))
+        return throwO(NO_REMOTE_CONFIGURED)
       } else if (state.get('mode') === 'remote') {
         const privK = state.get('privateKey')
-        if(!privK) return O.throw(new Error('No private key found please generate a keypair first using `rss-o-bot gen-keys` (see manual for more details).'))
+        if(!privK) return throwO(NO_PRIVATE_KEY_FOUND)
         return remote.send(
           H.getRemoteUrl(state.get('configuration')),
           { action: 'ping', args: [] }
@@ -228,7 +230,7 @@ if (!process.env['RSS_O_BOT_TESTING_MODE']) {
   runCLI()
     .subscribe(
       console.log,
-      console.error
+      Errors.log
     )
 }
 
