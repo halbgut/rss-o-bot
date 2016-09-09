@@ -5,13 +5,21 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 var WebSocket = require('faye-websocket');
 var jwt = require('jsonwebtoken');
 var http = require('http');
-var Rx = require('rx');
+
+var _require = require('rx');
+
+var O = _require.Observable;
+
 var debug = require('debug')('rss-o-bot');
-var O = Rx.Observable;
 
 var startup = Symbol('startup');
 
-module.exports = function (H) {
+module.exports = function (H, _ref) {
+  var throwO = _ref.throwO;
+  var PUBLIC_KEY_ALREADY_EXISTS = _ref.PUBLIC_KEY_ALREADY_EXISTS;
+  var LOCAL_ONLY_COMMAND_ON_SERVER = _ref.LOCAL_ONLY_COMMAND_ON_SERVER;
+  var NO_DATA_IN_REQUEST = _ref.NO_DATA_IN_REQUEST;
+
   var isTokenValid = function () {
     var cache = [];
     return function (nEl) {
@@ -26,12 +34,13 @@ module.exports = function (H) {
 
   var verifyTokenAndCheckForPublicKey = function verifyTokenAndCheckForPublicKey(o, respond, publicKey) {
     return function (e) {
+      debug('Server receiving message');
+      if (!e.data || e.data.length < 1) return respond(NO_DATA_IN_REQUEST);
       if (e.data.indexOf('PUBLIC KEY') > -1) {
         // Must be a public key
         if (publicKey) {
-          respond('I already have a public key. Please remove it from the server manually before generating a new one.');
+          respond({ error: PUBLIC_KEY_ALREADY_EXISTS });
         } else {
-          /*  */
           o.onNext([e.data, respond]);
         }
       } else {
@@ -55,16 +64,23 @@ module.exports = function (H) {
               (function () {
                 var ws = new WebSocket(request, socket, body);
                 var respond = function respond(msg) {
+                  debug('Server sending response.');
                   ws.send(msg);
+                  debug('Server closing socket.');
                   ws.close();
                   ws = null;
                 };
-                ws.on('message', verifyTokenAndCheckForPublicKey(o, respond));
+                ws.on('message', function (e) {
+                  return verifyTokenAndCheckForPublicKey(o, respond, publicKey)(e);
+                });
                 ws.on('error', function (err) {
+                  ws.close();
                   ws = null;
                   o.onError(err);
                 });
                 ws.on('end', function () {
+                  debug('Client closed socket.');
+                  ws.close();
                   ws = null;
                   o.onCompleted();
                 });
@@ -73,6 +89,10 @@ module.exports = function (H) {
           }).listen(port);
           /* Send the startup message */
           o.onNext([startup]);
+          debug('Server started');
+          return function () {
+            debug('Server killed');
+          };
         });
       };
     },
@@ -80,23 +100,24 @@ module.exports = function (H) {
     run: function run(commands) {
       return function (state) {
         var config = state.get('configuration');
-        return Server.listen(config)(state.get('publicKey')).map(function (_ref) {
-          var _ref2 = _slicedToArray(_ref, 2);
+        debug('Starting server');
+        return Server.listen(config)(state.get('publicKey')).flatMap(function (_ref2) {
+          var _ref3 = _slicedToArray(_ref2, 2);
 
-          var data = _ref2[0];
-          var respond = _ref2[1];
+          var data = _ref3[0];
+          var respond = _ref3[1];
 
           /* Just let it through if it's the start up message */
-          if (data === startup) return 'Server started!';
+          if (data === startup) return O.of('Server started!');
           /* Must be a public key */
           if (typeof data === 'string') {
             debug('Recieved public key');
-            return H.writeFile(H.publicKeyPath(config), data);
+            return H.writeFile(H.publicKeyPath(config), data).do(respond);
           } else {
             debug('Executing command ' + data.action);
             var cState = H.setCommandState(state)(H.findCommand(commands, data.action, data.args));
-            if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'));
-            return cState.get('command')(state);
+            if (cState.get('localOnly')) return throwO(LOCAL_ONLY_COMMAND_ON_SERVER);
+            return cState.get('command')(state).do(respond);
           }
         });
       };

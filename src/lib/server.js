@@ -1,13 +1,12 @@
 const WebSocket = require('faye-websocket')
 const jwt = require('jsonwebtoken')
 const http = require('http')
-const Rx = require('rx')
+const { Observable: O } = require('rx')
 const debug = require('debug')('rss-o-bot')
-const O = Rx.Observable
 
 const startup = Symbol('startup')
 
-module.exports = H => {
+module.exports = (H, { throwO, PUBLIC_KEY_ALREADY_EXISTS, LOCAL_ONLY_COMMAND_ON_SERVER, NO_DATA_IN_REQUEST }) => {
   const isTokenValid = (() => {
     let cache = []
     return nEl => {
@@ -17,11 +16,12 @@ module.exports = H => {
   })()
 
   const verifyTokenAndCheckForPublicKey = (o, respond, publicKey) => e => {
+    debug('Server receiving message')
+    if (!e.data || e.data.length < 1) return respond(NO_DATA_IN_REQUEST)
     if (e.data.indexOf('PUBLIC KEY') > -1) { // Must be a public key
       if (publicKey) {
-        respond('I already have a public key. Please remove it from the server manually before generating a new one.')
+        respond({ error: PUBLIC_KEY_ALREADY_EXISTS })
       } else {
-        /*  */
         o.onNext([e.data, respond])
       }
     } else {
@@ -47,16 +47,21 @@ module.exports = H => {
           if (WebSocket.isWebSocket(request)) {
             let ws = new WebSocket(request, socket, body)
             const respond = msg => {
+              debug('Server sending response.')
               ws.send(msg)
+              debug('Server closing socket.')
               ws.close()
               ws = null
             }
-            ws.on('message', verifyTokenAndCheckForPublicKey(o, respond))
+            ws.on('message', (e) => verifyTokenAndCheckForPublicKey(o, respond, publicKey)(e))
             ws.on('error', err => {
+              ws.close()
               ws = null
               o.onError(err)
             })
             ws.on('end', () => {
+              debug('Client closed socket.')
+              ws.close()
               ws = null
               o.onCompleted()
             })
@@ -65,26 +70,29 @@ module.exports = H => {
         .listen(port)
       /* Send the startup message */
       o.onNext([startup])
+      debug('Server started')
+      return () => { debug('Server killed') }
     }),
 
     run: commands => state => {
       const config = state.get('configuration')
+      debug('Starting server')
       return (
         Server.listen(config)(state.get('publicKey'))
-          .map(([data, respond]) => {
+          .flatMap(([data, respond]) => {
             /* Just let it through if it's the start up message */
-            if (data === startup) return 'Server started!'
+            if (data === startup) return O.of('Server started!')
             /* Must be a public key */
             if (typeof data === 'string') {
               debug('Recieved public key')
-              return H.writeFile(H.publicKeyPath(config), data)
+              return H.writeFile(H.publicKeyPath(config), data).do(respond)
             } else {
               debug(`Executing command ${data.action}`)
               const cState = H.setCommandState(state)(
                 H.findCommand(commands, data.action, data.args)
               )
-              if (cState.get('localOnly')) return O.throw(new Error('Local-only command can\'t be executed on a server'))
-              return cState.get('command')(state)
+              if (cState.get('localOnly')) return throwO(LOCAL_ONLY_COMMAND_ON_SERVER)
+              return cState.get('command')(state).do(respond)
             }
           })
       )

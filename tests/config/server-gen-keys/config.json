@@ -1,0 +1,11 @@
+{
+  "mode": "server",
+  "database": {
+    "name": "data",
+    "options": {
+      "dialect": "sqlite",
+      "storage": "../../data/test_feeds-server.sqlite"
+    }
+  }
+}
+

@@ -6,14 +6,24 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 var fs = require('fs');
 
+var _require = require('child_process');
+
+var spawn = _require.spawn;
+
+var _require2 = require('rx');
+
+var O = _require2.Observable;
+
 var Immutable = require('immutable');
 var uuid = require('node-uuid');
+var R = require('ramda');
 
 var runCLI = require('../../../dist/cli.js');
 var H = require('../../../dist/lib/helpers');
 var initStore = require('../../../dist/lib/store')(H);
 var Config = require('../../../dist/lib/config')(H);
 
+var DEBUG = process.env.DEBUG;
 var databases = [];
 
 var getConfig = function () {
@@ -64,11 +74,11 @@ var handleError = function handleError(t) {
 var run = function run(a) {
   var n = arguments.length <= 1 || arguments[1] === undefined ? 1 : arguments[1];
   var passConfig = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
-  return function (f, configExtend) {
+  return function (f, configExtend, configLocations) {
     return function (t) {
       if (n) t.plan(n);
       var config = passConfig ? toConfig(getConfig(configExtend)) : null;
-      var o = runCLI(['node', ''].concat(_toConsumableArray(a)), null, config);
+      var o = runCLI(['node', ''].concat(_toConsumableArray(a)), configLocations, config);
       f(t, o, config).subscribe(function () {}, handleError(t), function () {
         return t.end();
       });
@@ -143,6 +153,18 @@ var createDummyEntry = function createDummyEntry(url) {
   });
 };
 
+var startServer = function startServer(port, configDir, t) {
+  var server = spawn('bash', ['-c', 'DEBUG=' + DEBUG + ' RSS_O_BOT_TESTING_MODE= ../../dist/cli.js run --mode=server --config=' + configDir + ' --port=' + port]);
+
+  if (t) {
+    t.after.always(function () {
+      server.kill();
+    });
+  }
+
+  return O.fromEvent(server.stdout, 'data').map(R.toString).filter(R.equals('Server started!\n'));
+};
+
 module.exports = {
   removeDatabases: removeDatabases,
   getConfig: getConfig,
@@ -155,5 +177,6 @@ module.exports = {
   getStoreAnd: getStoreAnd,
   getStoreAndListFeeds: getStoreAndListFeeds,
   testObservable: testObservable,
-  createDummyEntry: createDummyEntry
+  createDummyEntry: createDummyEntry,
+  startServer: startServer
 };

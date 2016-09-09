@@ -8,4 +8,5 @@ node_modules
 /test/data
 /.nyc_output
 npm-debug.log
+/tests/config/*/*.pem
 

@@ -20,7 +20,7 @@ module.exports = function (H) {
           var ws = new WebSocket.Client(url);
           debug('Opening socket');
           ws.on('open', function () {
-            debug('Socket has been opened');
+            debug('Socket has been opened.');
             // Should be a GPG public key
             if (insecure) {
               ws.send(message);
@@ -32,7 +32,8 @@ module.exports = function (H) {
             }
           });
           ws.on('message', function (e) {
-            return o.onNext(e.data);
+            var data = e.data;
+            if (data.error) return o.onError(data.error);else o.onNext(data);
           });
           ws.on('error', function (err) {
             return o.onError(err);
@@ -40,6 +41,9 @@ module.exports = function (H) {
           ws.on('close', function () {
             return o.onCompleted();
           });
+          return function () {
+            debug('Connection closed.');
+          };
         });
       };
     }

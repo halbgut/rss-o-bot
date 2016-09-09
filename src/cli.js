@@ -18,7 +18,8 @@ const initStore = require('./lib/store')(H)
 const Notify = require('./lib/notify')(H)
 const opml = require('./lib/opml')(H)
 const remote = require('./lib/remote')(H)
-const Server = require('./lib/server')(H)
+const Server = require('./lib/server')(H, Errors)
+const genKeys = require('./lib/genKeys')(H)
 
 /* Pure modules */
 const Config = require('./lib/config')(H)
@@ -135,7 +136,7 @@ const commands = [
         return throwO(NO_REMOTE_CONFIGURED)
       } else if (state.get('mode') === 'remote') {
         const privK = state.get('privateKey')
-        if(!privK) return throwO(NO_PRIVATE_KEY_FOUND)
+        if (!privK) return throwO(NO_PRIVATE_KEY_FOUND)
         return remote.send(
           H.getRemoteUrl(state.get('configuration')),
           { action: 'ping', args: [] }
@@ -143,6 +144,28 @@ const commands = [
       } else if (state.get('mode') === 'server') {
         return O.of('pong')
       }
+    },
+    true
+  ],
+  [
+    'gen-keys',
+    true,
+    state => {
+      /* Generate a key pair */
+      const serverUrl = H.getRemoteUrl(state.get('configuration'))
+      genKeys(state.get('configuration'))
+      return (
+        getKeys(state)
+          /* Send the public key to the server */
+          .do(() => debug(`Sending public key to ${serverUrl}`))
+          .flatMap(([, pubK]) => remote.send(
+            serverUrl,
+            pubK.toString(),
+            /* Do it insecurely */
+            true
+          )())
+          .map(() => 'Keys generated and public key transmitted to server.')
+      )
     },
     true
   ]

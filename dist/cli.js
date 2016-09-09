@@ -29,7 +29,8 @@ var initStore = require('./lib/store')(H);
 var Notify = require('./lib/notify')(H);
 var opml = require('./lib/opml')(H);
 var remote = require('./lib/remote')(H);
-var Server = require('./lib/server')(H);
+var Server = require('./lib/server')(H, Errors);
+var genKeys = require('./lib/genKeys')(H);
 
 /* Pure modules */
 var Config = require('./lib/config')(H);
@@ -134,6 +135,24 @@ var commands = [['add', function (args) {
   } else if (state.get('mode') === 'server') {
     return O.of('pong');
   }
+}, true], ['gen-keys', true, function (state) {
+  /* Generate a key pair */
+  var serverUrl = H.getRemoteUrl(state.get('configuration'));
+  genKeys(state.get('configuration'));
+  return getKeys(state)
+  /* Send the public key to the server */
+  .do(function () {
+    return debug('Sending public key to ' + serverUrl);
+  }).flatMap(function (_ref16) {
+    var _ref17 = _slicedToArray(_ref16, 2);
+
+    var pubK = _ref17[1];
+    return remote.send(serverUrl, pubK.toString(),
+    /* Do it insecurely */
+    true)();
+  }).map(function () {
+    return 'Keys generated and public key transmitted to server.';
+  });
 }, true]];
 
 var runCommand = function runCommand(state) {
@@ -184,11 +203,11 @@ var runCLI = function runCLI() {
   .map(function (state) {
     return state.set('mode', state.getIn(['configuration', 'remote']) ? 'remote' : state.getIn(['configuration', 'mode']));
   }).map(H.getCommand(commands)).flatMap(function (state) {
-    return state.get('mode') === 'server' || state.get('mode') === 'client' ? getKeys(state).map(function (_ref16) {
-      var _ref17 = _slicedToArray(_ref16, 2);
+    return state.get('mode') === 'server' || state.get('mode') === 'client' ? getKeys(state).map(function (_ref18) {
+      var _ref19 = _slicedToArray(_ref18, 2);
 
-      var pub = _ref17[0];
-      var priv = _ref17[1];
+      var pub = _ref19[0];
+      var priv = _ref19[1];
       return state.set('publicKey', pub).set('privateKey', priv);
     }) : O.of(state);
   })

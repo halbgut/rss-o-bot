@@ -1,13 +1,17 @@
 const fs = require('fs')
+const { spawn } = require('child_process')
 
+const { Observable: O } = require('rx')
 const Immutable = require('immutable')
 const uuid = require('node-uuid')
+const R = require('ramda')
 
 const runCLI = require('../../../dist/cli.js')
 const H = require('../../../dist/lib/helpers')
 const initStore = require('../../../dist/lib/store')(H)
 const Config = require('../../../dist/lib/config')(H)
 
+const DEBUG = process.env.DEBUG
 const databases = []
 
 const getConfig = ((id = 0) => (extend = {}) => {
@@ -45,12 +49,12 @@ const handleError = t => err => {
   t.end()
 }
 
-const run = (a, n = 1, passConfig = true) => (f, configExtend) => t => {
+const run = (a, n = 1, passConfig = true) => (f, configExtend, configLocations) => t => {
   if (n) t.plan(n)
   const config = passConfig
     ? toConfig(getConfig(configExtend))
     : null
-  const o = runCLI(['node', '', ...a], null, config)
+  const o = runCLI(['node', '', ...a], configLocations, config)
   f(t, o, config)
     .subscribe(
       () => {},
@@ -103,6 +107,26 @@ const createDummyEntry =
           .map(feed => storeAndEntity ? [store, feed] : store)
       )
 
+const startServer =
+  (port, configDir, t) => {
+    const server = spawn('bash', [
+      '-c',
+      `DEBUG=${DEBUG} RSS_O_BOT_TESTING_MODE= ../../dist/cli.js run --mode=server --config=${configDir} --port=${port}`
+    ])
+
+    if (t) {
+      t.after.always(() => {
+        server.kill()
+      })
+    }
+
+    return (
+      O.fromEvent(server.stdout, 'data')
+        .map(R.toString)
+        .filter(R.equals('Server started!\n'))
+    )
+  }
+
 module.exports = {
   removeDatabases,
   getConfig,
@@ -115,6 +139,7 @@ module.exports = {
   getStoreAnd,
   getStoreAndListFeeds,
   testObservable,
-  createDummyEntry
+  createDummyEntry,
+  startServer
 }
 

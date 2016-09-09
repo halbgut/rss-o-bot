@@ -11,7 +11,7 @@ module.exports = H => ({
     const ws = new WebSocket.Client(url)
     debug('Opening socket')
     ws.on('open', () => {
-      debug('Socket has been opened')
+      debug('Socket has been opened.')
       // Should be a GPG public key
       if (insecure) {
         ws.send(message)
@@ -27,9 +27,14 @@ module.exports = H => ({
         )
       }
     })
-    ws.on('message', e => o.onNext(e.data))
+    ws.on('message', e => {
+      const data = e.data
+      if (data.error) return o.onError(data.error)
+      else o.onNext(data)
+    })
     ws.on('error', err => o.onError(err))
     ws.on('close', () => o.onCompleted())
+    return () => { debug('Connection closed.') }
   })
 })
 

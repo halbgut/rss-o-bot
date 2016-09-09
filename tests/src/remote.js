@@ -1,24 +1,52 @@
-const { spawn } = require('child_process')
+const fs = require('fs')
+
 const { test } = require('ava')
+const R = require('ramda')
+const { Observable: O } = require('rx')
+const Immutable = require('immutable')
 
 const T = require('./lib/helpers')
 
-const DEBUG = process.env.DEBUG
+const H = require('../../dist/lib/helpers')
+const genKeys = require('../../dist/lib/genKeys')(H)
+
 const config = { mode: 'remote', remote: 'ws://localhost', port: 3646 }
-let server
 
 test.before.cb(t => {
-  server = spawn('bash', ['-c', `DEBUG=${DEBUG} RSS_O_BOT_TESTING_MODE= ../../dist/cli.js run --mode=server --config=${__dirname}/../config/server-remote --port=${config.port}`])
-  server.stderr.on('data', out => {
-    console.error(out.toString())
-  })
-  server.stdout.on('data', out => {
-    if (out.toString() === 'Server started!\n') t.end()
-  })
+  const location = `${__dirname}/../config/server-remote`
+  genKeys(Immutable.Map({ location }))
+  T.startServer(config.port, location, test)
+    .do(() => t.end())
+    .subscribe(() => {})
 })
 
-test.after.always(() => {
-  server.kill()
+const genKeysConfig = R.merge(config, {port: 3647, location: `${__dirname}/../config/client-gen-keys`})
+const genKeysServerConfig = R.merge(config, {port: 3647, location: `${__dirname}/../config/server-gen-keys`})
+test.cb('genKeys', t => {
+  T.startServer(genKeysServerConfig.port, genKeysServerConfig.location)
+    .do(() =>
+      T.run(['gen-keys'], 3)((t, o) =>
+        o.last().flatMap(O.combineLatest(
+          H.readFile(`${genKeysConfig.location}/priv.pem`),
+          H.readFile(`${genKeysConfig.location}/pub.pem`),
+          H.readFile(`${genKeysServerConfig.location}/pub.pem`)
+        ))
+          .do(([ privateK, publicK, serverPublicK ]) => {
+            t.truthy(privateK)
+            t.truthy(publicK)
+            t.is(R.difference(publicK, serverPublicK).length, 0)
+            /*  cleanup */
+            fs.unlinkSync(`${genKeysConfig.location}/priv.pem`)
+            fs.unlinkSync(`${genKeysConfig.location}/pub.pem`)
+            fs.unlinkSync(`${genKeysServerConfig.location}/pub.pem`)
+          }),
+        genKeysConfig
+      )(t)
+    )
+    .subscribe(
+      R.T,
+      console.error
+    )
 })
 
 test.cb('ping/pong', T.run(['ping'])(
