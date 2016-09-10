@@ -11,6 +11,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
  * Helper functions used by multiple modules.
  */
 var fs = require('fs');
+var cp = require('child_process');
 var path = require('path');
 var markedMan = require('marked-man');
 
@@ -29,6 +30,7 @@ var Helpers = {
    */
   readFile: O.fromNodeCallback(fs.readFile),
   writeFile: O.fromNodeCallback(fs.writeFile),
+  exec: O.fromNodeCallback(cp.exec),
   stat: O.fromNodeCallback(fs.stat),
   isDirectory: function isDirectory(path) {
     return Helpers.stat(path).map(Helpers.tryCall('isDirectory')).map(function () {

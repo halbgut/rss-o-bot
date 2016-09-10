@@ -19,13 +19,13 @@ var Immutable = require('immutable');
 var T = require('./lib/helpers');
 
 var H = require('../../dist/lib/helpers');
-var genKeys = require('../../dist/lib/genKeys')(H);
+var Errors = require('../../dist/lib/errors');
+var genKeys = require('../../dist/lib/genKeys')(H, Errors);
 
 var config = { mode: 'remote', remote: 'ws://localhost', port: 3646, location: __dirname + '/../config/server-remote' };
 
 test.before.cb(function (t) {
-  genKeys(Immutable.Map(config));
-  T.startServer(config.port, config.location, test).do(function () {
+  genKeys(Immutable.Map(config)).flatMap(T.startServer(config.port, config.location, test)).do(function () {
     return t.end();
   }).subscribe(function () {});
 });

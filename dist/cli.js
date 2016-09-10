@@ -30,7 +30,7 @@ var Notify = require('./lib/notify')(H);
 var opml = require('./lib/opml')(H);
 var remote = require('./lib/remote')(H);
 var Server = require('./lib/server')(H, Errors);
-var genKeys = require('./lib/genKeys')(H);
+var genKeys = require('./lib/genKeys')(H, Errors);
 
 /* Pure modules */
 var Config = require('./lib/config')(H);
@@ -139,8 +139,7 @@ var commands = [['add', function (args) {
 }, true], ['gen-keys', true, function (state) {
   /* Generate a key pair */
   var serverUrl = H.getRemoteUrl(state.get('configuration'));
-  genKeys(state.get('configuration'));
-  return getKeys(state)
+  return genKeys(state.get('configuration')).flatMap(getKeys(state))
   /* Send the public key to the server */
   .do(function () {
     return debug('Sending public key to ' + serverUrl);

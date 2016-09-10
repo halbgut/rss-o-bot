@@ -19,7 +19,7 @@ const Notify = require('./lib/notify')(H)
 const opml = require('./lib/opml')(H)
 const remote = require('./lib/remote')(H)
 const Server = require('./lib/server')(H, Errors)
-const genKeys = require('./lib/genKeys')(H)
+const genKeys = require('./lib/genKeys')(H, Errors)
 
 /* Pure modules */
 const Config = require('./lib/config')(H)
@@ -154,9 +154,9 @@ const commands = [
     state => {
       /* Generate a key pair */
       const serverUrl = H.getRemoteUrl(state.get('configuration'))
-      genKeys(state.get('configuration'))
       return (
-        getKeys(state)
+        genKeys(state.get('configuration'))
+          .flatMap(getKeys(state))
           /* Send the public key to the server */
           .do(() => debug(`Sending public key to ${serverUrl}`))
           .flatMap(([, pubK]) => remote.send(

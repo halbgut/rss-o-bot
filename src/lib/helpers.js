@@ -3,6 +3,7 @@
  * Helper functions used by multiple modules.
  */
 const fs = require('fs')
+const cp = require('child_process')
 const path = require('path')
 const markedMan = require('marked-man')
 const {Observable: O} = require('rx')
@@ -17,6 +18,7 @@ const Helpers = {
    */
   readFile: O.fromNodeCallback(fs.readFile),
   writeFile: O.fromNodeCallback(fs.writeFile),
+  exec: O.fromNodeCallback(cp.exec),
   stat: O.fromNodeCallback(fs.stat),
   isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')).map(() => path),
   isFile: path => Helpers.stat(path).map(Helpers.tryCall('isFile')).map(() => path),
