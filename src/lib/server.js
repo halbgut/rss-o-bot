@@ -6,7 +6,7 @@ const debug = require('debug')('rss-o-bot')
 
 const startup = Symbol('startup')
 
-module.exports = (H, { throwO, PUBLIC_KEY_ALREADY_EXISTS, LOCAL_ONLY_COMMAND_ON_SERVER, NO_DATA_IN_REQUEST }) => {
+module.exports = (H, { throwO, PUBLIC_KEY_ALREADY_EXISTS, LOCAL_ONLY_COMMAND_ON_SERVER, NO_DATA_IN_REQUEST, UNKNOWN_COMMAND }) => {
   const isTokenValid = (() => {
     let cache = []
     return nEl => {
@@ -91,8 +91,12 @@ module.exports = (H, { throwO, PUBLIC_KEY_ALREADY_EXISTS, LOCAL_ONLY_COMMAND_ON_
               const cState = H.setCommandState(state)(
                 H.findCommand(commands, data.action, data.args)
               )
-              if (cState.get('localOnly')) return throwO(LOCAL_ONLY_COMMAND_ON_SERVER)
-              return cState.get('command')(state).do(respond)
+              if (!cState.get('command')) return throwO(UNKNOWN_COMMAND)
+              return (
+                cState.get('localOnly') && data.action !== 'ping'
+                  ? throwO(LOCAL_ONLY_COMMAND_ON_SERVER)
+                  : cState.get('command')(state).do(respond)
+              )
             }
           })
       )

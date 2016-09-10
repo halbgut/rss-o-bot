@@ -21,12 +21,11 @@ var T = require('./lib/helpers');
 var H = require('../../dist/lib/helpers');
 var genKeys = require('../../dist/lib/genKeys')(H);
 
-var config = { mode: 'remote', remote: 'ws://localhost', port: 3646 };
+var config = { mode: 'remote', remote: 'ws://localhost', port: 3646, location: __dirname + '/../config/server-remote' };
 
 test.before.cb(function (t) {
-  var location = __dirname + '/../config/server-remote';
-  genKeys(Immutable.Map({ location: location }));
-  T.startServer(config.port, location, test).do(function () {
+  genKeys(Immutable.Map(config));
+  T.startServer(config.port, config.location, test).do(function () {
     return t.end();
   }).subscribe(function () {});
 });
@@ -60,5 +59,7 @@ test.cb('ping/pong', T.run(['ping'])(function (t, o) {
     t.fail('Time out');
     t.end();
   }, 2000);
-  return o.tap(console.log);
-}, config));
+  return o.do(function () {
+    return t.pass();
+  });
+}, R.assoc('remote', 'ws://localhost', config)));

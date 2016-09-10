@@ -19,6 +19,7 @@ module.exports = function (H, _ref) {
   var PUBLIC_KEY_ALREADY_EXISTS = _ref.PUBLIC_KEY_ALREADY_EXISTS;
   var LOCAL_ONLY_COMMAND_ON_SERVER = _ref.LOCAL_ONLY_COMMAND_ON_SERVER;
   var NO_DATA_IN_REQUEST = _ref.NO_DATA_IN_REQUEST;
+  var UNKNOWN_COMMAND = _ref.UNKNOWN_COMMAND;
 
   var isTokenValid = function () {
     var cache = [];
@@ -116,8 +117,8 @@ module.exports = function (H, _ref) {
           } else {
             debug('Executing command ' + data.action);
             var cState = H.setCommandState(state)(H.findCommand(commands, data.action, data.args));
-            if (cState.get('localOnly')) return throwO(LOCAL_ONLY_COMMAND_ON_SERVER);
-            return cState.get('command')(state).do(respond);
+            if (!cState.get('command')) return throwO(UNKNOWN_COMMAND);
+            return cState.get('localOnly') && data.action !== 'ping' ? throwO(LOCAL_ONLY_COMMAND_ON_SERVER) : cState.get('command')(state).do(respond);
           }
         });
       };

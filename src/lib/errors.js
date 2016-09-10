@@ -1,5 +1,6 @@
-const R = require('ramda')
 const { Observable: O } = require('rx')
+
+const create = error => new Error(error)
 
 const Errors = {
   NO_PRIVATE_KEY_FOUND: 'NO_PRIVATE_KEY_FOUND',
@@ -9,13 +10,14 @@ const Errors = {
   messages: {
     NO_PRIVATE_KEY_FOUND: 'No private key found please generate a keypair first using `rss-o-bot gen-keys` (see manual for more details).',
     NO_REMOTE_CONFIGURED: 'No server configured, running in local mode. Check the configuration section of the man-page for more info.',
-    NO_DATA_IN_REQUEST: 'Request failed! No data trasmitted to server.'
+    NO_DATA_IN_REQUEST: 'Request failed! No data trasmitted to server.',
+    UNKNOWN_COMMAND: 'Unkonwn command.'
   },
   tranlate: error => Errors.messages[error.message],
   log: error => console.error(Errors.translate(error)),
   throw: error => { throw Errors.create(error) },
-  create: error => new Error(error),
-  throwO: R.pipe([Error.create, O.throw])
+  throwO: err => O.throw(create(err)),
+  create
 }
 
 module.exports = Errors

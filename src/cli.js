@@ -137,6 +137,7 @@ const commands = [
       } else if (state.get('mode') === 'remote') {
         const privK = state.get('privateKey')
         if (!privK) return throwO(NO_PRIVATE_KEY_FOUND)
+        debug('Sending ping.')
         return remote.send(
           H.getRemoteUrl(state.get('configuration')),
           { action: 'ping', args: [] }
@@ -176,7 +177,7 @@ const runCommand = state => {
   const config = state.get('configuration')
   /* Execute the command locally */
   if (mode === 'local' || state.get('localOnly')) {
-    debug('running command locally')
+    debug('Running command locally.')
     return state.get('command')(state)
   /* Send to a server */
   } else if (mode === 'remote') {
@@ -236,8 +237,8 @@ const runCLI = (
     .map(H.getCommand(commands))
     .flatMap(state =>
       state.get('mode') === 'server' ||
-      state.get('mode') === 'client'
-        ? getKeys(state).map(([pub, priv]) =>
+      state.get('mode') === 'remote'
+        ? getKeys(state).map(([priv, pub]) =>
           state
             .set('publicKey', pub)
             .set('privateKey', priv)

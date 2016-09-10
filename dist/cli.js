@@ -131,6 +131,7 @@ var commands = [['add', function (args) {
   } else if (state.get('mode') === 'remote') {
     var privK = state.get('privateKey');
     if (!privK) return throwO(NO_PRIVATE_KEY_FOUND);
+    debug('Sending ping.');
     return remote.send(H.getRemoteUrl(state.get('configuration')), { action: 'ping', args: [] })(privK);
   } else if (state.get('mode') === 'server') {
     return O.of('pong');
@@ -160,7 +161,7 @@ var runCommand = function runCommand(state) {
   var config = state.get('configuration');
   /* Execute the command locally */
   if (mode === 'local' || state.get('localOnly')) {
-    debug('running command locally');
+    debug('Running command locally.');
     return state.get('command')(state);
     /* Send to a server */
   } else if (mode === 'remote') {
@@ -203,11 +204,11 @@ var runCLI = function runCLI() {
   .map(function (state) {
     return state.set('mode', state.getIn(['configuration', 'remote']) ? 'remote' : state.getIn(['configuration', 'mode']));
   }).map(H.getCommand(commands)).flatMap(function (state) {
-    return state.get('mode') === 'server' || state.get('mode') === 'client' ? getKeys(state).map(function (_ref18) {
+    return state.get('mode') === 'server' || state.get('mode') === 'remote' ? getKeys(state).map(function (_ref18) {
       var _ref19 = _slicedToArray(_ref18, 2);
 
-      var pub = _ref19[0];
-      var priv = _ref19[1];
+      var priv = _ref19[0];
+      var pub = _ref19[1];
       return state.set('publicKey', pub).set('privateKey', priv);
     }) : O.of(state);
   })
