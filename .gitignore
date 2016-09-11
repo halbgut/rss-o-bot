@@ -9,4 +9,5 @@ node_modules
 /.nyc_output
 npm-debug.log
 /tests/config/*/*.pem
+/dist
 
