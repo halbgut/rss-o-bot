@@ -9,7 +9,7 @@ const T = require('./lib/helpers')
 
 const H = require('../../dist/lib/helpers')
 const Errors = require('../../dist/lib/errors')
-const genKeys = require('../../dist/lib/genKeys')(H, Errors)
+const genKeys = require('../../dist/lib/gen-keys')(H, Errors)
 
 const config = { mode: 'remote', remote: 'ws://localhost', port: 3646, location: `${__dirname}/../config/server-remote` }
 

@@ -20,7 +20,7 @@ var T = require('./lib/helpers');
 
 var H = require('../../dist/lib/helpers');
 var Errors = require('../../dist/lib/errors');
-var genKeys = require('../../dist/lib/genKeys')(H, Errors);
+var genKeys = require('../../dist/lib/gen-keys')(H, Errors);
 
 var config = { mode: 'remote', remote: 'ws://localhost', port: 3646, location: __dirname + '/../config/server-remote' };
 
