@@ -31,7 +31,7 @@ test.cb('genKeys', t => {
   T.startServer(genKeysServerConfig.port, genKeysServerConfig.location)
     .do(() =>
       T.run(['gen-keys'], 3)((t, o) =>
-        o.last().flatMap(O.combineLatest(
+        o.flatMap(() => O.combineLatest(
           H.readFile(`${genKeysConfig.location}/priv.pem`),
           H.readFile(`${genKeysConfig.location}/pub.pem`),
           H.readFile(`${genKeysServerConfig.location}/pub.pem`)

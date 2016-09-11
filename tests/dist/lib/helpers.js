@@ -155,6 +155,7 @@ var startServer = function startServer(port, configDir, t) {
   var server = spawn('bash', ['-c', 'DEBUG=' + DEBUG + ' RSS_O_BOT_TESTING_MODE= ../../dist/cli.js run --mode=server --config=' + configDir + ' --port=' + port]);
 
   server.stdout.on('data', function (buff) {
+    if (!buff) return;
     var msg = buff.toString();
     if (msg === 'Server started!\n') {
       subject.onNext(true);
@@ -163,7 +164,10 @@ var startServer = function startServer(port, configDir, t) {
   });
 
   server.stderr.on('data', function (buff) {
+    if (!buff) return;
     var msg = buff.toString();
+    /* Ignore debug statements */
+    if (msg.match(/ GMT rss\-o\-bot /)) return;
     subject.onError(msg);
   });
 

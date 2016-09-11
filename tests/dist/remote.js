@@ -39,7 +39,9 @@ test.cb('genKeys', function (t) {
   var genKeysServerConfig = R.merge(config, { port: 3647, location: __dirname + '/../config/server-gen-keys' });
   T.startServer(genKeysServerConfig.port, genKeysServerConfig.location).do(function () {
     return T.run(['gen-keys'], 3)(function (t, o) {
-      return o.last().flatMap(O.combineLatest(H.readFile(genKeysConfig.location + '/priv.pem'), H.readFile(genKeysConfig.location + '/pub.pem'), H.readFile(genKeysServerConfig.location + '/pub.pem'))).do(function (_ref) {
+      return o.flatMap(function () {
+        return O.combineLatest(H.readFile(genKeysConfig.location + '/priv.pem'), H.readFile(genKeysConfig.location + '/pub.pem'), H.readFile(genKeysServerConfig.location + '/pub.pem'));
+      }).do(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 3);
 
         var privateK = _ref2[0];

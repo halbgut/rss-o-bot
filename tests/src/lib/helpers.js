@@ -115,6 +115,7 @@ const startServer =
     ])
 
     server.stdout.on('data', buff => {
+      if (!buff) return
       const msg = buff.toString()
       if (msg === 'Server started!\n') {
         subject.onNext(true)
@@ -123,7 +124,10 @@ const startServer =
     })
 
     server.stderr.on('data', buff => {
+      if (!buff) return
       const msg = buff.toString()
+      /* Ignore debug statements */
+      if (msg.match(/ GMT rss\-o\-bot /)) return
       subject.onError(msg)
     })
 
