@@ -20,6 +20,7 @@ module.exports = function (H, _ref) {
   var LOCAL_ONLY_COMMAND_ON_SERVER = _ref.LOCAL_ONLY_COMMAND_ON_SERVER;
   var NO_DATA_IN_REQUEST = _ref.NO_DATA_IN_REQUEST;
   var UNKNOWN_COMMAND = _ref.UNKNOWN_COMMAND;
+  var FAILED_TO_SAVE_PUB_KEY = _ref.FAILED_TO_SAVE_PUB_KEY;
 
   var isTokenValid = function () {
     var cache = [];
@@ -113,7 +114,10 @@ module.exports = function (H, _ref) {
           /* Must be a public key */
           if (typeof data === 'string') {
             debug('Recieved public key');
-            return H.writeFile(H.publicKeyPath(config), data).do(respond);
+            return H.writeFile(H.publicKeyPath(config), data).catch(function () {
+              respond({ error: FAILED_TO_SAVE_PUB_KEY });
+              return O.of(FAILED_TO_SAVE_PUB_KEY);
+            }).do(respond);
           } else {
             debug('Executing command ' + data.action);
             var cState = H.setCommandState(state)(H.findCommand(commands, data.action, data.args));

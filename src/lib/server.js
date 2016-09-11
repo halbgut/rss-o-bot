@@ -6,7 +6,14 @@ const debug = require('debug')('rss-o-bot')
 
 const startup = Symbol('startup')
 
-module.exports = (H, { throwO, PUBLIC_KEY_ALREADY_EXISTS, LOCAL_ONLY_COMMAND_ON_SERVER, NO_DATA_IN_REQUEST, UNKNOWN_COMMAND }) => {
+module.exports = (H, {
+  throwO,
+  PUBLIC_KEY_ALREADY_EXISTS,
+  LOCAL_ONLY_COMMAND_ON_SERVER,
+  NO_DATA_IN_REQUEST,
+  UNKNOWN_COMMAND,
+  FAILED_TO_SAVE_PUB_KEY
+}) => {
   const isTokenValid = (() => {
     let cache = []
     return nEl => {
@@ -85,7 +92,14 @@ module.exports = (H, { throwO, PUBLIC_KEY_ALREADY_EXISTS, LOCAL_ONLY_COMMAND_ON_
             /* Must be a public key */
             if (typeof data === 'string') {
               debug('Recieved public key')
-              return H.writeFile(H.publicKeyPath(config), data).do(respond)
+              return (
+                H.writeFile(H.publicKeyPath(config), data)
+                  .catch(() => {
+                    respond({ error: FAILED_TO_SAVE_PUB_KEY })
+                    return O.of(FAILED_TO_SAVE_PUB_KEY)
+                  })
+                  .do(respond)
+              )
             } else {
               debug(`Executing command ${data.action}`)
               const cState = H.setCommandState(state)(
