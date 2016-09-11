@@ -25,14 +25,18 @@ var genKeys = require('../../dist/lib/gen-keys')(H, Errors);
 var config = { mode: 'remote', remote: 'ws://localhost', port: 3646, location: __dirname + '/../config/server-remote' };
 
 test.before.cb(function (t) {
-  genKeys(Immutable.Map(config)).flatMap(T.startServer(config.port, config.location, test)).do(function () {
+  genKeys(Immutable.Map(config)).flatMap(function () {
+    return T.startServer(config.port, config.location, test);
+  }).do(function () {
     return t.end();
-  }).subscribe(function () {});
+  }).subscribe(function () {}, function (err) {
+    t.fail(err);
+  });
 });
 
-var genKeysConfig = R.merge(config, { port: 3647, location: __dirname + '/../config/client-gen-keys' });
-var genKeysServerConfig = R.merge(config, { port: 3647, location: __dirname + '/../config/server-gen-keys' });
 test.cb('genKeys', function (t) {
+  var genKeysConfig = R.merge(config, { port: 3647, location: __dirname + '/../config/client-gen-keys' });
+  var genKeysServerConfig = R.merge(config, { port: 3647, location: __dirname + '/../config/server-gen-keys' });
   T.startServer(genKeysServerConfig.port, genKeysServerConfig.location).do(function () {
     return T.run(['gen-keys'], 3)(function (t, o) {
       return o.last().flatMap(O.combineLatest(H.readFile(genKeysConfig.location + '/priv.pem'), H.readFile(genKeysConfig.location + '/pub.pem'), H.readFile(genKeysServerConfig.location + '/pub.pem'))).do(function (_ref) {

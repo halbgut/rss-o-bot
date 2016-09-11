@@ -1,10 +1,9 @@
 const fs = require('fs')
 const { spawn } = require('child_process')
 
-const { Observable: O } = require('rx')
+const Rx = require('rx')
 const Immutable = require('immutable')
 const uuid = require('node-uuid')
-const R = require('ramda')
 
 const runCLI = require('../../../dist/cli.js')
 const H = require('../../../dist/lib/helpers')
@@ -109,10 +108,24 @@ const createDummyEntry =
 
 const startServer =
   (port, configDir, t) => {
+    const subject = new Rx.Subject()
     const server = spawn('bash', [
       '-c',
       `DEBUG=${DEBUG} RSS_O_BOT_TESTING_MODE= ../../dist/cli.js run --mode=server --config=${configDir} --port=${port}`
     ])
+
+    server.stdout.on('data', buff => {
+      const msg = buff.toString()
+      if (msg === 'Server started!\n') {
+        subject.onNext(true)
+        subject.onCompleted()
+      }
+    })
+
+    server.stderr.on('data', buff => {
+      const msg = buff.toString()
+      subject.onError(msg)
+    })
 
     if (t) {
       t.after.always(() => {
@@ -120,11 +133,7 @@ const startServer =
       })
     }
 
-    return (
-      O.fromEvent(server.stdout, 'data')
-        .map(R.toString)
-        .filter(R.equals('Server started!\n'))
-    )
+    return subject
   }
 
 module.exports = {

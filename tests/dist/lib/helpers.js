@@ -10,13 +10,10 @@ var _require = require('child_process');
 
 var spawn = _require.spawn;
 
-var _require2 = require('rx');
 
-var O = _require2.Observable;
-
+var Rx = require('rx');
 var Immutable = require('immutable');
 var uuid = require('node-uuid');
-var R = require('ramda');
 
 var runCLI = require('../../../dist/cli.js');
 var H = require('../../../dist/lib/helpers');
@@ -154,7 +151,21 @@ var createDummyEntry = function createDummyEntry(url) {
 };
 
 var startServer = function startServer(port, configDir, t) {
+  var subject = new Rx.Subject();
   var server = spawn('bash', ['-c', 'DEBUG=' + DEBUG + ' RSS_O_BOT_TESTING_MODE= ../../dist/cli.js run --mode=server --config=' + configDir + ' --port=' + port]);
+
+  server.stdout.on('data', function (buff) {
+    var msg = buff.toString();
+    if (msg === 'Server started!\n') {
+      subject.onNext(true);
+      subject.onCompleted();
+    }
+  });
+
+  server.stderr.on('data', function (buff) {
+    var msg = buff.toString();
+    subject.onError(msg);
+  });
 
   if (t) {
     t.after.always(function () {
@@ -162,7 +173,7 @@ var startServer = function startServer(port, configDir, t) {
     });
   }
 
-  return O.fromEvent(server.stdout, 'data').map(R.toString).filter(R.equals('Server started!\n'));
+  return subject;
 };
 
 module.exports = {

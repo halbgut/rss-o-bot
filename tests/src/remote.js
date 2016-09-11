@@ -15,14 +15,19 @@ const config = { mode: 'remote', remote: 'ws://localhost', port: 3646, location:
 
 test.before.cb(t => {
   genKeys(Immutable.Map(config))
-    .flatMap(T.startServer(config.port, config.location, test))
+    .flatMap(() => T.startServer(config.port, config.location, test))
     .do(() => t.end())
-    .subscribe(() => {})
+    .subscribe(
+      () => {},
+      err => {
+        t.fail(err)
+      }
+    )
 })
 
-const genKeysConfig = R.merge(config, {port: 3647, location: `${__dirname}/../config/client-gen-keys`})
-const genKeysServerConfig = R.merge(config, {port: 3647, location: `${__dirname}/../config/server-gen-keys`})
 test.cb('genKeys', t => {
+  const genKeysConfig = R.merge(config, {port: 3647, location: `${__dirname}/../config/client-gen-keys`})
+  const genKeysServerConfig = R.merge(config, {port: 3647, location: `${__dirname}/../config/server-gen-keys`})
   T.startServer(genKeysServerConfig.port, genKeysServerConfig.location)
     .do(() =>
       T.run(['gen-keys'], 3)((t, o) =>
