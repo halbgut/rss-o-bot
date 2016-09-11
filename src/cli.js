@@ -19,7 +19,7 @@ const Notify = require('./lib/notify')(H)
 const opml = require('./lib/opml')(H)
 const remote = require('./lib/remote')(H)
 const Server = require('./lib/server')(H, Errors)
-const genKeys = require('./lib/genKeys')(H, Errors)
+const genKeys = require('./lib/gen-keys')(H, Errors)
 
 /* Pure modules */
 const Config = require('./lib/config')(H)

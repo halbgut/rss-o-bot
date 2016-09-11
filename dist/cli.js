@@ -30,7 +30,7 @@ var Notify = require('./lib/notify')(H);
 var opml = require('./lib/opml')(H);
 var remote = require('./lib/remote')(H);
 var Server = require('./lib/server')(H, Errors);
-var genKeys = require('./lib/genKeys')(H, Errors);
+var genKeys = require('./lib/gen-keys')(H, Errors);
 
 /* Pure modules */
 var Config = require('./lib/config')(H);
