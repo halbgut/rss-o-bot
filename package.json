@@ -6,7 +6,7 @@
   "bin": "dist/cli.js",
   "man": "dist/docs/rss-o-bot.1",
   "scripts": {
-    "build": "npm run build-js && ./src/cli.js build-man",
+    "build": "npm run build-js && ./dist/cli.js build-man",
     "build-js": "babel --presets babel-preset-es2015 src --out-dir dist",
     "build-tests": "babel --presets babel-preset-es2015 tests/src --out-dir tests/dist",
     "watch-build-tests": "watch 'npm run build-tests' tests/src",
