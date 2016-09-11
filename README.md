@@ -131,12 +131,11 @@ Logo created by [mala23](https://github.com/mala23)
 
 ## TODO
 
-* Implement genKeys action
-* Implement tests for remote & server
+* remove dist from the repo
+* use XHR for remote/server
+* use typescript
+* upgrade rx
 * Document the installation options somewhere else
 * Test the docker container
 * Completions
-* add ramda
-* use typescript
-* upgrade rx
 
