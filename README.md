@@ -131,7 +131,6 @@ Logo created by [mala23](https://github.com/mala23)
 
 ## TODO
 
-* remove dist from the repo
 * use XHR for remote/server
 * use typescript
 * upgrade rx
