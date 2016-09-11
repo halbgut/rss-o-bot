@@ -34,6 +34,9 @@ var Errors = {
   throwO: function throwO(err) {
     return O.throw(create(err));
   },
+  translate: function translate(err) {
+    return Errors[err] || err;
+  },
   create: create
 };
 

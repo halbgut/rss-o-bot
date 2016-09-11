@@ -19,6 +19,7 @@ const Errors = {
   log: error => console.error(Errors.translate(error)),
   throw: error => { throw Errors.create(error) },
   throwO: err => O.throw(create(err)),
+  translate: err => Errors[err] || err,
   create
 }
 
