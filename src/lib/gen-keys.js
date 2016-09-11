@@ -1,4 +1,5 @@
 const debug = require('debug')('rss-o-bot')
+const { Observable: O } = require('rx')
 
 /**
  * OS specific approach. Works on MacOS but probably not
@@ -11,12 +12,19 @@ const genKeys = (H, Errors) => config => {
   return (
     H.exec('openssl genrsa 4096 -outform PEM')
       .do(() => debug('Tried to generate RSA private key'))
-      .flatMap(k => H.writeFile(privateKeyPath, k))
-      .flatMap(H.isFile(privateKeyPath).catch(() => Errors.throwO(Errors.FAILED_TO_GEN_PRIV_KEY)))
-      .flatMap(H.exec(`openssl rsa -pubout -in ${privateKeyPath}`))
-      .flatMap(k => H.writeFile(publicKeyPath, k))
-      .flatMap(H.isFile(publicKeyPath).catch(() => Errors.throwO(Errors.FAILED_TO_GEN_PUB_KEY)))
+      .flatMap(k => H.writeFile(privateKeyPath, k[0]))
+      .flatMap(() => H.isFile(privateKeyPath).catch(err => {
+        debug(err)
+        return Errors.throwO(Errors.FAILED_TO_GEN_PRIV_KEY)
+      }))
+      .flatMap(() => H.exec(`openssl rsa -pubout -in ${privateKeyPath}`))
+      .flatMap(k => H.writeFile(publicKeyPath, k[0]))
+      .flatMap(() => H.isFile(publicKeyPath).catch(err => {
+        debug(err)
+        return Errors.throwO(Errors.FAILED_TO_GEN_PUB_KEY)
+      }))
       .do(() => debug('Generated keypair.'))
+      .catch(err => O.throw(err).delay(1000))
       .retry(2)
   )
 }
