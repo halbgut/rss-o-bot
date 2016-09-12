@@ -3,10 +3,13 @@
  * Helper functions used by multiple modules.
  */
 const fs = require('fs')
+const http = require('http')
 const cp = require('child_process')
 const path = require('path')
+const R = require('ramda')
 const markedMan = require('marked-man')
-const {Observable: O} = require('rx')
+const { Observable: O } = require('rx')
+const jwt = require('jsonwebtoken')
 const debug = require('debug')('rss-o-bot')
 
 const domainRegex = '([\\w\\d-]+\\.)+\\w{2,}'
@@ -96,10 +99,63 @@ const Helpers = {
   /*
    * HTTP helpers
    */
+  serverStartup: Symbol('startup'),
   isResponseRedirect: res =>
     res.statusCode >= 300 && res.statusCode <= 399 && res.headers.location,
   isResponseSuccessful: res =>
     res.statusCode >= 200 && res.statusCode < 400,
+  httpServer: port => O.create(o => {
+    const server = http.createServer((req, res) => {
+      const respond = (code, headers = {'Content-Type': 'application/json'}) => (data) => {
+        const body = R.cond([
+          [Helpers.is('object'), JSON.stringify],
+          [R.T, R.toString]
+        ], body)
+        res.writeHead(code, headers)
+        res.end(body)
+        return O.just(true)
+      }
+      let body = ''
+      req.on('data', data => { body += data })
+      req.on('end', e => {
+        let data
+        try {
+          data = JSON.parse(body)
+        } catch (e) {
+          data = body
+        }
+        o.onNext([data, respond])
+      })
+    })
+    server.listen(port)
+    o.onNext(Helpers.serverStartup)
+  }),
+
+  /*
+   * JWT
+   */
+  isPayloadValid: (() => {
+    let cache = []
+    return nEl => {
+      cache = cache.filter(el => el[1] > Helpers.getTime())
+      return !(cache.findIndex(el => el[0] === nEl) > -1)
+    }
+  })(),
+
+  verifyJwt: (publicKey) => (token) => O.create(o => {
+    jwt.verify(
+      token,
+      publicKey,
+      { algorithms: ['RS512'] },
+      (err, data) => {
+        if (err || !Helpers.isPayloadValid([data.jit, data.exp])) {
+          // TODO Use Error.js here
+          return o.onError(err || new Error('Invalid jit'))
+        }
+        o.onNext(data)
+      }
+    )
+  }),
 
   /*
    * Man helpers
@@ -186,9 +242,10 @@ const Helpers = {
       .map(store => [store, ...Helpers.getConfigAndArgs(state)]),
 
   /*
-   * Others
+   * Primitives manipulation
    */
-  includesUpperCase: str => !!str.match(/[A-Z]/)
+  includesUpperCase: str => !!str.match(/[A-Z]/),
+  is: type => R.pipe(R.type, R.equals(type))
 }
 
 module.exports = Helpers

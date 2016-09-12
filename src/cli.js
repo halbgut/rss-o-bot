@@ -140,7 +140,7 @@ const commands = [
         debug('Sending ping.')
         return remote.send(
           H.getRemoteUrl(state.get('configuration')),
-          { action: 'ping', args: [] }
+          { command: 'ping', args: [] }
         )(privK)
       } else if (state.get('mode') === 'server') {
         return O.of('pong')
@@ -185,7 +185,7 @@ const runCommand = state => {
     return (
       H.readFile(H.privateKeyPath(config))
         .flatMap(remote.send(H.getRemoteUrl(config), {
-          action: state.get('action'),
+          command: state.get('command'),
           arguments: state.get('arguments').toJS()
         }))
     )
