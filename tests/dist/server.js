@@ -9,6 +9,8 @@ var _require2 = require('ava');
 var test = _require2.test;
 
 
+var H = require('../../dist/lib/helpers');
+
 var server = void 0;
 
 test.cb('start a server', function (t) {
@@ -20,7 +22,7 @@ test.cb('start a server', function (t) {
   });
   server.stdout.on('data', function (out) {
     var outStr = out.toString();
-    if (outStr === 'Server started!\n') {
+    if (outStr === 'Symbol(startup)\n') {
       /* Server successfully started */
       t.pass();
       server.kill();

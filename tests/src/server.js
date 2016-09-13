@@ -1,6 +1,8 @@
 const { spawn } = require('child_process')
 const { test } = require('ava')
 
+const H = require('../../dist/lib/helpers')
+
 let server
 
 test.cb('start a server', t => {
@@ -12,7 +14,7 @@ test.cb('start a server', t => {
   })
   server.stdout.on('data', out => {
     const outStr = out.toString()
-    if (outStr === 'Server started!\n') {
+    if (outStr === 'Symbol(startup)\n') {
       /* Server successfully started */
       t.pass()
       server.kill()
