@@ -139,9 +139,9 @@ const commands = [
         if (!privK) return throwO(NO_PRIVATE_KEY_FOUND)
         debug('Sending ping.')
         return remote.send(
-          H.getRemoteUrl(state.get('configuration')),
-          { command: 'ping', args: [] }
-        )(privK)
+          privK,
+          H.getRemoteUrl(state.get('configuration'))
+        )({ command: 'ping', args: [] })
       } else if (state.get('mode') === 'server') {
         return O.of('pong')
       }
@@ -160,11 +160,11 @@ const commands = [
           /* Send the public key to the server */
           .do(() => debug(`Sending public key to ${serverUrl}`))
           .flatMap(([, pubK]) => remote.send(
+            null,
             serverUrl,
-            pubK.toString(),
             /* Do it insecurely */
             true
-          )())
+          )(pubK.toString()))
           .map(() => 'Keys generated and public key transmitted to server.')
       )
     },
@@ -184,10 +184,12 @@ const runCommand = state => {
     debug('Sending command as remote')
     return (
       H.readFile(H.privateKeyPath(config))
-        .flatMap(remote.send(H.getRemoteUrl(config), {
-          command: state.get('command'),
-          arguments: state.get('arguments').toJS()
-        }))
+        .flatMap(privK =>
+          remote.send(privK, H.getRemoteUrl(config))({
+            command: state.get('command'),
+            arguments: state.get('arguments').toJS()
+          })
+        )
     )
   } else if (mode === 'server') {
     /* Ignore any command passed, since there's only

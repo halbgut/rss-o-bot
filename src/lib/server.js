@@ -35,24 +35,25 @@ module.exports = (H, {
     ])
 
   const Server = {
-    run: commands => state => publicKey =>
+    run: commands => state =>
       H.httpServer(state.getIn(['configuration', 'port']))
+        .filter(H.is('object'))
         .flatMap(([data, respond]) =>
           R.ifElse(
-            R.anyPass(R.not, R.pipe(R.length, R.lt(1))),
+            R.anyPass(R.pipe(R.length, R.lt(1))),
             O.throw({ error: NO_DATA_IN_REQUEST }),
             (data) =>
               R.cond(
                 [
                   H.isString,
-                  savePublicKey(state.get('configuration'), publicKey)
+                  savePublicKey(state.get('configuration'), state.get('publicKey'))
                 ],
                 [
                   R.where({
                     command: H.is('string'),
                     args: R.allPass([H.is('array'), R.all(H.is('string'))])
                   }),
-                  R.pipe(H.verifyToken(publicKey), executeCommand(state))
+                  R.pipe(H.verifyToken(state.get('publicKey')), executeCommand(state))
                 ],
                 [R.T, O.throw({ error: NO_DATA_IN_REQUEST })]
               )(data)

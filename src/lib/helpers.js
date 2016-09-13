@@ -6,6 +6,7 @@ const fs = require('fs')
 const http = require('http')
 const cp = require('child_process')
 const path = require('path')
+const uuid = require('node-uuid')
 const R = require('ramda')
 const markedMan = require('marked-man')
 const { Observable: O } = require('rx')
@@ -104,7 +105,9 @@ const Helpers = {
     res.statusCode >= 300 && res.statusCode <= 399 && res.headers.location,
   isResponseSuccessful: res =>
     res.statusCode >= 200 && res.statusCode < 400,
+
   httpServer: port => O.create(o => {
+    debug('Starting HTTP server.')
     const server = http.createServer((req, res) => {
       const respond = (code, headers = {'Content-Type': 'application/json'}) => (data) => {
         const body = R.cond([
@@ -128,7 +131,42 @@ const Helpers = {
       })
     })
     server.listen(port)
+    console.log(Helpers.serverStartup)
     o.onNext(Helpers.serverStartup)
+  }),
+
+  httpPost: url => message => O.create(o => {
+    const buffer = Buffer.from(JSON.stringify(message))
+    const [host, port] = url.split(':')
+    const req = http.request(
+      {
+        port,
+        host,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': buffer
+        }
+      },
+      res => {
+        let body = ''
+        res.setEncoding('UTF-8')
+        res.on('data', data => { body += data })
+        res.on('end', () => {
+          let resData
+          try {
+            resData = JSON.parse(body)
+          } catch (e) {
+            resData = body
+          }
+          o.onNext(resData)
+          o.onCompleted()
+        })
+      }
+    )
+    req.on('error', err => { o.onError(err) })
+    req.write(buffer)
+    req.end()
   }),
 
   /*
@@ -142,7 +180,7 @@ const Helpers = {
     }
   })(),
 
-  verifyJwt: (publicKey) => (token) => O.create(o => {
+  verifyJwt: publicKey => token => O.create(o => {
     jwt.verify(
       token,
       publicKey,
@@ -153,6 +191,19 @@ const Helpers = {
           return o.onError(err || new Error('Invalid jit'))
         }
         o.onNext(data)
+      }
+    )
+  }),
+
+  signJwt: privateKey => message => O.create(o => {
+    jwt.sign(
+      R.merge(message, { exp: 60000, jti: uuid.v4() }),
+      privateKey,
+      { algorithm: 'RS512' },
+      (err, token) => {
+        if (err) return o.onError(err)
+        o.onNext(token)
+        o.onCompleted()
       }
     )
   }),
