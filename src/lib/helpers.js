@@ -109,6 +109,7 @@ const Helpers = {
   httpServer: port => O.create(o => {
     debug('Starting HTTP server.')
     const server = http.createServer((req, res) => {
+      debug('Receiving message.')
       const respond = (code, headers = {'Content-Type': 'application/json'}) => (data) => {
         const body = R.cond([
           [Helpers.is('object'), JSON.stringify],
@@ -131,7 +132,6 @@ const Helpers = {
       })
     })
     server.listen(port)
-    console.log(Helpers.serverStartup)
     o.onNext(Helpers.serverStartup)
   }),
 
@@ -140,8 +140,8 @@ const Helpers = {
     const [host, port] = url.split(':')
     const req = http.request(
       {
-        port,
         host,
+        port,
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
