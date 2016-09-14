@@ -123,6 +123,8 @@ const commands = [
     true,
     state =>
       O.of(state)
+        .flatMap(H.mkdirDeep(`${__dirname}/../dist/docs`))
+        .do(console.log)
         .flatMap(H.buildMan)
         .flatMap(({ man }) => H.writeFile(`${__dirname}/../dist/docs/rss-o-bot.1`, man))
         .map(() => 'Man built'),

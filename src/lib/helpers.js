@@ -26,6 +26,14 @@ const Helpers = {
   stat: O.fromNodeCallback(fs.stat),
   isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')).map(() => path),
   isFile: path => Helpers.stat(path).map(Helpers.tryCall('isFile')).map(() => path),
+  mkdir: path => O.fromNodeCallback(fs.mkdir),
+  mkdirDeep: dirPath =>
+    Helpers.isDirectory(dirPath)
+      .flatMap(() => Helpers.mkdir(dirPath))
+      .catch(() =>
+        Helpers.mkdirDeep(path.normalize(`${dirPath}/..`))
+          .flatMap(() => Helpers.mkdir(dirPath))
+      ),
 
   findExistingDirectory: strOrArrLocations => {
     const locations = Array.prototype.isPrototypeOf(strOrArrLocations)
