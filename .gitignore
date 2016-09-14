@@ -5,9 +5,9 @@ node_modules
 *.map
 /docker/data
 /tags
-/test/data
 /.nyc_output
 npm-debug.log
 /tests/config/*/*.pem
+/tests/dist
 /dist
 

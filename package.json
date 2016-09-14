@@ -11,7 +11,7 @@
     "build-tests": "babel --presets babel-preset-es2015 tests/src --out-dir tests/dist",
     "watch-build-tests": "watch 'npm run build-tests' tests/src",
     "watch-build": "watch 'npm run build-js -- --source-maps' src",
-    "test": "RSS_O_BOT_TESTING_MODE=1 ava tests/dist/*.js",
+    "test": "npm run build-tests && RSS_O_BOT_TESTING_MODE=1 ava tests/dist/*.js",
     "watch-test": "RSS_O_BOT_TESTING_MODE=1 ava tests/src/*.js --watch",
     "ci-test": "npm run build && npm run test && npm run test-coverage",
     "debug-test": "DEBUG=rss-o-bot RSS_O_BOT_TESTING_MODE=1 ava",
