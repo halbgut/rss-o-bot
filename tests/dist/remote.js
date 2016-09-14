@@ -22,7 +22,7 @@ var H = require('../../dist/lib/helpers');
 var Errors = require('../../dist/lib/errors');
 var genKeys = require('../../dist/lib/gen-keys')(H, Errors);
 
-var config = { mode: 'remote', remote: 'ws://localhost', port: 3646, location: __dirname + '/../config/server-remote' };
+var config = { mode: 'remote', remote: 'localhost', port: 3646, location: __dirname + '/../config/server-remote' };
 
 test.before.cb(function (t) {
   genKeys(Immutable.Map(config)).flatMap(function () {
@@ -68,4 +68,4 @@ test.cb('ping/pong', T.run(['ping'])(function (t, o) {
   return o.do(function () {
     return t.pass();
   });
-}, R.assoc('remote', 'ws://localhost', config)));
+}, R.assoc('remote', 'localhost', config)));

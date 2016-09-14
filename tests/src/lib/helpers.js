@@ -117,7 +117,7 @@ const startServer =
     server.stdout.on('data', buff => {
       if (!buff) return
       const msg = buff.toString()
-      if (msg === 'Server started!\n') {
+      if (msg === 'Symbol(startup)\n') {
         subject.onNext(true)
         subject.onCompleted()
       }

@@ -9,8 +9,6 @@ var _require2 = require('ava');
 var test = _require2.test;
 
 
-var H = require('../../dist/lib/helpers');
-
 var server = void 0;
 
 test.cb('start a server', function (t) {

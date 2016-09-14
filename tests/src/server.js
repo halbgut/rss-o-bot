@@ -1,8 +1,6 @@
 const { spawn } = require('child_process')
 const { test } = require('ava')
 
-const H = require('../../dist/lib/helpers')
-
 let server
 
 test.cb('start a server', t => {

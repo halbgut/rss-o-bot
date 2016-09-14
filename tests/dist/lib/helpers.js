@@ -157,7 +157,7 @@ var startServer = function startServer(port, configDir, t) {
   server.stdout.on('data', function (buff) {
     if (!buff) return;
     var msg = buff.toString();
-    if (msg === 'Server started!\n') {
+    if (msg === 'Symbol(startup)\n') {
       subject.onNext(true);
       subject.onCompleted();
     }

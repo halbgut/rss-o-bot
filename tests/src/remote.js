@@ -11,7 +11,7 @@ const H = require('../../dist/lib/helpers')
 const Errors = require('../../dist/lib/errors')
 const genKeys = require('../../dist/lib/gen-keys')(H, Errors)
 
-const config = { mode: 'remote', remote: 'ws://localhost', port: 3646, location: `${__dirname}/../config/server-remote` }
+const config = { mode: 'remote', remote: 'localhost', port: 3646, location: `${__dirname}/../config/server-remote` }
 
 test.before.cb(t => {
   genKeys(Immutable.Map(config))
@@ -62,6 +62,6 @@ test.cb('ping/pong', T.run(['ping'])(
     }, 2000)
     return o.do(() => t.pass())
   },
-  R.assoc('remote', 'ws://localhost', config)
+  R.assoc('remote', 'localhost', config)
 ))
 
