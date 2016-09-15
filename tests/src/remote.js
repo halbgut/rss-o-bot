@@ -30,12 +30,14 @@ test.cb('genKeys', t => {
   const genKeysServerConfig = R.merge(config, {port: 3647, location: `${__dirname}/../config/server-gen-keys`})
   T.startServer(genKeysServerConfig.port, genKeysServerConfig.location)
     .do(() =>
-      T.run(['gen-keys'], 3)((t, o) =>
-        o.flatMap(() => O.combineLatest(
-          H.readFile(`${genKeysConfig.location}/priv.pem`),
-          H.readFile(`${genKeysConfig.location}/pub.pem`),
-          H.readFile(`${genKeysServerConfig.location}/pub.pem`)
-        ))
+      T.run(['gen-keys'], 4)((t, o) =>
+        o
+          .do(x => t.is(x, 'Keys generated and public key transmitted to server.'))
+          .flatMap(() => O.combineLatest(
+            H.readFile(`${genKeysConfig.location}/priv.pem`),
+            H.readFile(`${genKeysConfig.location}/pub.pem`),
+            H.readFile(`${genKeysServerConfig.location}/pub.pem`)
+          ))
           .do(([ privateK, publicK, serverPublicK ]) => {
             t.truthy(privateK)
             t.truthy(publicK)

@@ -139,6 +139,10 @@ const startServer =
       })
     }
 
+    process.on('exit', () => {
+      if (!server.killed) server.kill()
+    })
+
     return subject
   }
 
