@@ -158,7 +158,7 @@ const commands = [
       const serverUrl = H.getRemoteUrl(state.get('configuration'))
       return (
         genKeys(state.get('configuration'))
-          .flatMap(getKeys(state))
+          .flatMap(() => getKeys(state))
           /* Send the public key to the server */
           .do(() => debug(`Sending public key to ${serverUrl}`))
           .flatMap(([, pubK]) => remote.send(
@@ -167,7 +167,11 @@ const commands = [
             /* Do it insecurely */
             true
           )(pubK.toString()))
-          .map(() => 'Keys generated and public key transmitted to server.')
+          .map((res) =>
+            res.output
+              ? 'Keys generated and public key transmitted to server.'
+              : Errors.create(res.error)
+          )
       )
     },
     true
