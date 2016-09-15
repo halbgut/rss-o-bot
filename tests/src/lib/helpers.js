@@ -117,6 +117,7 @@ const startServer =
     server.stdout.on('data', buff => {
       if (!buff) return
       const msg = buff.toString()
+      if (DEBUG) console.log(msg)
       if (msg === 'Symbol(startup)\n') {
         subject.onNext(true)
         subject.onCompleted()
@@ -126,6 +127,7 @@ const startServer =
     server.stderr.on('data', buff => {
       if (!buff) return
       const msg = buff.toString()
+      if (DEBUG) console.error(msg)
       /* Ignore debug statements */
       if (msg.match(/ GMT rss\-o\-bot /)) return
       subject.onError(msg)
