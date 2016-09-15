@@ -51,7 +51,7 @@ module.exports = (H, {
             } else if (data.indexOf('PUBLIC KEY') > -1) {
               return (
                 savePublicKey(state.get('configuration'), state.get('publicKey'))(data)
-                  .map(() => respond(200)({ output: 'Wrote public key.' }))
+                  .flatMap(() => respond(200)({ output: 'Wrote public key.' }))
                   .catch(errRespond)
               )
             } else {
