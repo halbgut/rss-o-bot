@@ -20,7 +20,8 @@ module.exports = H => {
         : https.request
     debug(`${(protocol || 'http:').toUpperCase()} GET ${depth} ${url}`)
     request({
-      host, path,
+      host,
+      path,
       headers: { 'User-Agent': 'RSS-o-Bot' }
     }, res => {
       let body = ''
@@ -79,7 +80,7 @@ module.exports = H => {
         } else if (!not && !lowerCase) {
           return title.indexOf(keyword) === -1
         } else {
-          debug('Unexpected case in filter ${not}, ${lowerCase}')
+          debug(`Unexpected case in filter ${not}, ${lowerCase}`)
         }
       }).length === 0
   }
