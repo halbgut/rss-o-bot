@@ -123,7 +123,6 @@ const Helpers = {
           [Helpers.is('object'), JSON.stringify],
           [R.T, R.toString]
         ])(data)
-        console.log('responding: ', body)
         res.writeHead(code, headers)
         res.end(body)
         return O.just(true)

@@ -1,5 +1,4 @@
-const Rx = require('rx')
-const { Observable: O } = Rx
+const { Observable: O } = require('rx')
 const R = require('ramda')
 const debug = require('debug')('rss-o-bot')
 
@@ -12,7 +11,7 @@ module.exports = (H, {
   FAILED_TO_SAVE_PUB_KEY
 }) => {
   const savePublicKey = (config, publicKey) => newPublicKey =>
-    Rx.if(
+    O.if(
       () => publicKey,
       O.throw({ error: PUBLIC_KEY_ALREADY_EXISTS }),
       H.writeFile(H.publicKeyPath(config), newPublicKey)
@@ -38,10 +37,23 @@ module.exports = (H, {
           .flatMap(x => {
             if (H.is('Symbol')(x)) return O.of(x)
             const [ data, respond ] = x
+            const errRespond = err => {
+              debug(err)
+              // If it's a properly formated error, it may be sent to the user
+              return (
+                err.error
+                  ? respond(500)(err)
+                  : respond(500)({ error: NO_DATA_IN_REQUEST })
+              )
+            }
             if (data.length < 1) {
-              return respond(500)({ error: NO_DATA_IN_REQUEST })
+              return errRespond(null)
             } else if (data.indexOf('PUBLIC KEY') > -1) {
-              return savePublicKey(state.get('configuration'), state.get('publicKey'))
+              return (
+                savePublicKey(state.get('configuration'), state.get('publicKey'))(data)
+                  .map(() => respond(200)({ output: 'Wrote public key.' }))
+                  .catch(errRespond)
+              )
             } else {
               return (
                 H.verifyJwt(state.get('publicKey'))(data)
@@ -57,10 +69,7 @@ module.exports = (H, {
                     ],
                     [R.T, () => respond(500)({ error: NO_DATA_IN_REQUEST })]
                   ]))
-                  .catch(err => {
-                    debug(err)
-                    return respond(500)({ error: NO_DATA_IN_REQUEST })
-                  })
+                  .catch(errRespond)
               )
             }
           })
