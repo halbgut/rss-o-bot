@@ -122,7 +122,8 @@ const Helpers = {
         const body = R.cond([
           [Helpers.is('object'), JSON.stringify],
           [R.T, R.toString]
-        ], body)
+        ])(data)
+        console.log('responding: ', body)
         res.writeHead(code, headers)
         res.end(body)
         return O.just(true)
@@ -153,10 +154,11 @@ const Helpers = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Content-Length': buffer
+          'Content-Length': buffer.length
         }
       },
       res => {
+        console.log('waiting for response')
         let body = ''
         res.setEncoding('UTF-8')
         res.on('data', data => { body += data })
@@ -189,6 +191,7 @@ const Helpers = {
   })(),
 
   verifyJwt: publicKey => token => O.create(o => {
+    debug('Verifying JWT token.')
     jwt.verify(
       token,
       publicKey,
@@ -197,15 +200,16 @@ const Helpers = {
         if (err || !Helpers.isPayloadValid([data.jit, data.exp])) {
           // TODO Use Error.js here
           return o.onError(err || new Error('Invalid jit'))
+        } else {
+          o.onNext(data)
         }
-        o.onNext(data)
       }
     )
   }),
 
   signJwt: privateKey => message => O.create(o => {
     jwt.sign(
-      R.merge(message, { exp: 60000, jti: uuid.v4() }),
+      R.merge(message, { exp: Helpers.getTime(60), jti: uuid.v4() }),
       privateKey,
       { algorithm: 'RS512' },
       (err, token) => {
