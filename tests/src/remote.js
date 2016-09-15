@@ -60,7 +60,7 @@ test.cb('ping/pong', T.run(['ping'])(
       t.fail('Time out')
       t.end()
     }, 2000)
-    return o.do(() => t.pass())
+    return o.filter(R.propEq('output', 'pong')).do(() => t.pass())
   },
   R.assoc('remote', 'localhost', config)
 ))
