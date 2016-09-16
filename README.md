@@ -131,8 +131,7 @@ Logo created by [mala23](https://github.com/mala23)
 
 ## TODO
 
-* use XHR for remote/server
-* use typescript
+* use flow
 * upgrade rx
 * Document the installation options somewhere else
 * Test the docker container
