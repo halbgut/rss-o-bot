@@ -16,7 +16,7 @@
     "ci-test": "npm run build && npm run test && standard && npm run test-coverage",
     "debug-test": "DEBUG=rss-o-bot RSS_O_BOT_TESTING_MODE=1 ava",
     "test-coverage": "nyc --include dist/ npm test && nyc report --reporter=text-lcov | coveralls",
-    "build-deps-graph": "madge -i ./dependency-graph.svg src "
+    "build-deps-graph": "madge -i ./src/docs/dependency-graph.svg src"
   },
   "repository": "https://github.com/Kriegslustig/rss-o-bot.git",
   "author": "Kriegslustig <npm@ls7.ch>",
