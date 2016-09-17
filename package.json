@@ -7,7 +7,7 @@
   "man": "dist/docs/rss-o-bot.1",
   "scripts": {
     "build": "npm run build-js && ./dist/cli.js build-man --config=tests/config/succeeding",
-    "build-js": "babel --presets babel-preset-es2015 src --out-dir dist",
+    "build-js": "babel src --out-dir dist",
     "build-tests": "babel --presets babel-preset-es2015 tests/src --out-dir tests/dist",
     "watch-build-tests": "watch 'npm run build-tests' tests/src",
     "watch-build": "watch 'npm run build-js -- --source-maps' src",
@@ -16,7 +16,9 @@
     "ci-test": "npm run build && npm run test && standard && npm run test-coverage",
     "debug-test": "DEBUG=rss-o-bot RSS_O_BOT_TESTING_MODE=1 ava",
     "test-coverage": "nyc --include dist/ npm test && nyc report --reporter=text-lcov | coveralls",
-    "build-deps-graph": "madge -i ./src/docs/dependency-graph.svg src"
+    "build-deps-graph": "madge -i ./src/docs/dependency-graph.svg src",
+    "flow": "flow",
+    "flow-typed": "flow-typed"
   },
   "repository": "https://github.com/Kriegslustig/rss-o-bot.git",
   "author": "Kriegslustig <npm@ls7.ch>",
@@ -40,8 +42,11 @@
     "ava": "^0.15.2",
     "babel-cli": "^6.11.4",
     "babel-core": "^6.9.1",
+    "babel-plugin-transform-flow-strip-types": "^6.14.0",
     "babel-preset-es2015": "^6.9.0",
     "coveralls": "^2.11.9",
+    "flow-bin": "^0.32.0",
+    "flow-typed": "^2.0.0-beta.7",
     "nyc": "^7.0.0",
     "standard": "^8.0.0",
     "watch": "^0.18.0"
