@@ -1,4 +1,4 @@
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 
 module.exports = H => ({
   send: (privateKey, url, insecure = false) => message =>

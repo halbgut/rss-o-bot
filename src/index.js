@@ -4,7 +4,7 @@
  * The main function takes no parameters and simply runs
  * the daemon process.
  */
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 const debug = require('debug')('rss-o-bot')
 
 const Helpers = require('./lib/helpers')

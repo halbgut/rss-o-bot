@@ -1,4 +1,4 @@
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 const debug = require('debug')('rss-o-bot')
 
 const poll = require('./lib/poll')
@@ -6,7 +6,7 @@ const poll = require('./lib/poll')
 /* Extracts blog, link and title from a feed-item */
 const callbackWrapper = callback => ({ blogTitle, link, title }) =>
   callback(blogTitle, link, title)
-    .tap(() => debug('Sent notifications'))
+    .do(() => debug('Sent notifications'))
     .retry(2)
 
 module.exports = H => {
@@ -43,7 +43,7 @@ module.exports = H => {
           updateLatestLink(feed.get('id'), info.link).map(info)
         )
         .filter(() => feed.get('latestLink'))
-        .tap(({link}) => debug(`New URL: ${link}`))
+        .do(({link}) => debug(`New URL: ${link}`))
     )
   }
 

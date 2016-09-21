@@ -9,7 +9,7 @@ const urlUtil = require('url')
 const debug = require('debug')('rss-o-bot')
 
 const Feedparser = require('feedparser')
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 
 module.exports = H => {
   const get = (url, depth = 0) => O.create(o => {
@@ -27,23 +27,23 @@ module.exports = H => {
       let body = ''
       if (H.isResponseRedirect(res)) {
         if (depth > 10) { // maximum redirects
-          return o.onError(new Error('Maximum redirects reached'))
+          return o.error(new Error('Maximum redirects reached'))
         }
         get(res.headers.location, ++depth)
           .subscribe(
-            v => o.onNext(v),
-            err => o.onError(err),
-            v => o.onCompleted()
+            v => o.next(v),
+            err => o.error(err),
+            v => o.complete()
           )
       } else if (H.isResponseSuccessful(res)) {
         res.on('data', chunk => { body += chunk })
-        res.on('end', () => { o.onNext(body); o.onCompleted() })
-        res.on('error', err => o.onError(err))
+        res.on('end', () => { o.next(body); o.complete() })
+        res.on('error', err => o.error(err))
       } else {
-        o.onError(new Error(`Request failed: ${url} with ${res.statusCode}`))
+        o.error(new Error(`Request failed: ${url} with ${res.statusCode}`))
       }
     })
-      .on('error', err => o.onError(err))
+      .on('error', err => o.error(err))
       .end()
   })
 
@@ -53,11 +53,11 @@ module.exports = H => {
       const feedparser = new Feedparser()
       feedparser.write(xml)
       feedparser.end()
-      feedparser.on('error', err => o.onError(err))
+      feedparser.on('error', err => o.error(err))
       feedparser.on('data', data => stream.push(data))
       feedparser.on('end', function () {
-        o.onNext([stream, this.meta])
-        o.onCompleted()
+        o.next([stream, this.meta])
+        o.complete()
       })
     })
   }

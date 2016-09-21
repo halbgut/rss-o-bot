@@ -1,5 +1,5 @@
 const debug = require('debug')('rss-o-bot')
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 
 /**
  * OS specific approach. Works on MacOS but probably not

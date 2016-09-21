@@ -7,7 +7,7 @@
  * The executable configured by the package.
  */
 
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 const Immutable = require('immutable')
 const debug = require('debug')('rss-o-bot')
 
@@ -114,8 +114,8 @@ const commands = [
     true,
     state => O.create(o => {
       const packageInfo = require('../package.json')
-      o.onNext(`RSS-o-Bot Version: ${packageInfo.version}`)
-      o.onCompleted()
+      o.next(`RSS-o-Bot Version: ${packageInfo.version}`)
+      o.complete()
     })
   ],
   [

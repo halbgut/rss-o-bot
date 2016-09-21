@@ -6,7 +6,7 @@
  */
 const path = require('path')
 const Immutable = require('immutable')
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 
 module.exports = H => {
   const Config = {

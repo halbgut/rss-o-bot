@@ -1,4 +1,4 @@
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 let hasRun = false
 
 module.exports = config => (blogTitle, link, title) => {

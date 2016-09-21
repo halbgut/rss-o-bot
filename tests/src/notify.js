@@ -3,7 +3,7 @@
  */
 
 const { test } = require('ava')
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 
 const runCLI = require('../../dist/cli.js')
 const H = require('../../dist/lib/helpers')
@@ -47,7 +47,7 @@ test.cb('notifiers/poll-feeds order', t => {
     'notification-methods': [notify]
   })
   createDummyEntryAndPoll(config, url)
-    .tap(([latest]) => { latestItem = latest })
+    .do(([latest]) => { latestItem = latest })
     .flatMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
     .subscribe(
       () => {},
@@ -68,7 +68,7 @@ test.cb('poll-feeds multiple new posts', t => {
     'notification-methods': [notify]
   })
   createDummyEntryAndPoll(config, url, 3)
-    .tap(latest => { latestItems = latest.reverse() })
+    .do(latest => { latestItems = latest.reverse() })
     .flatMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
     .subscribe(
       () => {},

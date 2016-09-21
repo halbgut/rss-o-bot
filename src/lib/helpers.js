@@ -9,7 +9,7 @@ const path = require('path')
 const uuid = require('node-uuid')
 const R = require('ramda')
 const markedMan = require('marked-man')
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 const jwt = require('jsonwebtoken')
 const debug = require('debug')('rss-o-bot')
 
@@ -20,13 +20,13 @@ const Helpers = {
   /*
    * fs releated
    */
-  readFile: O.fromNodeCallback(fs.readFile),
-  writeFile: O.fromNodeCallback(fs.writeFile),
-  exec: O.fromNodeCallback(cp.exec),
-  stat: O.fromNodeCallback(fs.stat),
+  readFile: O.bindNodeCallback(fs.readFile),
+  writeFile: O.bindNodeCallback(fs.writeFile),
+  exec: O.bindNodeCallback(cp.exec),
+  stat: O.bindNodeCallback(fs.stat),
   isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')).map(() => path),
   isFile: path => Helpers.stat(path).map(Helpers.tryCall('isFile')).map(() => path),
-  mkdir: path => O.fromNodeCallback(fs.mkdir),
+  mkdir: path => O.bindNodeCallback(fs.mkdir),
   mkdirDeep: dirPath =>
     Helpers.isDirectory(dirPath)
       .flatMap(() => Helpers.mkdir(dirPath))
@@ -136,11 +136,11 @@ const Helpers = {
         } catch (e) {
           data = body
         }
-        o.onNext([data, respond])
+        o.next([data, respond])
       })
     })
     server.listen(port)
-    o.onNext(Helpers.serverStartup)
+    o.next(Helpers.serverStartup)
   }),
 
   httpPost: url => message => O.create(o => {
@@ -168,12 +168,12 @@ const Helpers = {
           } catch (e) {
             resData = body
           }
-          o.onNext(resData)
-          o.onCompleted()
+          o.next(resData)
+          o.complete()
         })
       }
     )
-    req.on('error', err => { o.onError(err) })
+    req.on('error', err => { o.error(err) })
     req.write(buffer)
     req.end()
   }),
@@ -198,9 +198,9 @@ const Helpers = {
       (err, data) => {
         if (err || !Helpers.isPayloadValid([data.jit, data.exp])) {
           // TODO Use Error.js here
-          return o.onError(err || new Error('Invalid jit'))
+          return o.error(err || new Error('Invalid jit'))
         } else {
-          o.onNext(data)
+          o.next(data)
         }
       }
     )
@@ -212,9 +212,9 @@ const Helpers = {
       privateKey,
       { algorithm: 'RS512' },
       (err, token) => {
-        if (err) return o.onError(err)
-        o.onNext(token)
-        o.onCompleted()
+        if (err) return o.error(err)
+        o.next(token)
+        o.complete()
       }
     )
   }),

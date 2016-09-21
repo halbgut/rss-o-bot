@@ -2,7 +2,7 @@ const fs = require('fs')
 
 const { test } = require('ava')
 const R = require('ramda')
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 const Immutable = require('immutable')
 
 const T = require('./lib/helpers')

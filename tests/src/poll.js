@@ -19,29 +19,29 @@ const allEntriesValid = t => entries =>
 
 test.cb('poll rss', t => T.testObservable(
   Poll('https://lucaschmid.net/feed/rss.xml', [])
-    .tap(allEntriesValid(t))
+    .do(allEntriesValid(t))
 )(t))
 
 test.cb('poll atom', t => T.testObservable(
   Poll('https://lucaschmid.net/feed/atom.xml', [])
-    .tap(allEntriesValid(t))
+    .do(allEntriesValid(t))
 )(t))
 
 test.cb('poll positive atom filter', t => T.testObservable(
   Poll('https://lucaschmid.net/feed/atom.xml', [['definetly not inside the feeds']])
-    .tap(entries => t.is(entries.length, 0))
+    .do(entries => t.is(entries.length, 0))
 )(t))
 
 test.cb('poll negative rss filter', t => T.testObservable(
   /* Testing inverted filters */
   Poll('https://lucaschmid.net/feed/rss.xml', [['a', true], ['e', true]])
-    .tap(entries => t.is(entries.length, 0))
+    .do(entries => t.is(entries.length, 0))
 )(t))
 
 test.cb('poll positive rss filter', t => T.testObservable(
   /* Testing inverted filters */
   Poll('https://lucaschmid.net/feed/rss.xml', [['a'], ['e']])
-    .tap(entries => t.true(entries.length > -1))
+    .do(entries => t.true(entries.length > -1))
 )(t))
 
 test.cb('poll case-sensitive positive rss filter', t => T.testObservable(
@@ -51,6 +51,6 @@ test.cb('poll case-sensitive positive rss filter', t => T.testObservable(
       /* I'm assuming, that all entries have some upper-case letters in them */
       Poll('https://lucaschmid.net/feed/rss.xml', [entries[0].title])
     )
-    .tap(entries => t.true(entries.length === 1))
+    .do(entries => t.true(entries.length === 1))
 )(t))
 

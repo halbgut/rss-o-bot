@@ -1,7 +1,7 @@
 const fs = require('fs')
 const { spawn } = require('child_process')
 
-const Rx = require('rx')
+const Rx = require('rxjs/Rx')
 const Immutable = require('immutable')
 const uuid = require('node-uuid')
 
@@ -119,8 +119,8 @@ const startServer =
       const msg = buff.toString()
       if (DEBUG) console.log(msg)
       if (msg === 'Symbol(startup)\n') {
-        subject.onNext(true)
-        subject.onCompleted()
+        subject.next(true)
+        subject.complete()
       }
     })
 
@@ -130,7 +130,7 @@ const startServer =
       if (DEBUG) console.error(msg)
       /* Ignore debug statements */
       if (msg.match(/ GMT rss\-o\-bot /)) return
-      subject.onError(msg)
+      subject.error(msg)
     })
 
     if (t) {

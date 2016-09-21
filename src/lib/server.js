@@ -1,4 +1,4 @@
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 const R = require('ramda')
 const debug = require('debug')('rss-o-bot')
 

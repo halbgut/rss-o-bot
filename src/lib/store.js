@@ -5,7 +5,7 @@
  * This allows users to use any DB they might want.
  */
 const uuid = require('node-uuid')
-const Rx = require('rx')
+const Rx = require('rxjs/Rx')
 const O = Rx.Observable
 const Sequelize = require('sequelize')
 const path = require('path')
@@ -27,7 +27,7 @@ module.exports = H => {
           .map(() => feed)
         : O.just(feed)
     )
-    .tap(feed => debug(`feed inserted: ${feed.get('url')}`))
+    .do(feed => debug(`feed inserted: ${feed.get('url')}`))
 
   // TODO: Data races have been prevented.
   // The updaterId is for reference inside the next select query

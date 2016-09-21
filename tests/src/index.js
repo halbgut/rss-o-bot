@@ -1,7 +1,7 @@
 const path = require('path')
 const { test } = require('ava')
 const sax = require('sax')
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 
 const runCLI = require('../../dist/cli.js')
 const H = require('../../dist/lib/helpers')
@@ -118,7 +118,7 @@ test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1
           .map(() => store)
       )
       .flatMap(({ listFeeds }) => listFeeds())
-      .tap(feeds =>
+      .do(feeds =>
         t.truthy(feeds[0].get('title') !== 'undefined')
       )
       .subscribe(
@@ -136,14 +136,14 @@ test.cb('export', T.run(['export'], false)((t, o, config) =>
     const parser = sax.parser(true)
     parser.onopentag = t => {
       if (t.name !== 'outline') return
-      o.onNext([t.attributes.xmlUrl || t.attributes.url, t.attributes.title])
+      o.next([t.attributes.xmlUrl || t.attributes.url, t.attributes.title])
     }
-    parser.onend = () => { o.onCompleted() }
-    parser.onerror = err => o.onError(err)
+    parser.onend = () => { o.complete() }
+    parser.onerror = err => o.error(err)
     parser.write(xmlExport).close()
   }))
     .withLatestFrom(T.getStoreAndListFeeds(config))
-    .tap(([ entry, list ]) => t.true(
+    .do(([ entry, list ]) => t.true(
       !!list.find(item =>
         item.get('url') === entry[0] &&
         (
@@ -157,7 +157,7 @@ test.cb('export', T.run(['export'], false)((t, o, config) =>
 const importFile = path.resolve(__dirname, '..', 'data', 'export.xml')
 test.cb('import', T.run(['import', importFile], 2)((t, o, config) =>
   o.flatMap(a => T.getStoreAndListFeeds(config).map(b => [a, b]))
-    .tap(([result, list]) => {
+    .do(([result, list]) => {
       t.deepEqual(2, result.split('\n').filter(x => !!x).length)
       t.true(
         list.filter(item =>

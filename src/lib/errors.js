@@ -1,4 +1,4 @@
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 
 const create = error => new Error(error)
 

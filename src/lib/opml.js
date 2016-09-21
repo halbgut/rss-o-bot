@@ -9,7 +9,7 @@ const sax = require('sax')
 const fs = require('fs')
 const xml = require('xml')
 const moment = require('moment')
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 
 module.exports = H => ({
   import (file) {
@@ -26,12 +26,12 @@ module.exports = H => ({
         saxStream.on('end', () =>
           O.forkJoin(tasks)
             .subscribe(
-              v => o.onNext(v),
-              err => o.onError(err),
-              () => o.onCompleted()
+              v => o.next(v),
+              err => o.error(err),
+              () => o.complete()
             )
         )
-        saxStream.on('error', err => o.onError(err))
+        saxStream.on('error', err => o.error(err))
       })
   },
 

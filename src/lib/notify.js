@@ -2,7 +2,7 @@
  * notifiy
  * This module notifies about new entries users.
  */
-const { Observable: O } = require('rx')
+const { Observable: O } = require('rxjs/Rx')
 const debug = require('debug')('rss-o-bot')
 
 module.exports = H => config => {
@@ -36,6 +36,6 @@ const getNotifierFunctions = (H, config, setMethods) =>
         .catch(() => { console.error(`Failed to load notifier ${module}`) })
         .filter(f => f) /* Exclude all notifiers, that weren't found */
         .map(f => f(config))
-        .tap(() => debug(`Successfully loaded notifier: ${module}`))
+        .do(() => debug(`Successfully loaded notifier: ${module}`))
   )
 
