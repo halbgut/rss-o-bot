@@ -14,6 +14,6 @@ module.exports = config => (blogTitle, link, title) => {
     t.end()
   }
   /* Ignore the actual notification */
-  return O.just(true)
+  return O.of(true)
 }
 

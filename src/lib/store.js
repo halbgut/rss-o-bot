@@ -25,7 +25,7 @@ module.exports = H => {
         ? O.forkJoin(filters.map(f => O.fromPromise(Filter.create(f))))
           .flatMap(filters => O.fromPromise(feed.addFilters(filters)))
           .map(() => feed)
-        : O.just(feed)
+        : O.of(feed)
     )
     .do(feed => debug(`feed inserted: ${feed.get('url')}`))
 

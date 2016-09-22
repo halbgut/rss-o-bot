@@ -125,7 +125,7 @@ const Helpers = {
         ])(data)
         res.writeHead(code, headers)
         res.end(body)
-        return O.just(true)
+        return O.of(true)
       }
       let body = ''
       req.on('data', data => { body += data })
