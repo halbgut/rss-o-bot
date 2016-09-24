@@ -68,7 +68,7 @@ test.cb('poll-feeds multiple new posts', t => {
     'notification-methods': [notify]
   })
   createDummyEntryAndPoll(config, url, 3)
-    .do(latest => { latestItems = latest.reverse() })
+    .do(latest => { latestItems = latest })
     .switchMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
     .subscribe(
       () => {},
