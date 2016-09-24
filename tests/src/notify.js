@@ -12,12 +12,12 @@ const T = require('./lib/helpers')
 
 const createDummyEntryAndPoll = (config, url, offset = 2) =>
   T.createDummyEntry(url, [], config, true)
-    .flatMap(([store, feed]) =>
+    .switchMap(([store, feed]) =>
       Poll(url, [])
         .map(entries => entries.slice(0, offset))
-        .flatMap(entries =>
+        .switchMap(entries =>
           store.updateLatestLink(feed.get('id'), entries[offset - 1].link)
-            .map(entries.slice(0, -1))
+            .mapTo(entries.slice(0, -1))
         )
     )
 
@@ -28,7 +28,7 @@ test.cb('notifier injection', t => {
   })
   global.NOTIFIER_TEST_OBJECT = t
   createDummyEntryAndPoll(config, url)
-    .flatMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
+    .switchMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
     .subscribe(
       () => {},
       T.handleError(t)
@@ -48,7 +48,7 @@ test.cb('notifiers/poll-feeds order', t => {
   })
   createDummyEntryAndPoll(config, url)
     .do(([latest]) => { latestItem = latest })
-    .flatMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
+    .switchMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
     .subscribe(
       () => {},
       T.handleError(t)
@@ -69,7 +69,7 @@ test.cb('poll-feeds multiple new posts', t => {
   })
   createDummyEntryAndPoll(config, url, 3)
     .do(latest => { latestItems = latest.reverse() })
-    .flatMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
+    .switchMap(() => runCLI(['node', '', 'poll-feeds'], null, config))
     .subscribe(
       () => {},
       T.handleError(t)

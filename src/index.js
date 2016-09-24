@@ -20,7 +20,7 @@ module.exports = function runRSSOBotDaemon (state) {
     O.interval(config.get('interval') * 1000).startWith(0)
   )
     .map(([store]) => store)
-    .flatMap(pollFeeds(Notify(config)))
+    .switchMap(pollFeeds(Notify(config)))
     /* Restart on error */
     .catch(err => {
       debug(state)

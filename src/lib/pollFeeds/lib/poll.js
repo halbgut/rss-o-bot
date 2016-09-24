@@ -87,7 +87,7 @@ module.exports = H => {
 
   const Poll = (url, filters) =>
     get(url)
-      .flatMap(parse)
+      .switchMap(parse)
       .map(([stream, meta]) => [
         stream.filter(applyFilters(filters)),
         meta

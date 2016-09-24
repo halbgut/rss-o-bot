@@ -34,7 +34,7 @@ module.exports = (H, {
       const exec = executeCommand(state, commands)
       return (
         H.httpServer(state.getIn(['configuration', 'port']))
-          .flatMap(x => {
+          .switchMap(x => {
             if (H.is('Symbol')(x)) return O.of(x)
             const [ data, respond ] = x
             const errRespond = err => {
@@ -51,13 +51,13 @@ module.exports = (H, {
             } else if (data.indexOf('PUBLIC KEY') > -1) {
               return (
                 savePublicKey(state.get('configuration'), state.get('publicKey'))(data)
-                  .flatMap(() => respond(200)({ output: 'Wrote public key.' }))
+                  .switchMap(() => respond(200)({ output: 'Wrote public key.' }))
                   .catch(errRespond)
               )
             } else {
               return (
                 H.verifyJwt(state.get('publicKey'))(data)
-                  .flatMap(R.cond([
+                  .switchMap(R.cond([
                     [
                       R.where({
                         command: H.is('String'),
@@ -65,7 +65,7 @@ module.exports = (H, {
                       }),
                       (command) =>
                         exec(command)
-                          .flatMap(output => respond(200)({ output }))
+                          .switchMap(output => respond(200)({ output }))
                     ],
                     [R.T, () => respond(500)({ error: NO_DATA_IN_REQUEST })]
                   ]))

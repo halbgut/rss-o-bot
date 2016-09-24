@@ -47,7 +47,7 @@ test.cb('poll positive rss filter', t => T.testObservable(
 test.cb('poll case-sensitive positive rss filter', t => T.testObservable(
   /* Testing inverted filters */
   Poll('https://lucaschmid.net/feed/rss.xml', [])
-    .flatMap(entries =>
+    .switchMap(entries =>
       /* I'm assuming, that all entries have some upper-case letters in them */
       Poll('https://lucaschmid.net/feed/rss.xml', [entries[0].title])
     )

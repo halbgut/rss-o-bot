@@ -86,7 +86,7 @@ const containsFeedUrl = (url, t) => feeds => {
 
 const getStoreAnd = cb => config =>
   initStore(config)
-    .flatMap(cb)
+    .switchMap(cb)
 
 const getStoreAndListFeeds = getStoreAnd(({ listFeeds }) => listFeeds())
 
@@ -101,7 +101,7 @@ const testObservable = o => t =>
 const createDummyEntry =
   (url, filters = [], config = getConfigWithDefaults(), storeAndEntity) =>
     initStore(config)
-      .flatMap(store =>
+      .switchMap(store =>
         store.insertFeed(url, filters)
           .map(feed => storeAndEntity ? [store, feed] : store)
       )

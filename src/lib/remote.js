@@ -7,6 +7,6 @@ module.exports = H => ({
         ? O.of(message)
         : H.signJwt(privateKey)(message)
     )
-    .flatMap(H.httpPost(url))
+    .switchMap(H.httpPost(url))
 })
 

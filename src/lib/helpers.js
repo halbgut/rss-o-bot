@@ -29,10 +29,10 @@ const Helpers = {
   mkdir: path => O.bindNodeCallback(fs.mkdir),
   mkdirDeep: dirPath =>
     Helpers.isDirectory(dirPath)
-      .flatMap(() => Helpers.mkdir(dirPath))
+      .switchMap(() => Helpers.mkdir(dirPath))
       .catch(() =>
         Helpers.mkdirDeep(path.normalize(`${dirPath}/..`))
-          .flatMap(() => Helpers.mkdir(dirPath))
+          .switchMap(() => Helpers.mkdir(dirPath))
       ),
 
   findExistingDirectory: strOrArrLocations => {
@@ -41,8 +41,8 @@ const Helpers = {
       : [strOrArrLocations]
     return (
       O.of(locations[0])
-        .flatMap(l => l
-          ? Helpers.isDirectory(l).flatMap(is => is
+        .switchMap(l => l
+          ? Helpers.isDirectory(l).switchMap(is => is
             ? O.of(l)
             : Helpers.findExistingDirectory(locations.slice(1))
           )

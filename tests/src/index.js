@@ -57,8 +57,8 @@ test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1
       t.deepEqual([title, setUrl, filters], ['undefined', url, filter])
       t.regex(id, /\d+/)
     })
-      .flatMap(() => initStore(config))
-      .flatMap(H.tryCall('getFeeds'))
+      .switchMap(() => initStore(config))
+      .switchMap(H.tryCall('getFeeds'))
       .map(T.containsFeedUrl(url, t))
   ))
 
@@ -66,8 +66,8 @@ test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1
     const config = T.getConfig()
     t.plan(1)
     initStore(T.toConfig(config))
-      .flatMap(H.tryCall('insertFeed', url, []))
-      .flatMap(() =>
+      .switchMap(H.tryCall('insertFeed', url, []))
+      .switchMap(() =>
         runCLI(['node', '', 'list'], null, config)
       )
       .map(T.parsePrintedFeeds)
@@ -85,16 +85,16 @@ test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1
     t.plan(1)
     const store$ = initStore(T.toConfig(config))
 
-    store$.flatMap(({ insertFeed, listFeeds }) =>
+    store$.switchMap(({ insertFeed, listFeeds }) =>
       insertFeed(rmTestURL, [])
-        .flatMap(listFeeds)
+        .switchMap(listFeeds)
         .map(feeds => feeds.filter(feed => feed.get('url') === rmTestURL))
         .map(feeds => feeds[0].get('id'))
-        .flatMap(feedId =>
+        .switchMap(feedId =>
           runCLI(['node', '', 'rm', feedId], null, config)
             .map(() => feedId)
         )
-        .flatMap(feedId =>
+        .switchMap(feedId =>
           listFeeds()
             .map(feeds =>
               t.deepEqual(feeds.filter(feed => feed.get('id') === feedId).length, 0)
@@ -113,11 +113,11 @@ test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1
   const url = 'https://lucaschmid.net/feed/rss.xml'
   test.cb('poll-feeds', t => {
     T.createDummyEntry(url)
-      .flatMap(store =>
+      .switchMap(store =>
         runCLI(['node', '', 'poll-feeds'], null, T.getConfig())
           .map(() => store)
       )
-      .flatMap(({ listFeeds }) => listFeeds())
+      .switchMap(({ listFeeds }) => listFeeds())
       .do(feeds =>
         t.truthy(feeds[0].get('title') !== 'undefined')
       )
@@ -132,7 +132,7 @@ test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1
 /* Checks if the exported elements contain all elements inside the feed list.
  */
 test.cb('export', T.run(['export'], false)((t, o, config) =>
-  o.flatMap(xmlExport => O.create(o => {
+  o.switchMap(xmlExport => O.create(o => {
     const parser = sax.parser(true)
     parser.onopentag = t => {
       if (t.name !== 'outline') return
@@ -156,7 +156,7 @@ test.cb('export', T.run(['export'], false)((t, o, config) =>
 
 const importFile = path.resolve(__dirname, '..', 'data', 'export.xml')
 test.cb('import', T.run(['import', importFile], 2)((t, o, config) =>
-  o.flatMap(a => T.getStoreAndListFeeds(config).map(b => [a, b]))
+  o.switchMap(a => T.getStoreAndListFeeds(config).map(b => [a, b]))
     .do(([result, list]) => {
       t.deepEqual(2, result.split('\n').filter(x => !!x).length)
       t.true(
@@ -170,8 +170,8 @@ test.cb('import', T.run(['import', importFile], 2)((t, o, config) =>
 
 test.cb('readConfig', t => {
   Config.readConfig([ `${__dirname}/../config/succeeding` ])
-    .flatMap(initStore)
-    .flatMap(({ listFeeds }) => listFeeds())
+    .switchMap(initStore)
+    .switchMap(({ listFeeds }) => listFeeds())
     .subscribe(
       res => { t.true(Array.prototype.isPrototypeOf(res)) },
       T.handleError(t),

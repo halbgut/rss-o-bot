@@ -30,34 +30,34 @@ const commands = [
     'add',
     args => !!args.get(0),
     state =>
-      O.of(state).flatMap(H.setUpEnv(initStore))
-        .flatMap(([{ insertFeed }, config, url, ...filters]) =>
+      O.of(state).switchMap(H.setUpEnv(initStore))
+        .switchMap(([{ insertFeed }, config, url, ...filters]) =>
           insertFeed(url, filters.map(H.transformFilter))
         )
         .map(f => [f])
-        .flatMap(H.printFeeds)
+        .switchMap(H.printFeeds)
   ],
   [
     'rm',
     args => !!args.get(0),
     state =>
-      O.of(state).flatMap(H.setUpEnv(initStore))
-        .flatMap(([{ removeFeed }, config, id]) => removeFeed(id))
+      O.of(state).switchMap(H.setUpEnv(initStore))
+        .switchMap(([{ removeFeed }, config, id]) => removeFeed(id))
   ],
   [
     'list',
     true,
     state =>
-      O.of(state).flatMap(H.setUpEnv(initStore))
-        .flatMap(([{ listFeeds }]) => listFeeds())
-        .flatMap(H.printFeeds)
+      O.of(state).switchMap(H.setUpEnv(initStore))
+        .switchMap(([{ listFeeds }]) => listFeeds())
+        .switchMap(H.printFeeds)
   ],
   [
     'poll-feeds',
     true,
     state =>
-      O.of(state).flatMap(H.setUpEnv(initStore))
-        .flatMap(([store, config]) =>
+      O.of(state).switchMap(H.setUpEnv(initStore))
+        .switchMap(([store, config]) =>
           require('.')
             .pollFeeds(Notify(config))(store, true)
         )
@@ -72,19 +72,19 @@ const commands = [
     'import',
     (args) => !!args.get(0),
     state =>
-      O.of(state).flatMap(H.setUpEnv(initStore))
+      O.of(state).switchMap(H.setUpEnv(initStore))
         .map(([store]) => store)
         // TODO: Perform readFile here instead of inside opml.import
-        .flatMap(opml.import(state.get('arguments').first()))
-        .flatMap(H.printFeeds)
+        .switchMap(opml.import(state.get('arguments').first()))
+        .switchMap(H.printFeeds)
   ],
   [
     'export',
     true,
     state =>
-      O.of(state).flatMap(H.setUpEnv(initStore))
+      O.of(state).switchMap(H.setUpEnv(initStore))
         .map(([ store ]) => store)
-        .flatMap(opml.export)
+        .switchMap(opml.export)
   ],
   [
     ['run'],
@@ -98,7 +98,7 @@ const commands = [
     true,
     state =>
       O.of(state)
-        .flatMap(H.buildMan)
+        .switchMap(H.buildMan)
         .map(({ synopsis }) => `${synopsis}Please refer to \`man rss-o-bot\`, \`rss-o-bot --manual\` or the README for further instructions.`)
   ],
   [
@@ -106,7 +106,7 @@ const commands = [
     true,
     state =>
       O.of(state)
-        .flatMap(H.buildMan)
+        .switchMap(H.buildMan)
         .map(({ raw }) => raw)
   ],
   [
@@ -123,10 +123,10 @@ const commands = [
     true,
     state =>
       O.of(state)
-        .flatMap(H.mkdirDeep(`${__dirname}/../dist/docs`))
+        .switchMap(H.mkdirDeep(`${__dirname}/../dist/docs`))
         .do(console.log)
-        .flatMap(H.buildMan)
-        .flatMap(({ man }) => H.writeFile(`${__dirname}/../dist/docs/rss-o-bot.1`, man))
+        .switchMap(H.buildMan)
+        .switchMap(({ man }) => H.writeFile(`${__dirname}/../dist/docs/rss-o-bot.1`, man))
         .map(() => 'Man built'),
     true
   ],
@@ -158,10 +158,10 @@ const commands = [
       const serverUrl = H.getRemoteUrl(state.get('configuration'))
       return (
         genKeys(state.get('configuration'))
-          .flatMap(() => getKeys(state))
+          .switchMap(() => getKeys(state))
           /* Send the public key to the server */
           .do(() => debug(`Sending public key to ${serverUrl}`))
-          .flatMap(([, pubK]) => remote.send(
+          .switchMap(([, pubK]) => remote.send(
             null,
             serverUrl,
             /* Do it insecurely */
@@ -190,7 +190,7 @@ const runCommand = state => {
     debug('Sending command as remote')
     return (
       H.readFile(H.privateKeyPath(config))
-        .flatMap(privK =>
+        .switchMap(privK =>
           remote.send(privK, H.getRemoteUrl(config))({
             command: state.get('command'),
             arguments: state.get('arguments').toJS()
@@ -225,7 +225,7 @@ const runCLI = (
     /* Extract arguments */
     .map(Argv.extractArguments)
     /* Get config */
-    .flatMap(state =>
+    .switchMap(state =>
       (config
         ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults)
         : Config.readConfig(state.getIn(['switches', 'config']) || configLocations)
@@ -243,7 +243,7 @@ const runCLI = (
       )
     )
     .map(H.getCommand(commands))
-    .flatMap(state =>
+    .switchMap(state =>
       state.get('mode') === 'server' ||
       state.get('mode') === 'remote'
         ? getKeys(state).map(([priv, pub]) =>
@@ -254,7 +254,7 @@ const runCLI = (
         : O.of(state)
     )
     /* Run command */
-    .flatMap(runCommand)
+    .switchMap(runCommand)
 
 module.exports = runCLI
 

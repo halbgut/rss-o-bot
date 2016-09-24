@@ -12,7 +12,7 @@ module.exports = H => config => {
   return (blog, link, title) =>
     /* Call all registered notifiers */
     O.merge(...notifierFunctions)
-      .flatMap(f => f(blog, link, title))
+      .switchMap(f => f(blog, link, title))
       /* The results should be ignored here */
       .last()
       .map(() => null)

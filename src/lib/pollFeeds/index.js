@@ -16,7 +16,7 @@ module.exports = H => {
    */
   const queryFeed = ({updateLatestLink, setBlogTitle}) => feed => {
     const feed$ = O.fromPromise(feed.getFilters())
-      .flatMap(filters =>
+      .switchMap(filters =>
         Poll(
           feed.get('url'),
           filters.map(f => [f.get('keyword'), f.get('kind')])
@@ -30,17 +30,17 @@ module.exports = H => {
       )
     return (
       feed$
-        .flatMap(getNewLinks(feed))
+        .switchMap(getNewLinks(feed))
         .filter(({link}) =>
           (link && link !== feed.get('latestLink')) || debug(`Old URL: ${link}`)
         )
-        .flatMap(info =>
+        .switchMap(info =>
           feed.get('blogTitle')
             ? O.of(info)
-            : setBlogTitle(feed.get('id'), info.blogTitle).map(info)
+            : setBlogTitle(feed.get('id'), info.blogTitle).mapTo(info)
         )
-        .flatMap(info =>
-          updateLatestLink(feed.get('id'), info.link).map(info)
+        .switchMap(info =>
+          updateLatestLink(feed.get('id'), info.link).mapTo(info)
         )
         .filter(() => feed.get('latestLink'))
         .do(({link}) => debug(`New URL: ${link}`))
@@ -56,7 +56,7 @@ module.exports = H => {
         e.link === feed.get('latestLink')
       )
       const newLinks = stream.slice(0, latestIndex).reverse()
-      return O.fromArray(newLinks)
+      return O.of(...newLinks)
     } else if (stream[0]) {
       return O.of(stream[0])
     } else if (stream.length < 1) {
@@ -68,9 +68,9 @@ module.exports = H => {
 
   const PollFeeds = callback => (store, force) =>
     store.getFeeds(force)
-      .flatMap(feeds =>
+      .switchMap(feeds =>
         O.merge(...feeds.map(queryFeed(store)))
-          .flatMap(callbackWrapper(callback))
+          .switchMap(callbackWrapper(callback))
       )
   return PollFeeds
 }

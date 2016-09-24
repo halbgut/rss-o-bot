@@ -15,7 +15,7 @@ const config = { mode: 'remote', remote: 'localhost', port: 3646, location: `${_
 
 test.before.cb(t => {
   genKeys(Immutable.Map(config))
-    .flatMap(() => T.startServer(config.port, config.location, test))
+    .switchMap(() => T.startServer(config.port, config.location, test))
     .do(() => t.end())
     .subscribe(
       () => {},
@@ -33,7 +33,7 @@ test.cb('genKeys', t => {
       T.run(['gen-keys'], 4)((t, o) =>
         o
           .do(x => t.is(x, 'Keys generated and public key transmitted to server.'))
-          .flatMap(() => O.combineLatest(
+          .switchMap(() => O.combineLatest(
             H.readFile(`${genKeysConfig.location}/priv.pem`),
             H.readFile(`${genKeysConfig.location}/pub.pem`),
             H.readFile(`${genKeysServerConfig.location}/pub.pem`)

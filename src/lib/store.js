@@ -20,10 +20,10 @@ module.exports = H => {
         blogTitle
       }
     ))
-    .flatMap(feed =>
+    .switchMap(feed =>
       filters.length > 0
         ? O.forkJoin(filters.map(f => O.fromPromise(Filter.create(f))))
-          .flatMap(filters => O.fromPromise(feed.addFilters(filters)))
+          .switchMap(filters => O.fromPromise(feed.addFilters(filters)))
           .map(() => feed)
         : O.of(feed)
     )
