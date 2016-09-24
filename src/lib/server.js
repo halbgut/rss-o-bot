@@ -23,9 +23,9 @@ module.exports = (H, {
     )
     if (!cState.get('command')) return throwO(UNKNOWN_COMMAND)
     return (
-      cState.get('localOnly') && command !== 'ping'
-        ? throwO(LOCAL_ONLY_COMMAND_ON_SERVER)
-        : cState.get('command')(state)
+      H.shouldRunOnServer(cState.get('scope'))
+        ? cState.get('command')(state)
+        : throwO(LOCAL_ONLY_COMMAND_ON_SERVER)
     )
   }
 

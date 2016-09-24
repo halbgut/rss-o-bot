@@ -148,7 +148,7 @@ const commands = [
         return O.of('pong')
       }
     },
-    true
+    H.scope.SHARED
   ],
   [
     'gen-keys',
@@ -174,7 +174,7 @@ const commands = [
           )
       )
     },
-    true
+    H.scope.LOCAL
   ]
 ]
 
@@ -182,7 +182,7 @@ const runCommand = state => {
   const mode = state.get('mode')
   const config = state.get('configuration')
   /* Execute the command locally */
-  if (mode === 'local' || state.get('localOnly')) {
+  if (mode === 'local' || H.shouldRunOnRemote(state.get('scope'))) {
     debug('Running command locally.')
     return state.get('command')(state)
   /* Send to a server */
@@ -211,8 +211,8 @@ const getKeys = state => {
   const config = state.get('configuration')
   return O.combineLatest(
     /* If a keyfile can't be opended, simply assume it isn't there */
-    H.readFile(H.privateKeyPath(config)).catch(O.of(undefined)),
-    H.readFile(H.publicKeyPath(config)).catch(O.of(undefined))
+    H.readFile(H.privateKeyPath(config)).catch(() => O.of(undefined)),
+    H.readFile(H.publicKeyPath(config)).catch(() => O.of(undefined))
   )
 }
 

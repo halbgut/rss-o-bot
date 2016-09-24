@@ -9,6 +9,7 @@ const { Observable: O } = require('rxjs/Rx')
 const genKeys = (H, Errors) => config => {
   const privateKeyPath = H.privateKeyPath(config)
   const publicKeyPath = H.publicKeyPath(config)
+  debug('Attempting to generate key pair.')
   return (
     H.exec(`openssl genrsa -out ${privateKeyPath} 4096`)
       .delay(100)

@@ -157,7 +157,6 @@ const Helpers = {
         }
       },
       res => {
-        console.log('waiting for response')
         let body = ''
         res.setEncoding('UTF-8')
         res.on('data', data => { body += data })
@@ -269,14 +268,14 @@ const Helpers = {
   getCommand: commands => state => {
     const command = Helpers.findCommand(commands, state.get('action'), state.get('arguments'))
     if (!command) throw new Error(`No such command: ${state.get('action')}`)
-    debug(`Running command ${command[0]}`)
+    debug(`Running command ${command[0]}.`)
     return Helpers.setCommandState(state)(command)
   },
 
   setCommandState: state => command =>
     state
       .set('command', Helpers.tryGet(2)(command))
-      .set('localOnly', Helpers.tryGet(3)(command)),
+      .set('scope', Helpers.tryGet(3)(command)),
 
   findCommand: (commands, action, args) =>
     commands.find(([command, validator, run]) =>
@@ -307,7 +306,24 @@ const Helpers = {
    * Primitives manipulation
    */
   includesUpperCase: str => !!str.match(/[A-Z]/),
-  is: type => R.pipe(R.type, R.equals(type))
+  is: type => R.pipe(R.type, R.equals(type)),
+
+  /*
+   * Scopes; meaning where to execute a commmand.
+   * When running command in remote-mode, that code is normally just executed on the server.
+   * Some can always be run locally though, avoiding unnecessary network traffic.
+   */
+  scope: {
+    SHARED: Symbol('scope: shared'),
+    LOCAL: Symbol('scope: local'),
+    SERVER: Symbol('scope: local')
+  },
+  shouldRunOnRemote: scope =>
+    scope === Helpers.scope.SHARED ||
+    scope === Helpers.scope.LOCAL,
+  shouldRunOnServer: scope =>
+    scope === Helpers.scope.SHARED ||
+    scope === Helpers.scope.SERVER
 }
 
 module.exports = Helpers
