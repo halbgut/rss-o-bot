@@ -2,4 +2,8 @@
 *.map
 /data.sqlite
 /config.json
+/decls
+/flow-typed
+/logo_rss-o-bot.svg
+/.*
 
