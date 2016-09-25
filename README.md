@@ -18,10 +18,6 @@ Refer to the [man-page on Github](https://github.com/Kriegslustig/rss-o-bot/blob
 
 ## Installation
 
-RSS-o-Bot can be run in two modes; remote and local. The former is meant for running RSS-o-Bot on a server and controlling it from your local machine. Local mode is preferred, since it's a lot simpler to use.
-
-### Local Mode Installation
-
 ```bash
 npm i -g rss-o-bot
 npm i -g rss-o-bot-email # A notifier
@@ -40,27 +36,6 @@ Your RSS-o-Bot, will search for a configuration file here: `~/.rss-o-bot/config.
 
 By default rss-o-bot stores its data inside a SQLite database in `~/.rss-o-bot/feeds.sqlite`.
 
-### Remote Mode Installation
-
-Installing RSS-o-Bot on a remote Server is a bit more complex. You'll first need to create you're configuration files. The local configuration is pretty simple:
-
-```json
-{
-  "remote": "[URL]"
-}
-```
-
-The configuration options on the server is basically the same as for a local install one.
-
-```json
-{
-  "mode": "server",
-  ...
-}
-```
-
-For other configuration options, refer to the installation guide for the local version or the man-page.
-
 ## Usage
 
 First, let's add a feed:
@@ -69,14 +44,14 @@ First, let's add a feed:
 $ rss-o-bot add https://github.com/kriegslustig/rss-o-bot/commits/master.atom
 ```
 
-That feed might might get a bit busy. So let's say, we only care about changes in the notification system. To add a filter, we'll first need to delete the old feed. To do that, we'll need to know its ID.
+When we now list all feeds, the one we added, is displayed.
 
 ```bash
 $ rss-o-bot list
-1 https://github.com/kriegslustig/rss-o-bot/commits/master.atom
+1: null - https://github.com/kriegslustig/rss-o-bot/commits/master.atom -
 ```
 
-The first column in the output of `rss-o-bot list` denotes the ID. So let's remove it:
+The first column in the output of `rss-o-bot list` is the feeds IDs. The second shows the title. It's `null` right now, because 
 
 ```bash
 $ rss-o-bot rm 1
@@ -131,8 +106,8 @@ Logo created by [mala23](https://github.com/mala23)
 
 ## TODO
 
+* remove callback from pollFeeds
 * use flow
-* upgrade rx
 * Document the installation options somewhere else
 * Test the docker container
 * Completions
