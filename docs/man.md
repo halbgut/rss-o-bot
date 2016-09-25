@@ -78,6 +78,35 @@ An object containing information on the database. It must include a `name` prope
 }
 ```
 
+## Remote-Mode
+The RSS-o-Bot daemon can be run on a remote machine (as a server) and controlled through the local installation. The installation isn't as straight forward as the simple _local-mode_ install. A quick note on terminology; *remote* refers to the local installation and server refers to the daemon running somewhere else.
+
+### Install
+First, let's set up the remote (local installation). Simply install it using `NPM`. Now let's configure it. Create a file `~/.rss-o-bot/config.json`. It should contain the following:
+
+```
+{
+  "remote": "my.fancy-server.co"
+}
+```
+
+Fill in the address of your server in the `remote`-field. It may contain a domain or an IP. You can also use a `port`-field to set the remote to communicate with something other than the default port (3645). If you have any questions regarding configuration, please checkout the JSON-Schema in docs/config.schema.json first.
+
+Then on your server, install `RSS-o-Bot`, the same way. Then configure it, as you would in the local-mode installation and add the following field:
+
+```
+{
+  ...
+  "mode": "server"
+}
+```
+
+Then run the server as a daemon as described in the README.
+
+The communication between remote and server is simple HTTP. To secure it, all messages from remote to server is signed and verified using an asymetric cypher. These messages **are not encrypted** and communication from server to client is **not signed**. Only commands sent from remote to server are signed. That means, that anyone can listen in. So It's advisable to run an RSS-o-Bot server behind a TLS-enabled SSH proxy.
+
+For that asymetric signiture to work, a keypair needs to be generated and a public key communicated to the server. RSS-o-Bot provides an easy to use command for that. After configuring both server and remote and having started the server daemon, you can simply run `rss-o-bot gen-keys` on the remote. This command assumes that you are either using TLS (as described in the last paragraph) or are trusting the connection. If a MitM may intercept the public key and send his own along, defeating the signature/verification process insecure.
+
 ## AUTHORS
 Kriegslustig <npm@ls7.ch>
 
