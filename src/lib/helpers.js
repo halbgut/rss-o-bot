@@ -24,12 +24,11 @@ const Helpers = {
   writeFile: O.bindNodeCallback(fs.writeFile),
   exec: O.bindNodeCallback(cp.exec),
   stat: O.bindNodeCallback(fs.stat),
-  isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')).map(() => path),
+  isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')).mapTo(path),
   isFile: path => Helpers.stat(path).map(Helpers.tryCall('isFile')).map(() => path),
-  mkdir: path => O.bindNodeCallback(fs.mkdir),
+  mkdir: O.bindNodeCallback(fs.mkdir),
   mkdirDeep: dirPath =>
     Helpers.isDirectory(dirPath)
-      .switchMap(() => Helpers.mkdir(dirPath))
       .catch(() =>
         Helpers.mkdirDeep(path.normalize(`${dirPath}/..`))
           .switchMap(() => Helpers.mkdir(dirPath))

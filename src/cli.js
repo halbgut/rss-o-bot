@@ -130,8 +130,7 @@ const commands = [
     true,
     state =>
       O.of(state)
-        .switchMap(H.mkdirDeep(`${__dirname}/../dist/docs`))
-        .do(console.log)
+        .switchMap(() => H.mkdirDeep(`${__dirname}/../dist/docs`))
         .switchMap(H.buildMan)
         .switchMap(({ man }) => H.writeFile(`${__dirname}/../dist/docs/rss-o-bot.1`, man))
         .map(() => 'Man built'),
