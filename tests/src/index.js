@@ -54,7 +54,7 @@ test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1
   test.cb('add', T.run(['add', url, filter], 3)((t, o, config) =>
     o.map(feed => {
       const [id, title, setUrl, filters] = T.parsePrintedFeeds(feed)[0]
-      t.deepEqual([title, setUrl, filters], ['undefined', url, filter])
+      t.deepEqual([title, setUrl, filters], ['Luca Nils Schmid - Blog', url, filter])
       t.regex(id, /\d+/)
     })
       .switchMap(() => initStore(config))

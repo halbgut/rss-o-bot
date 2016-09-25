@@ -258,7 +258,7 @@ const Helpers = {
     )
       .map(feeds =>
         feeds.map(([id, blogTitle, url, filters]) =>
-          `${id}: ${blogTitle} - ${url} - ${filters}\n`
+          `${id}: ${blogTitle} | ${url} | ${filters}\n`
         ).join('')
       ),
 

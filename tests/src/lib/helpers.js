@@ -69,7 +69,7 @@ const parsePrintedFeeds = feeds =>
         return false
       } else {
         const [id, rest] = feed.split(': ')
-        const [title, setUrl, filters] = rest.split(' - ')
+        const [title, setUrl, filters] = rest.split(' | ')
         return [id, title, setUrl, filters]
       }
     })

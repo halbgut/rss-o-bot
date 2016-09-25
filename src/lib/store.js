@@ -4,11 +4,12 @@
  * by this module. They are made through sequelize.
  * This allows users to use any DB they might want.
  */
+const path = require('path')
 const uuid = require('node-uuid')
 const Rx = require('rxjs/Rx')
 const O = Rx.Observable
 const Sequelize = require('sequelize')
-const path = require('path')
+const R = require('ramda')
 const debug = require('debug')('rss-o-bot')
 
 module.exports = H => {
@@ -118,7 +119,8 @@ module.exports = H => {
             updateLatestLink: genUpdateLatestLink(Feed),
             removeFeed: genRemoveFeed(Feed),
             listFeeds: genListFeeds(Feed),
-            setBlogTitle: genSetBlogTitle(Feed)
+            setBlogTitle: genSetBlogTitle(Feed),
+            findById: R.unary(Feed.findById.bind(Feed))
           }
         })
     )

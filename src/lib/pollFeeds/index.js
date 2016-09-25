@@ -72,6 +72,7 @@ module.exports = H => {
         O.merge(...feeds.map(queryFeed(store)))
           .switchMap(callbackWrapper(callback))
       )
+  PollFeeds.queryFeed = queryFeed
   return PollFeeds
 }
 

@@ -18,6 +18,7 @@ const initStore = require('./lib/store')(H)
 const Notify = require('./lib/notify')(H)
 const opml = require('./lib/opml')(H)
 const remote = require('./lib/remote')(H)
+const pollFeeds = require('./lib/pollFeeds')(H)
 const Server = require('./lib/server')(H, Errors)
 const genKeys = require('./lib/gen-keys')(H, Errors)
 
@@ -31,9 +32,15 @@ const commands = [
     args => !!args.get(0),
     state =>
       O.of(state).switchMap(H.setUpEnv(initStore))
-        .switchMap(([{ insertFeed }, config, url, ...filters]) =>
-          insertFeed(url, filters.map(H.transformFilter))
+        .switchMap(([store, config, url, ...filters]) =>
+          store.insertFeed(url, filters.map(H.transformFilter))
+            .switchMap(feed =>
+              pollFeeds.queryFeed(store)(feed)
+                .defaultIfEmpty(feed.get('id'))
+            )
+            .switchMap(store.findById)
         )
+
         .map(f => [f])
         .switchMap(H.printFeeds)
   ],
