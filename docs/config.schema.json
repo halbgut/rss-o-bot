@@ -59,8 +59,7 @@
     },
     "remote": {
       "type": "string",
-      "description": "The hostname (most likely the domain) of the RSS-O-Bot server",
-      "format": "hostname"
+      "description": "The hostname or IP of the RSS-O-Bot server"
     }
   }
 }
