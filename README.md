@@ -106,6 +106,7 @@ Logo created by [mala23](https://github.com/mala23)
 
 ## TODO
 
+* test schema against config and cache result. (use hashing function to check if config has changed. store the hash inside a cache table. Also, add a test-config command)
 * remove callback from pollFeeds
 * use flow
 * Document the installation options somewhere else
