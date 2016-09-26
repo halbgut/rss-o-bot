@@ -73,7 +73,7 @@ const commands = [
     'test-notification',
     true,
     state =>
-      Notify(state.get('config'))('Test', state.get('arguments').first() || 'test', 'Test Title')
+      Notify(state.get('configuration'))('Test', state.get('arguments').first() || 'test', 'Test Title')
   ],
   [
     'import',
