@@ -34,21 +34,13 @@ const Helpers = {
           .switchMap(() => Helpers.mkdir(dirPath))
       ),
 
-  findExistingDirectory: strOrArrLocations => {
-    const locations = Array.prototype.isPrototypeOf(strOrArrLocations)
-      ? strOrArrLocations
-      : [strOrArrLocations]
-    return (
-      O.of(locations[0])
-        .switchMap(l => l
-          ? Helpers.isDirectory(l).switchMap(is => is
-            ? O.of(l)
-            : Helpers.findExistingDirectory(locations.slice(1))
-          )
-          : O.throw('None of those directories exist')
-        )
-    )
-  },
+  findExistingDirectory: loc =>
+    O.onErrorResumeNext(
+      ...(
+        (R.is(Array, loc) ? loc : [loc])
+          .map(l => Helpers.isDirectory(l))
+      )
+    ).catch(() => O.throw('None of those directories exist')),
 
   /*
    * Functional helpers
