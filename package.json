@@ -19,7 +19,8 @@
     "build-deps-graph": "madge -i ./src/docs/dependency-graph.svg src",
     "ava": "RSS_O_BOT_TESTING_MODE=1 ava",
     "flow": "flow",
-    "flow-typed": "flow-typed"
+    "flow-typed": "flow-typed",
+    "prepublish": "npm run --silent build"
   },
   "repository": "https://github.com/Kriegslustig/rss-o-bot.git",
   "author": "Kriegslustig <npm@ls7.ch>",
