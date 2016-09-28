@@ -36,11 +36,14 @@ const Helpers = {
 
   findExistingDirectory: loc =>
     O.onErrorResumeNext(
-      ...(
-        (R.is(Array, loc) ? loc : [loc])
-          .map(l => Helpers.isDirectory(l))
-      )
-    ).catch(() => O.throw('None of those directories exist')),
+      ...(R.is(Array, loc) ? loc : [loc])
+        .map(Helpers.isDirectory)
+    )
+      .defaultIfEmpty(false)
+      .filter(x => {
+        if (!x) throw new Error('None of those directories exist')
+        return true
+      }),
 
   /*
    * Functional helpers
