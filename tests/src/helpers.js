@@ -3,22 +3,20 @@
  */
 const { test } = require('ava')
 const { findExistingDirectory } = require('../../src/lib/helpers')
+const { Observable: O } = require('rxjs/Rx')
 
-test.cb(t => {
+test('findExistingDirectory positive', t =>
   findExistingDirectory(['./not/a/directory', '.'])
     .do(f => {
       t.is(f, '.')
     })
-    .subscribe(
-      () => {},
-      (err) => {
-        console.error(err)
-        t.fail('')
-        t.end()
-      },
-      () => {
-        t.end()
-      }
-    )
-})
+)
+
+test('findExistingDirectory negative', t =>
+  findExistingDirectory(['./not/a/directory'])
+    .catch(() => {
+      t.pass()
+      return O.empty()
+    })
+)
 
