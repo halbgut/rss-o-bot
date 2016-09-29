@@ -33,8 +33,11 @@ const getNotifierFunctions = (H, config, setMethods) =>
         O.of(`rss-o-bot-${module}`).map(require),
         H.isDirectory(module).map(require)
       )
-        .catch(() => { console.error(`Failed to load notifier ${module}`) })
-        .filter(f => f) /* Exclude all notifiers, that weren't found */
+        .defaultIfEmpty()
+        .filter(x => {
+          if (!x) throw new Error(`Failed to load notifier ${module}`)
+          return true
+        })
         .map(f => f(config))
         .do(() => debug(`Successfully loaded notifier: ${module}`))
   )
