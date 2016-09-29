@@ -322,7 +322,7 @@ const Helpers = {
   /*
    * Others
    */
-  getNpmPrefix: () => Helpers.exec('npm', ['config', 'get', 'prefix'])
+  getNpmPrefix: () => Helpers.exec('npm config get prefix').map(l => `${l[0].trim()}/lib/node_modules/`)
 }
 
 module.exports = Helpers
