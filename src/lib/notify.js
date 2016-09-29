@@ -15,7 +15,6 @@ module.exports = H => config => {
       .switchMap(f => f(blog, link, title))
       /* The results should be ignored here */
       .last()
-      .map(() => null)
 }
 
 const getNotifierFunctions = (H, config, setMethods) =>
@@ -27,11 +26,13 @@ const getNotifierFunctions = (H, config, setMethods) =>
     typeof module === 'function'
       ? O.of(module(config))
       : O.onErrorResumeNext(
-        H.isDirectory(`${__dirname}/../../../rss-o-bot-${module}`).map(require),
-        H.isDirectory(`${__dirname}/../../../${module}`).map(require),
-        O.of(module).map(require),
-        O.of(`rss-o-bot-${module}`).map(require),
-        H.isDirectory(module).map(require)
+        H.isDirectory(module).map(require),
+        H.getNpmPrefix()
+          .switchMap(prefix =>
+            H.isDirectory(`${prefix}/${module}`)
+              .catch(() => H.isDirectory(`${prefix}/rss-o-bot-${module}`))
+              .map(require)
+          )
       )
         .defaultIfEmpty()
         .filter(x => {

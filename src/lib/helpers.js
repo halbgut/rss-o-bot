@@ -317,7 +317,12 @@ const Helpers = {
     scope === Helpers.scope.LOCAL,
   shouldRunOnServer: scope =>
     scope === Helpers.scope.SHARED ||
-    scope === Helpers.scope.SERVER
+    scope === Helpers.scope.SERVER,
+
+  /*
+   * Others
+   */
+  getNpmPrefix: () => Helpers.exec('npm', ['config', 'get', 'prefix'])
 }
 
 module.exports = Helpers
