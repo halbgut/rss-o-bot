@@ -2,7 +2,7 @@
  * Tests for helpers.js
  */
 const { test } = require('ava')
-const { findExistingDirectory } = require('../../src/lib/helpers')
+const { findExistingDirectory } = require('../../dist/lib/helpers')
 const { Observable: O } = require('rxjs/Rx')
 
 test('findExistingDirectory positive', t =>
