@@ -74,6 +74,7 @@ const commands = [
     true,
     state =>
       Notify(state.get('configuration'))('Test', state.get('arguments').first() || 'test', 'Test Title')
+        .mapTo('Successfully sent test notification.')
   ],
   [
     'import',
