@@ -20,7 +20,7 @@ const Argv = {
       },
       Immutable.Map({})
     )
-    return Immutable.fromJS({ action: argv[2], arguments: args, switches })
+    return Immutable.fromJS({ action: argv[2] || 'run', arguments: args, switches })
   }
 }
 
