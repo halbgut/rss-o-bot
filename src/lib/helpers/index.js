@@ -12,6 +12,8 @@ const markedMan = require('marked-man')
 const { Observable: O } = require('rxjs/Rx')
 const jwt = require('jsonwebtoken')
 const debug = require('debug')('rss-o-bot')
+const ObservableOperators = require('./lib/observable-operators')
+ObservableOperators(O)
 
 const domainRegex = '([\\w\\d-]+\\.)+\\w{2,}'
 const protoRegex = '\\w+:\\/\\/'
@@ -35,15 +37,11 @@ const Helpers = {
       ),
 
   findExistingDirectory: loc =>
-    O.onErrorResumeNext(
+    O.onErrorResumeNextT(
       ...(R.is(Array, loc) ? loc : [loc])
         .map(Helpers.isDirectory)
     )
-      .defaultIfEmpty(false)
-      .filter(x => {
-        if (!x) throw new Error('None of those directories exist')
-        return true
-      }),
+      .catch(() => O.throw(new Error('None of those directories exist'))),
 
   /*
    * Functional helpers
