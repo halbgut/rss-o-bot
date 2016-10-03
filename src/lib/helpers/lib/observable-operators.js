@@ -6,8 +6,7 @@
 const { Observable: O } = require('rxjs')
 
 module.exports = (Observable: typeof O) => {
-  const NewObservable = Object.create(Observable)
-  NewObservable.onErrorResumeNextT = (...observables) =>
+  Observable.onErrorResumeNextT = (...observables) =>
     O.onErrorResumeNext(...observables)
       .defaultIfEmpty(false)
       .flatMap(x => x

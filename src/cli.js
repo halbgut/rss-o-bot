@@ -182,6 +182,12 @@ const commands = [
       )
     },
     H.scope.LOCAL
+  ],
+  [
+    'test-config',
+    true,
+    state => O.of(Config.validate(state.get('configuration').toJS())),
+    H.scope.LOCAL
   ]
 ]
 

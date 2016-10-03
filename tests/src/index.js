@@ -48,6 +48,14 @@ test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1
   })
 ))
 
+test.cb('test-config true', T.run(['test-config', `--config=${__dirname}/../config/succeeding`], 1, false)((t, o) =>
+  o.map(x => t.truthy(x))
+))
+
+test.cb('test-config false', T.run(['test-config', `--config=${__dirname}/../config/invalid`], 1, false)((t, o) =>
+  o.map(x => t.falsy(x))
+))
+
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
   const filter = 'somefilter'
