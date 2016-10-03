@@ -34,7 +34,9 @@ Your RSS-o-Bot, will search for a configuration file here: `~/.rss-o-bot/config.
 }
 ```
 
-By default rss-o-bot stores its data inside a SQLite database in `~/.rss-o-bot/feeds.sqlite`.
+By default rss-o-bot stores its data inside a SQLite database in `~/.rss-o-bot/feeds.sqlite`. But you may configure it as you want (see man-page).
+
+After creating the configuration file you can validate it using `rss-o-bot test-config`.
 
 ## Usage
 

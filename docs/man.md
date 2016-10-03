@@ -45,6 +45,9 @@ Exports the RSS feeds as OPML to STDOUT. The export does not include the defined
 ### poll-feeds
 Triggers a poll of all feeds in the database.
 
+### test-config
+Validates the configuration file against a JSON Schema.
+
 ## DEBUGGING
 To enter the debugging mode, you'll need to set the `DEBUG` environment variable to a list including `rss-o-bot`. For example:
 
