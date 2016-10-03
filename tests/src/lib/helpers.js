@@ -133,12 +133,6 @@ const startServer =
       subject.error(msg)
     })
 
-    if (t) {
-      t.after.always(() => {
-        server.kill()
-      })
-    }
-
     process.on('exit', () => {
       if (!server.killed) server.kill()
     })
