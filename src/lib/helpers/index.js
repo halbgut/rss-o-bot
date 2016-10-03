@@ -215,11 +215,11 @@ const Helpers = {
    */
   buildMan: state =>
     O.forkJoin(
-      Helpers.readFile(`${__dirname}/../../docs/man.md`),
-      Helpers.readFile(`${__dirname}/../../docs/synopsis.md`)
+      Helpers.readFile(`${__dirname}/../../../docs/man.md`),
+      Helpers.readFile(`${__dirname}/../../../docs/synopsis.md`)
     )
       .map(([f1, f2]) => [f1.toString(), f2.toString()])
-      .map(args => [...args, require('../../package.json')])
+      .map(args => [...args, require('../../../package.json')])
       .map(([raw, synopsis, packageInfo]) => [
         raw, synopsis, packageInfo,
         raw
