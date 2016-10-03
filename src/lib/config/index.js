@@ -7,6 +7,9 @@
 const path = require('path')
 const Immutable = require('immutable')
 const { Observable: O } = require('rxjs/Rx')
+const jsonSchema = require('json-schema')
+
+const configSchema = require('./config.schema')
 
 module.exports = H => {
   const Config = {
@@ -60,7 +63,9 @@ module.exports = H => {
           H.readFile(`${location}/${Config.filename}`)
             .map(Config.parse(location))
             .map(Config.applyDefaults)
-        )
+        ),
+
+    validate: (config) => jsonSchema(config, configSchema)
   }
 
   return Config

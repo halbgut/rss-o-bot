@@ -1,11 +1,13 @@
 /**
  * ObservableOperators
  * Attaches helper operators to the passed `Observable`s prototype
+ * @flow
  */
 const { Observable: O } = require('rxjs')
 
-module.exports = (Observable: O) => {
-  Observable.onErrorResumeNextT = (...observables) =>
+module.exports = (Observable: typeof O) => {
+  const NewObservable = Object.create(Observable)
+  NewObservable.onErrorResumeNextT = (...observables) =>
     O.onErrorResumeNext(...observables)
       .defaultIfEmpty(false)
       .flatMap(x => x
