@@ -3,7 +3,7 @@ const H = require('../../dist/lib/helpers')
 const Config = require('../../dist/lib/config')(H)
 
 test('validate empty', t => t.truthy(
-  Config.validate({}).valid
+  Config.validate({})
 ))
 
 test('validate full', t => t.truthy(
@@ -13,7 +13,7 @@ test('validate full', t => t.truthy(
       'dialect': 'sqlite',
       'storage': '~/.rss-o-bot/feeds.sqlite'
     }
-  }).valid
+  })
 ))
 
 test('validate extended', t => t.truthy(
@@ -24,6 +24,6 @@ test('validate extended', t => t.truthy(
       'storage': '~/.rss-o-bot/feeds.sqlite'
     },
     'undefined': ''
-  }).valid
+  })
 ))
 

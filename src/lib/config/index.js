@@ -65,7 +65,7 @@ module.exports = H => {
             .map(Config.applyDefaults)
         ),
 
-    validate: (config) => jsonSchema(config, configSchema)
+    validate: (config) => jsonSchema(config, configSchema).valid
   }
 
   return Config
