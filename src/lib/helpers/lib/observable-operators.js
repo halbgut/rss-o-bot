@@ -12,5 +12,8 @@ module.exports = (Observable: O) => {
         ? O.of(x)
         : O.throw()
       )
+  Observable.prototype.log = function (str) {
+    return this.do(x => console.log(str || x))
+  }
 }
 
