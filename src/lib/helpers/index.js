@@ -12,6 +12,8 @@ const markedMan = require('marked-man')
 const { Observable: O } = require('rxjs/Rx')
 const jwt = require('jsonwebtoken')
 const debug = require('debug')('rss-o-bot')
+const CliTable = require('cli-table2')
+
 const ObservableOperators = require('./lib/observable-operators')
 ObservableOperators(O)
 
@@ -248,11 +250,11 @@ const Helpers = {
         ])
       ))
     )
-      .map(feeds =>
-        feeds.map(([id, blogTitle, url, filters]) =>
-          `${id}: ${blogTitle} | ${url} | ${filters}\n`
-        ).join('')
-      ),
+      .map(feeds => {
+        const table = new CliTable({ head: [ 'ID', 'Title', 'URL', 'Filters' ] })
+        table.push(...feeds)
+        return table.toString()
+      }),
 
   /*
    * Helpers for finding commands
