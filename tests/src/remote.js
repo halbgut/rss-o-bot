@@ -20,7 +20,6 @@ test.before.cb(t => {
     .subscribe(
       () => {},
       err => {
-        console.error(err)
         t.fail(err)
       }
     )
