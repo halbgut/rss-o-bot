@@ -12,23 +12,27 @@ const Sequelize = require('sequelize')
 const R = require('ramda')
 const debug = require('debug')('rss-o-bot')
 
-module.exports = H => {
-  const genInsertFeed = (Feed, Filter) => (url, filters, blogTitle) =>
-    O.fromPromise(Feed.create(
-      {
-        url,
-        lastCheck: 0,
-        blogTitle
-      }
-    ))
-    .switchMap(feed =>
-      filters.length > 0
-        ? O.forkJoin(filters.map(f => O.fromPromise(Filter.create(f))))
-          .switchMap(filters => O.fromPromise(feed.addFilters(filters)))
-          .map(() => feed)
-        : O.of(feed)
+module.exports = (H, E) => {
+  const genInsertFeed = (Feed, Filter) => (url, filters, blogTitle) => {
+    if (!H.isValidUrl(url)) return E.throwO(E.INVALID_URL)
+    return (
+      O.fromPromise(Feed.create(
+        {
+          url,
+          lastCheck: 0,
+          blogTitle
+        }
+      ))
+      .switchMap(feed =>
+        filters.length > 0
+          ? O.forkJoin(filters.map(f => O.fromPromise(Filter.create(f))))
+            .switchMap(filters => O.fromPromise(feed.addFilters(filters)))
+            .map(() => feed)
+          : O.of(feed)
+      )
+      .do(feed => debug(`feed inserted: ${feed.get('url')}`))
     )
-    .do(feed => debug(`feed inserted: ${feed.get('url')}`))
+  }
 
   // TODO: Data races have been prevented.
   // The updaterId is for reference inside the next select query

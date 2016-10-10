@@ -6,6 +6,7 @@ const fs = require('fs')
 const http = require('http')
 const cp = require('child_process')
 const path = require('path')
+const url = require('url')
 const uuid = require('node-uuid')
 const R = require('ramda')
 const markedMan = require('marked-man')
@@ -88,6 +89,11 @@ const Helpers = {
   /*
    * URL manipulation
    */
+
+  /* Simply interpret URLs containing a domain as valid
+   * this should be good enough in most cases.
+   */
+  isValidUrl: str => !!url.parse(str).hostname,
   isAbsoluteUrl: str =>
     !!str.match(new RegExp(`^${protoRegex}|${domainRegex}`)),
 

@@ -37,10 +37,10 @@ const commands = [
             .switchMap(feed =>
               pollFeeds.queryFeed(store)(feed)
                 .defaultIfEmpty(feed.get('id'))
+                .catch(() => store.removeFeed(feed.get('id')))
             )
             .switchMap(store.findById)
         )
-
         .map(f => [f])
         .switchMap(H.printFeeds)
   ],
