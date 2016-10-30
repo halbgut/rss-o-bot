@@ -20,6 +20,12 @@ Display the current version.
 ### --config=_/path/to/configDirectory_
 The path to a directory containing configuration files. See CONFIGURATION for further information.
 
+### --columns=[_columns_...]
+_columns_ should be a comma-seperated list of columns to be displayed. (e.g. `--columns=blogTitle, url`). Available columns are `blogTitle`, `url`, `filters` and `lastCheck`.
+
+### --no-wrap
+Don't wrap table views.
+
 ## ACTIONS
 ### [run]
 Run the deamon process in the foreground.
@@ -31,7 +37,7 @@ _$1_ a Feed-URL to the database. _url_ is a URL to an Atom or RSS feed. The URL 
 Remove a Feed-URL from the database. _id_ is the key of a Feed-URL inside the database. `id`s are displayed in `rss-o-bot list`.
 
 ### list
-List all Feed-URLs, their IDs and their filters.
+List all Feed-URLs, their IDs and their filters. See also _--no-wrap_ and _--columns_
 
 ### test-notification [_url_]
 Send a test notification over the defined "notification-methods"
