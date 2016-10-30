@@ -43,7 +43,7 @@ const commands = [
             .switchMap(store.findById)
         )
         .map(f => [f])
-        .switchMap(H.printFeeds(true))
+        .switchMap(H.printFeeds(!state.getIn(['switches', 'no-wrap']), state.getIn(['switches', 'columns'])))
   ],
   [
     'rm',
@@ -85,7 +85,7 @@ const commands = [
         .map(([store]) => store)
         // TODO: Perform readFile here instead of inside opml.import
         .switchMap(opml.import(state.get('arguments').first()))
-        .switchMap(H.printFeeds(true))
+        .switchMap(H.printFeeds(!state.getIn(['switches', 'no-wrap']), state.getIn(['switches', 'columns'])))
   ],
   [
     'export',
