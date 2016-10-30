@@ -26,6 +26,7 @@
   "author": "Kriegslustig <npm@ls7.ch>",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^1.1.3",
     "cli-table2": "^0.2.0",
     "debug": "^2.2.0",
     "feedparser": "^1.1.4",

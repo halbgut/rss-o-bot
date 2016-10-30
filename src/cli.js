@@ -10,10 +10,11 @@
 const { Observable: O } = require('rxjs/Rx')
 const Immutable = require('immutable')
 const debug = require('debug')('rss-o-bot')
+const chalk = require('chalk')
 
 const H = require('./lib/helpers')
 const Errors = require('./lib/errors')
-const { throwO, NO_PRIVATE_KEY_FOUND, NO_REMOTE_CONFIGURED } = Errors
+const { throwO } = Errors
 const initStore = require('./lib/store')(H)
 const Notify = require('./lib/notify')(H)
 const opml = require('./lib/opml')(H)
@@ -142,10 +143,10 @@ const commands = [
     true,
     state => {
       if (state.get('mode') === 'local') {
-        return throwO(NO_REMOTE_CONFIGURED)
+        return throwO('NO_REMOTE_CONFIGURED')
       } else if (state.get('mode') === 'remote') {
         const privK = state.get('privateKey')
-        if (!privK) return throwO(NO_PRIVATE_KEY_FOUND)
+        if (!privK) return throwO('NO_PRIVATE_KEY_FOUND')
         debug('Sending ping.')
         return remote.send(
           privK,
@@ -256,6 +257,10 @@ const runCLI = (
       )
     )
     .map(H.getCommand(commands))
+    .flatMap(state => state.get('command')
+      ? O.of(state)
+      : throwO('NO_SUCH_COMMAND', { command: state.get('action') })
+    )
     .switchMap(state =>
       state.get('mode') === 'server' ||
       state.get('mode') === 'remote'
@@ -274,8 +279,13 @@ module.exports = runCLI
 if (!process.env['RSS_O_BOT_TESTING_MODE']) {
   runCLI()
     .subscribe(
-      console.log,
-      Errors.log
+      (error) => {
+        console.log(error)
+        process.stderr.write(chalk.dim.bold.bgRed.white('error:'))
+        process.stderr.write(' ')
+        process.stderr.write(Errors[error] || (error ? error.toString() : ''))
+        process.stderr.write('\n')
+      }
     )
 }
 
