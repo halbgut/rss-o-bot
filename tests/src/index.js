@@ -59,7 +59,7 @@ test.cb('test-config false', T.run(['test-config', `--config=${__dirname}/../con
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
   const filter = 'somefilter'
-  test.cb('add', T.run(['add', url, filter], 4)((t, o, config) =>
+  test.cb('add', T.run(['add', url, filter, '--no-wrap'], 4)((t, o, config) =>
     o.map(feed => {
       t.truthy(feed.includes('Luca Nils Schmid - Blog'))
       t.truthy(feed.includes(url))
@@ -76,7 +76,7 @@ test.cb('test-config false', T.run(['test-config', `--config=${__dirname}/../con
     initStore(T.toConfig(config))
       .switchMap(H.tryCall('insertFeed', url, []))
       .switchMap(() =>
-        runCLI(['node', '', 'list'], null, config)
+        runCLI(['node', '', 'list', '--no-wrap'], null, config)
       )
       .subscribe(
         feeds => {
