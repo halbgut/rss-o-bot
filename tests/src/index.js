@@ -13,7 +13,7 @@ test.always.after('remove DB', T.removeDatabases)
 
 test.cb('version', T.run(['-v'])((t, o) =>
   o.map(version =>
-    t.regex(version, /RSS\-o\-Bot Version: \d+\.\d+\.\d+/)
+    t.regex(version, /RSS-o-Bot Version: \d+\.\d+\.\d+/)
   )
 ))
 

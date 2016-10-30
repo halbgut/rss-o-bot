@@ -71,8 +71,14 @@ const Helpers = {
   privateKeyPath: config => path.normalize(`${config.get('location')}/priv.pem`),
   publicKeyPath: config => path.normalize(`${config.get('location')}/pub.pem`),
 
-  getTime (mod = 0) {
-    return Math.round(((new Date()).getTime()) / 1000) + mod
+  /*
+   * Time related
+   */
+  getTime: (mod = 0) => Math.round((Date.now) / 1000) + mod,
+  parseTime: (n) => {
+    const d = new Date()
+    d.setTime(n)
+    return d
   },
 
   /*
@@ -240,26 +246,58 @@ const Helpers = {
       })),
 
   /* Prints all feed in a bare table */
-  printFeeds: feeds =>
-    O.forkJoin(
+  printFeeds: (wrap, show = 'blogTitle,url,filters,lastCheck') => feeds => {
+    const columns = R.prepend('id', show.split(','))
+    const labels = {
+      id: 'ID',
+      blogTitle: 'Title',
+      url: 'URL',
+      filters: 'Filters',
+      lastCheck: 'Last Polled'
+    }
+    const modifiers = (filters) => ({
+      filters: () =>
+        filters.map(f =>
+          f.get('kind')
+            ? f.get('keyword')
+            : `!${f.get('keyword')}`
+        ).join(', '),
+      lastCheck: t => Helpers.parseTime(t).toISOString()
+    })
+    return O.forkJoin(
       feeds.map(feed => O.fromPromise(feed.getFilters()
-        .then(filters => [
-          feed.get('id'),
-          feed.get('blogTitle'),
-          feed.get('url'),
-          filters.map(f =>
-            f.get('kind')
-              ? f.get('keyword')
-              : `!${f.get('keyword')}`
-          ).join(', ')
-        ])
+        .then(filters =>
+          R.pipe(
+            R.map(c => [c, feed.get(c)]),
+            R.fromPairs,
+            R.evolve(modifiers(filters))
+          )(columns)
+        )
       ))
     )
       .map(feeds => {
-        const table = new CliTable({ head: [ 'ID', 'Title', 'URL', 'Filters' ] })
-        table.push(...feeds)
+        const ttyWidth = process.stdout.columns
+        const width = (w) => Math.round(ttyWidth / w) + 1
+        const columnWidths = R.prepend(
+          width(20),
+          R.pipe(
+            R.tail,
+            R.map(() => width(columns.length)),
+            R.update(columns.length - 2, width(columns.length) + width(20) - 1)
+          )(columns)
+        )
+        const table = new CliTable({
+          head: R.map(R.prop(R.__, labels), columns),
+          wordWrap: wrap,
+          colWidths: wrap ? columnWidths : []
+        })
+        table.push(...R.map(
+          (feed) => R.map(R.prop(R.__, feed), columns),
+          feeds
+        ))
         return table.toString()
-      }),
+      })
+  },
 
   /*
    * Helpers for finding commands

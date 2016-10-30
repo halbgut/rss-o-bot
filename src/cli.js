@@ -43,7 +43,7 @@ const commands = [
             .switchMap(store.findById)
         )
         .map(f => [f])
-        .switchMap(H.printFeeds)
+        .switchMap(H.printFeeds(true))
   ],
   [
     'rm',
@@ -58,7 +58,7 @@ const commands = [
     state =>
       O.of(state).switchMap(H.setUpEnv(initStore))
         .switchMap(([{ listFeeds }]) => listFeeds())
-        .switchMap(H.printFeeds)
+        .switchMap(H.printFeeds(true, state.getIn(['switches', 'columns'])))
   ],
   [
     'poll-feeds',
@@ -85,7 +85,7 @@ const commands = [
         .map(([store]) => store)
         // TODO: Perform readFile here instead of inside opml.import
         .switchMap(opml.import(state.get('arguments').first()))
-        .switchMap(H.printFeeds)
+        .switchMap(H.printFeeds(true))
   ],
   [
     'export',
