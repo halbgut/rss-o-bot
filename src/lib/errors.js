@@ -25,6 +25,7 @@ const Errors = {
   INVALID_URL: 'Invalid URL given.',
   INVALID_FEED: 'Feed is not a vaild RSS-Feed or a valid Atom-Feed.',
   NO_SUCH_COMMAND: 'No such command.',
+  INVALID_JWT: 'Invalid token sent to server.',
   UNKNOWN: 'An unknown error occured. Run the command again with the `DEBUG=rss-o-bot` infront to get some more info.'
 }
 

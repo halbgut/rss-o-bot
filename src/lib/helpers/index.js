@@ -112,7 +112,7 @@ const Helpers = {
   isResponseRedirect: res =>
     res.statusCode >= 300 && res.statusCode <= 399 && res.headers.location,
   isResponseSuccessful: res =>
-    res.statusCode >= 200 && res.statusCode < 400,
+    res.statusCode < 400,
 
   httpServer: port => O.create(o => {
     debug('Starting HTTP server.')
@@ -125,7 +125,7 @@ const Helpers = {
         ])(data)
         res.writeHead(code, headers)
         res.end(body)
-        return O.of(true)
+        return O.empty()
       }
       let body = ''
       req.on('data', data => { body += data })
@@ -140,11 +140,11 @@ const Helpers = {
       })
     })
     server.listen(port)
-    o.next(Helpers.serverStartup)
+    o.next([Helpers.serverStartup])
   }),
 
   httpPost: url => message => O.create(o => {
-    const buffer = Buffer.from(JSON.stringify(message))
+    const buffer = new Buffer(JSON.stringify(message))
     const [host, port] = url.split(':')
     const req = http.request(
       {
@@ -196,7 +196,6 @@ const Helpers = {
       { algorithms: ['RS512'] },
       (err, data) => {
         if (err || !Helpers.isPayloadValid([data.jit, data.exp])) {
-          // TODO Use Error.js here
           return o.error(err || new Error('Invalid jit'))
         } else {
           o.next(data)

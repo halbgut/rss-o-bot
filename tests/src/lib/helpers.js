@@ -118,7 +118,7 @@ const startServer =
       if (!buff) return
       const msg = buff.toString()
       if (DEBUG) console.log(msg)
-      if (msg === 'Symbol(startup)\n') {
+      if (msg.includes('Succssfully started server.')) {
         subject.next(true)
         subject.complete()
       }
@@ -129,7 +129,7 @@ const startServer =
       const msg = buff.toString()
       if (DEBUG) console.error(msg)
       /* Ignore debug statements */
-      if (msg.match(/ GMT rss\-o\-bot /)) return
+      if (msg.match(/ GMT rss-o-bot /)) return
       subject.error(msg)
     })
 

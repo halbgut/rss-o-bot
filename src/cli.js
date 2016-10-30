@@ -279,8 +279,8 @@ module.exports = runCLI
 if (!process.env['RSS_O_BOT_TESTING_MODE']) {
   runCLI()
     .subscribe(
+      (msg) => process.stdout.write(msg),
       (error) => {
-        console.log(error)
         process.stderr.write(chalk.dim.bold.bgRed.white('error:'))
         process.stderr.write(' ')
         process.stderr.write(Errors[error] || (error ? error.toString() : ''))

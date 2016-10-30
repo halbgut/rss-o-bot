@@ -28,8 +28,9 @@ module.exports = (H, { throwO }) => {
       return (
         H.httpServer(state.getIn(['configuration', 'port']))
           .switchMap(x => {
-            if (H.is('Symbol')(x)) return O.of(x)
             const [ data, respond ] = x
+            debug(`client sent: ${data.toString()}`)
+            if (data === H.serverStartup) return O.of('Succssfully started server.')
             const errRespond = err => {
               debug(err)
               // If it's a properly formated error, it may be sent to the user
@@ -62,7 +63,7 @@ module.exports = (H, { throwO }) => {
                     ],
                     [R.T, () => respond(500)({ error: 'NO_DATA_IN_REQUEST' })]
                   ]))
-                  .catch(errRespond)
+                  .catch(() => errRespond('INVALID_JWT'))
               )
             }
           })
