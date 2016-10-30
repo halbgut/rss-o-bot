@@ -58,7 +58,7 @@ const commands = [
     state =>
       O.of(state).switchMap(H.setUpEnv(initStore))
         .switchMap(([{ listFeeds }]) => listFeeds())
-        .switchMap(H.printFeeds(true, state.getIn(['switches', 'columns'])))
+        .switchMap(H.printFeeds(!state.getIn(['switches', 'no-wrap']), state.getIn(['switches', 'columns'])))
   ],
   [
     'poll-feeds',

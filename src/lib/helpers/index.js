@@ -74,7 +74,7 @@ const Helpers = {
   /*
    * Time related
    */
-  getTime: (mod = 0) => Math.round((Date.now) / 1000) + mod,
+  getTime: (mod = 0) => Math.round((Date.now()) / 1000) + mod,
   parseTime: (n) => {
     const d = new Date()
     d.setTime(n)
@@ -246,7 +246,7 @@ const Helpers = {
       })),
 
   /* Prints all feed in a bare table */
-  printFeeds: (wrap, show = 'blogTitle,url,filters,lastCheck') => feeds => {
+  printFeeds: (wrap = true, show = 'blogTitle,url,filters,lastCheck') => feeds => {
     const columns = R.prepend('id', show.split(','))
     const labels = {
       id: 'ID',
