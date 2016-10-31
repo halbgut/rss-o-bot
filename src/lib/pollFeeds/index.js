@@ -9,7 +9,7 @@ const callbackWrapper = callback => ({ blogTitle, link, title }) =>
     .do(() => debug('Sent notifications'))
     .retry(2)
 
-module.exports = H => {
+module.exports = (H, { throwO }) => {
   const Poll = poll(H)
   /* Takes a store and a feed entity and returns an observable of new links
    * found on that feed.
@@ -25,7 +25,7 @@ module.exports = H => {
           .catch(err => {
             const msg = `Failed downloading "${feed.get('url')}"`
             debug(`${msg}: ${err}`)
-            return O.throw(err)
+            return throwO('FAILED_TO_DOWNLOAD_FEED', { error: err, feed: feed.get('url') })
           })
       )
     return (

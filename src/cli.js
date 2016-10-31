@@ -19,7 +19,7 @@ const initStore = require('./lib/store')(H, Errors)
 const Notify = require('./lib/notify')(H)
 const opml = require('./lib/opml')(H)
 const remote = require('./lib/remote')(H)
-const pollFeeds = require('./lib/pollFeeds')(H)
+const pollFeeds = require('./lib/pollFeeds')(H, Errors)
 const Server = require('./lib/server')(H, Errors)
 const genKeys = require('./lib/gen-keys')(H, Errors)
 
@@ -38,7 +38,10 @@ const commands = [
             .switchMap(feed =>
               pollFeeds.queryFeed(store)(feed)
                 .defaultIfEmpty(feed.get('id'))
-                .catch(() => store.removeFeed(feed.get('id')))
+                .catch((err) =>
+                  store.removeFeed(feed.get('id'))
+                    .switchMap(() => O.throw(err))
+                )
             )
             .switchMap(store.findById)
         )
@@ -281,9 +284,10 @@ if (!process.env['RSS_O_BOT_TESTING_MODE']) {
     .subscribe(
       (msg) => process.stdout.write(msg),
       (error) => {
+        const translatedError = Errors.translate(error)
         process.stderr.write(chalk.dim.bold.bgRed.white('error:'))
         process.stderr.write(' ')
-        process.stderr.write(Errors[error] || (error ? error.toString() : ''))
+        process.stderr.write(translatedError)
         process.stderr.write('\n')
       }
     )
