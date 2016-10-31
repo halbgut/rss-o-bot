@@ -77,7 +77,7 @@ const Helpers = {
   getTime: (mod = 0) => Math.round((Date.now()) / 1000) + mod,
   parseTime: (n) => {
     const d = new Date()
-    d.setTime(n)
+    d.setTime(n * 1000)
     return d
   },
 
