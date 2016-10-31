@@ -14,7 +14,7 @@ const debug = require('debug')('rss-o-bot')
 
 module.exports = (H, E) => {
   const genInsertFeed = (Feed, Filter) => (url, filters, blogTitle) => {
-    if (!H.isValidUrl(url)) return E.throwO(E.INVALID_URL)
+    if (!H.isValidUrl(url)) return E.throwO('INVALID_URL')
     return (
       O.fromPromise(Feed.create(
         {
