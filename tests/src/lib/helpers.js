@@ -1,5 +1,4 @@
-const fs = require('fs')
-const { spawn } = require('child_process')
+const { spawn, execSync } = require('child_process')
 
 const Rx = require('rxjs/Rx')
 const Immutable = require('immutable')
@@ -11,11 +10,9 @@ const initStore = require('../../../dist/lib/store')(H)
 const Config = require('../../../dist/lib/config')(H)
 
 const DEBUG = process.env.DEBUG
-const databases = []
 
 const getConfig = ((id = 0) => (extend = {}) => {
   const db = `${__dirname}/../../../data/test_feeds-${uuid.v4()}.sqlite`
-  databases.push(db)
   return Object.assign({
     'database': {
       'name': 'data',
@@ -28,13 +25,7 @@ const getConfig = ((id = 0) => (extend = {}) => {
 })()
 
 const removeDatabases = t => {
-  databases.forEach(db => {
-    try {
-      fs.unlinkSync(db)
-    } catch (e) {
-      /* Ignore errors, since some tests don't ever ope na db */
-    }
-  })
+  execSync(`rm ${__dirname}/../../../data/test_feeds-*.sqlite`)
   t.pass()
 }
 
