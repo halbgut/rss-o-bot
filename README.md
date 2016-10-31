@@ -102,6 +102,19 @@ notifier(configuration)(blogTitle, entryUrl, entryTitle)
 
 You may want to check the [`rss-o-bot-email`](https://github.com/kriegslustig/rss-o-bot-email) source code for further reference.
 
+## Trouble Shooting
+
+### Error: Please install sqlite3 package manually
+
+This error sometimes occures when sqlite3 couldn't be installed properly. To solve this do the following:
+
+```
+cd $(npm config get prefix)/lib/node_modules/rss-o-bot/node_modules/sqlite3
+npm i --build-from-source
+```
+
+Now you should be able to run rss-o-bot.
+
 ## Credits
 
 Logo created by [mala23](https://github.com/mala23)
