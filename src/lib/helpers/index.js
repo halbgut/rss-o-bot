@@ -246,7 +246,7 @@ const Helpers = {
       })),
 
   /* Prints all feed in a bare table */
-  printFeeds: (wrap = true, show = 'blogTitle,url,filters,lastCheck') => feeds => {
+  printFeeds: (wrapInput = true, show = 'blogTitle,url,filters') => feeds => {
     const columns = R.prepend('id', show.split(','))
     const labels = {
       id: 'ID',
@@ -277,6 +277,9 @@ const Helpers = {
     )
       .map(feeds => {
         const ttyWidth = process.stdout.columns
+        const longestLine = Helpers.longestLineLength(feeds, columns)
+        // Only wrap when tty width can be measured and is necessary
+        const wrap = (longestLine > ttyWidth || wrap) && ttyWidth > 0
         const width = (w) => Math.round(ttyWidth / w) + 1
         const columnWidths = R.prepend(
           width(20),
@@ -297,6 +300,18 @@ const Helpers = {
         ))
         return table.toString()
       })
+  },
+
+  longestLineLength: (feeds, columns) => {
+    const lengths = R.map(
+      R.pipe(
+        R.values,
+        R.join(' '),
+        R.length
+      )
+    )(feeds)
+    // Get longest line and add some for spacing and borders
+    return Math.max(...lengths) + columns.length * 4 + 1
   },
 
   /*
