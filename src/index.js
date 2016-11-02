@@ -10,7 +10,8 @@ const debug = require('debug')('rss-o-bot')
 const Helpers = require('./lib/helpers')
 const Config = require('./lib/config')(Helpers)
 const initStore = require('./lib/store')(Helpers)
-const pollFeeds = require('./lib/pollFeeds')(Helpers)
+const Errors = require('./lib/errors')
+const pollFeeds = require('./lib/pollFeeds')(Helpers, Errors)
 const Notify = require('./lib/notify')(Helpers)
 
 module.exports = function runRSSOBotDaemon (state) {

@@ -5,7 +5,7 @@ let server
 
 test.cb('start a server', t => {
   /* Spawn in non-testing mode */
-  server = spawn('bash', ['-c', `RSS_O_BOT_TESTING_MODE= node --trace-deprecation ../../dist/cli.js run --config=${__dirname}/../config/server`])
+  server = spawn('bash', ['-c', `RSS_O_BOT_TESTING_MODE= node --trace-deprecation ../../../dist/cli.js run --config=${__dirname}/../../config/server`])
   t.plan(1)
   server.stderr.on('data', out => {
     console.error(out.toString())

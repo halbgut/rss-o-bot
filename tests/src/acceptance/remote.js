@@ -7,11 +7,11 @@ const Immutable = require('immutable')
 
 const T = require('./lib/helpers')
 
-const H = require('../../dist/lib/helpers')
-const Errors = require('../../dist/lib/errors')
-const genKeys = require('../../dist/lib/gen-keys')(H, Errors)
+const H = require('../../../dist/lib/helpers')
+const Errors = require('../../../dist/lib/errors')
+const genKeys = require('../../../dist/lib/gen-keys')(H, Errors)
 
-const config = { mode: 'remote', remote: 'localhost', port: 3646, location: `${__dirname}/../config/server-remote` }
+const config = { mode: 'remote', remote: 'localhost', port: 3646, location: `${__dirname}/../../config/server-remote` }
 
 test.before.cb(t => {
   genKeys(Immutable.Map(config))
@@ -26,8 +26,8 @@ test.before.cb(t => {
 })
 
 test.cb('genKeys', t => {
-  const genKeysConfig = R.merge(config, {port: 3647, location: `${__dirname}/../config/client-gen-keys`})
-  const genKeysServerConfig = R.merge(config, {port: 3647, location: `${__dirname}/../config/server-gen-keys`})
+  const genKeysConfig = R.merge(config, {port: 3647, location: `${__dirname}/../../config/client-gen-keys`})
+  const genKeysServerConfig = R.merge(config, {port: 3647, location: `${__dirname}/../../config/server-gen-keys`})
   T.startServer(genKeysServerConfig.port, genKeysServerConfig.location)
     .do(() =>
       T.run(['gen-keys'], 4)((t, o) =>

@@ -4,15 +4,16 @@ const Rx = require('rxjs/Rx')
 const Immutable = require('immutable')
 const uuid = require('node-uuid')
 
-const runCLI = require('../../../dist/cli.js')
-const H = require('../../../dist/lib/helpers')
-const initStore = require('../../../dist/lib/store')(H)
-const Config = require('../../../dist/lib/config')(H)
+const runCLI = require('../../../../dist/cli.js')
+const H = require('../../../../dist/lib/helpers')
+const Errors = require('../../../../dist/lib/errors')
+const initStore = require('../../../../dist/lib/store')(H, Errors)
+const Config = require('../../../../dist/lib/config')(H)
 
 const DEBUG = process.env.DEBUG
 
 const getConfig = ((id = 0) => (extend = {}) => {
-  const db = `${__dirname}/../../../data/test_feeds-${uuid.v4()}.sqlite`
+  const db = `${__dirname}/../../../../data/test_feeds-${uuid.v4()}.sqlite`
   return Object.assign({
     'database': {
       'name': 'data',
@@ -25,7 +26,7 @@ const getConfig = ((id = 0) => (extend = {}) => {
 })()
 
 const removeDatabases = t => {
-  execSync(`rm ${__dirname}/../../../data/test_feeds-*.sqlite`)
+  execSync(`rm ${__dirname}/../../../../data/test_feeds-*.sqlite`)
   t.pass()
 }
 
@@ -102,7 +103,7 @@ const startServer =
     const subject = new Rx.Subject()
     const server = spawn('bash', [
       '-c',
-      `DEBUG=${DEBUG} RSS_O_BOT_TESTING_MODE= ../../dist/cli.js run --mode=server --config=${configDir} --port=${port}`
+      `DEBUG=${DEBUG} RSS_O_BOT_TESTING_MODE= ../../../dist/cli.js run --mode=server --config=${configDir} --port=${port}`
     ])
 
     server.stdout.on('data', buff => {

@@ -1,6 +1,6 @@
 const { test } = require('ava')
-const H = require('../../dist/lib/helpers')
-const Config = require('../../dist/lib/config')(H)
+const H = require('../../../dist/lib/helpers')
+const Config = require('../../../dist/lib/config')(H)
 
 test('validate empty', t => t.truthy(
   Config.validate({})

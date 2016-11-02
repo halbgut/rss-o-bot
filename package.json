@@ -13,7 +13,7 @@
     "watch:build:tests": "watch 'npm run --silent build:tests' tests/src",
     "watch:build": "watch 'npm run --silent build:js -- --source-maps' src",
     "watch:test": "RSS_O_BOT_TESTING_MODE=1 ava tests/src/*.js --watch",
-    "test": "npm run --silent build:tests && RSS_O_BOT_TESTING_MODE=1 ava tests/dist/*.js",
+    "test": "npm run --silent build:tests && RSS_O_BOT_TESTING_MODE=1 ava tests/dist/*/*.js",
     "test:debug": "DEBUG=rss-o-bot RSS_O_BOT_TESTING_MODE=1 ava",
     "test:ci": "npm run --silent build && npm run --silent test && eslint && npm run --silent test-coverage",
     "test:coverage": "nyc --include dist/ npm test && nyc report --reporter=text-lcov | coveralls",

@@ -3,10 +3,10 @@ const { test } = require('ava')
 const sax = require('sax')
 const { Observable: O } = require('rxjs/Rx')
 
-const runCLI = require('../../dist/cli.js')
-const H = require('../../dist/lib/helpers')
-const initStore = require('../../dist/lib/store')(H)
-const Config = require('../../dist/lib/config')(H)
+const runCLI = require('../../../dist/cli.js')
+const H = require('../../../dist/lib/helpers')
+const initStore = require('../../../dist/lib/store')(H)
+const Config = require('../../../dist/lib/config')(H)
 const T = require('./lib/helpers')
 
 test.always.after('remove DB', T.removeDatabases)
@@ -41,18 +41,18 @@ test.cb('help with mode-flag', T.run(['-h', '--mode=local'])((t, o) =>
   )
 ))
 
-test.cb('--config', T.run(['help', `--config=${__dirname}/../config/failing`], 1, false)((t, o) =>
+test.cb('--config', T.run(['help', `--config=${__dirname}/../../config/failing`], 1, false)((t, o) =>
   o.catch(() => {
     t.pass()
     return O.of()
   })
 ))
 
-test.cb('test-config true', T.run(['test-config', `--config=${__dirname}/../config/succeeding`], 1, false)((t, o) =>
+test.cb('test-config true', T.run(['test-config', `--config=${__dirname}/../../config/succeeding`], 1, false)((t, o) =>
   o.map(x => t.truthy(x))
 ))
 
-test.cb('test-config false', T.run(['test-config', `--config=${__dirname}/../config/invalid`], 1, false)((t, o) =>
+test.cb('test-config false', T.run(['test-config', `--config=${__dirname}/../../config/invalid`], 1, false)((t, o) =>
   o.map(x => t.falsy(x))
 ))
 
@@ -162,7 +162,7 @@ test.cb('export', T.run(['export'], false)((t, o, config) =>
     ))
 ))
 
-const importFile = path.resolve(__dirname, '..', 'data', 'export.xml')
+const importFile = path.resolve(__dirname, '..', '..', 'data', 'export.xml')
 test.cb('import', T.run(['import', importFile], 2)((t, o, config) =>
   o.switchMap(a => T.getStoreAndListFeeds(config).map(b => [a, b]))
     .do(([result, list]) => {
@@ -177,7 +177,7 @@ test.cb('import', T.run(['import', importFile], 2)((t, o, config) =>
 ))
 
 test.cb('readConfig', t => {
-  Config.readConfig([ `${__dirname}/../config/succeeding` ])
+  Config.readConfig([ `${__dirname}/../../config/succeeding` ])
     .switchMap(initStore)
     .switchMap(({ listFeeds }) => listFeeds())
     .subscribe(

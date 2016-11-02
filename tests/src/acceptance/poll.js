@@ -1,9 +1,9 @@
 const { test } = require('ava')
 
-const H = require('../../dist/lib/helpers')
+const H = require('../../../dist/lib/helpers')
 const T = require('./lib/helpers')
 
-const Poll = require('../../dist/lib/pollFeeds/lib/poll.js')(H)
+const Poll = require('../../../dist/lib/pollFeeds/lib/poll.js')(H)
 
 const isValidEntry = t => e => {
   t.true(typeof e.blogTitle === 'string')
