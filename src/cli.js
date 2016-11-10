@@ -54,6 +54,7 @@ const commands = [
     state =>
       O.of(state).switchMap(H.setUpEnv(initStore))
         .switchMap(([{ removeFeed }, config, id]) => removeFeed(id))
+        .mapTo(`Deleted feed "${state.get('arguments').get(0)}"`)
   ],
   [
     'list',
@@ -72,6 +73,7 @@ const commands = [
           require('.')
             .pollFeeds(Notify(config))(store, true)
         )
+        .mapTo('Successfully polled all feeds in store.')
   ],
   [
     'test-notification',

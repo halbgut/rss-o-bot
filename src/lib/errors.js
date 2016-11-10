@@ -1,11 +1,12 @@
 const { Observable: O } = require('rxjs/Rx')
 const debug = require('debug')('rss-o-bot')
 const chalk = require('chalk')
+const R = require('ramda')
 
 const Errors = {
   translate: error => Errors.debug(Errors[error.message] || Errors['UNKNOWN'])(error),
   debug: generator => error => {
-    debug(error)
+    debug(R.path(['meta', 'error'], error) || error)
     return generator(error.meta)
   },
   log: error => console.error(Errors.translate(error)),
@@ -28,7 +29,8 @@ const Errors = {
   NO_SUCH_COMMAND: () => 'No such command.',
   INVALID_JWT: () => 'Invalid token sent to server.',
   UNKNOWN: () => 'An unknown error occured. Run the command again with the `DEBUG=rss-o-bot` infront to get some more info.',
-  FAILED_TO_DOWNLOAD_FEED: ({ error, feed }) => `Unable to download ${feed}. \nReason: ${chalk.italic(error)}`
+  FAILED_TO_DOWNLOAD_FEED: ({ error, feed }) => `Unable to download ${feed}. \nReason: ${chalk.italic(error)}`,
+  FAILED_TO_PARSE_FEED: ({ feed }) => `Unable to parse XML served by "${feed}".`
 }
 
 module.exports = Errors

@@ -9,24 +9,20 @@ const callbackWrapper = callback => ({ blogTitle, link, title }) =>
     .do(() => debug('Sent notifications'))
     .retry(2)
 
-module.exports = (H, { throwO }) => {
-  const Poll = poll(H)
+module.exports = (H, E) => {
+  const Poll = poll(H, E)
   /* Takes a store and a feed entity and returns an observable of new links
    * found on that feed.
    */
   const queryFeed = ({updateLatestLink, setBlogTitle}) => feed => {
     const feed$ = O.fromPromise(feed.getFilters())
+      .do(() => debug(`Downloading ${feed.get('url')}`))
       .switchMap(filters =>
         Poll(
           feed.get('url'),
           filters.map(f => [f.get('keyword'), f.get('kind')])
         )
           .retry(2)
-          .catch(err => {
-            const msg = `Failed downloading "${feed.get('url')}"`
-            debug(`${msg}: ${err}`)
-            return throwO('FAILED_TO_DOWNLOAD_FEED', { error: err, feed: feed.get('url') })
-          })
       )
     return (
       feed$

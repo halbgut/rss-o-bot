@@ -7,7 +7,8 @@ const { Observable: O } = require('rxjs/Rx')
 
 const runCLI = require('../../../dist/cli.js')
 const H = require('../../../dist/lib/helpers')
-const Poll = require('../../../dist/lib/pollFeeds/lib/poll.js')(H)
+const E = require('../../../dist/lib/errors')
+const Poll = require('../../../dist/lib/pollFeeds/lib/poll.js')(H, E)
 const T = require('./lib/helpers')
 
 const createDummyEntryAndPoll = (config, url, offset = 2) =>

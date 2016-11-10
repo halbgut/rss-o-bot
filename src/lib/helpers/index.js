@@ -101,7 +101,7 @@ const Helpers = {
    */
   isValidUrl: str => !!url.parse(str).hostname,
   isAbsoluteUrl: str =>
-    !!str.match(new RegExp(`^${protoRegex}|${domainRegex}`)),
+    str && !!str.match(new RegExp(`^${protoRegex}|${domainRegex}`)),
 
   getBaseUrl (url) {
     const match = url.match(new RegExp(`(${protoRegex})?${domainRegex}`))
@@ -126,7 +126,7 @@ const Helpers = {
       debug('Receiving message.')
       const respond = (code, headers = {'Content-Type': 'application/json'}) => (data) => {
         const body = R.cond([
-          [Helpers.is('object'), JSON.stringify],
+          [R.is(Object), JSON.stringify],
           [R.T, R.toString]
         ])(data)
         res.writeHead(code, headers)
@@ -358,7 +358,6 @@ const Helpers = {
    * Primitives manipulation
    */
   includesUpperCase: str => !!str.match(/[A-Z]/),
-  is: type => R.pipe(R.type, R.equals(type)),
 
   /*
    * Scopes; meaning where to execute a commmand.

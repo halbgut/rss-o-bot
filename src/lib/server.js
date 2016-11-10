@@ -54,8 +54,8 @@ module.exports = (H, { throwO }) => {
                   .switchMap(R.cond([
                     [
                       R.where({
-                        command: H.is('String'),
-                        args: R.allPass([H.is('Array'), R.all(H.is('String'))])
+                        command: R.is(String),
+                        args: R.allPass([R.is(Array), R.all(R.is(String))])
                       }),
                       (command) =>
                         exec(command)
