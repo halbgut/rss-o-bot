@@ -25,6 +25,7 @@ module.exports = (H, { throwO }) => {
       headers: { 'User-Agent': 'RSS-o-Bot' }
     }, res => {
       let body = ''
+      res.setEncoding('utf8')
       if (H.isResponseRedirect(res)) {
         if (depth > 10) { // maximum redirects
           return o.error(new Error('Maximum redirects reached'))

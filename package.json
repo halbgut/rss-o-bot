@@ -58,12 +58,13 @@
     "eslint-plugin-standard": "^2.0.0",
     "flow-bin": "^0.33.0",
     "flow-typed": "^2.0.0-beta.7",
+    "nock": "^9.0.2",
     "nyc": "^8.3.0",
     "watch": "^0.19.2"
   },
   "peerDependencies": {
-    "rss-o-bot-telegram": "0.1.x",
     "rss-o-bot-desktop": "0.1.x",
-    "rss-o-bot-email": "0.1.x"
+    "rss-o-bot-email": "0.1.x",
+    "rss-o-bot-telegram": "0.1.x"
   }
 }

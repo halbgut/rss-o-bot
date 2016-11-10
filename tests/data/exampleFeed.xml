@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xml:lang="en-US">
+  <id>tag:github.com,2008:/Kriegslustig/rss-o-bot/commits/master</id>
+  <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commits/master"/>
+  <link type="application/atom+xml" rel="self" href="https://github.com/Kriegslustig/rss-o-bot/commits/master.atom"/>
+  <title>Recent Commits to rss-o-bot:master</title>
+  <updated>2016-11-02T21:41:43+01:00</updated>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/626404a9fe51b226b34224069fd4e21d10b0e1f3</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/626404a9fe51b226b34224069fd4e21d10b0e1f3"/>
+    <title>
+        refactor(tests): move acceptance tests to acceptance tests
+    </title>
+    <updated>2016-11-02T21:41:43+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;refactor(tests): move acceptance tests to acceptance tests&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/b82de06b9034bd14eb59d14336bad7751c797a77</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/b82de06b9034bd14eb59d14336bad7751c797a77"/>
+    <title>
+        chore(package.json): better naming for npm scripts
+    </title>
+    <updated>2016-11-01T21:18:39+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;chore(package.json): better naming for npm scripts&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/d84740caf6cb56cfc3fa239be45a76cbb7da445c</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/d84740caf6cb56cfc3fa239be45a76cbb7da445c"/>
+    <title>
+        fix(package.json): invalid peer dependency
+    </title>
+    <updated>2016-11-01T21:14:36+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;fix(package.json): invalid peer dependency&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/3af372bbceb2030d90a36a2bb526a1b794a8898e</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/3af372bbceb2030d90a36a2bb526a1b794a8898e"/>
+    <title>
+        chore(release): v1.0.0-rc.7
+    </title>
+    <updated>2016-10-31T21:10:55+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;chore(release): v1.0.0-rc.7&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/b3b5f446579b400fc736d59ce900189c86c78292</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/b3b5f446579b400fc736d59ce900189c86c78292"/>
+    <title>
+        feat(cli): implement more intelligent tables
+    </title>
+    <updated>2016-10-31T21:10:04+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;feat(cli): implement more intelligent tables&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/c4bf26332cfba08c94ef1ac04c5647bcb03cbdf8</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/c4bf26332cfba08c94ef1ac04c5647bcb03cbdf8"/>
+    <title>
+        feat(errors): vastly improved error handling
+    </title>
+    <updated>2016-10-31T20:47:56+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;feat(errors): vastly improved error handling&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/2b6376533372c837ccefb4e9c8225ab63127234f</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/2b6376533372c837ccefb4e9c8225ab63127234f"/>
+    <title>
+        fix(store): make invalid url error sensible
+    </title>
+    <updated>2016-10-31T20:25:44+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;fix(store): make invalid url error sensible&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/3f240bae6d5bfe5ece7dcb6307d2659714f95143</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/3f240bae6d5bfe5ece7dcb6307d2659714f95143"/>
+    <title>
+        chore(tests): proper cleanup after tests
+    </title>
+    <updated>2016-10-31T20:10:51+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;chore(tests): proper cleanup after tests&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/9691046be0339bd24e2fb89b90c82399a7b36b69</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/9691046be0339bd24e2fb89b90c82399a7b36b69"/>
+    <title>
+        fix(cli): date shown in list off by *1000
+    </title>
+    <updated>2016-10-31T20:07:22+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;fix(cli): date shown in list off by *1000&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/93c9715c761e40498afddbf27e3d5435d6de8419</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/93c9715c761e40498afddbf27e3d5435d6de8419"/>
+    <title>
+        docs(README): add a section on trouble shooting
+    </title>
+    <updated>2016-10-31T20:01:34+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;docs(README): add a section on trouble shooting&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/a0cff6dad6c621906e578a49a7fdf60f46eabe59</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/a0cff6dad6c621906e578a49a7fdf60f46eabe59"/>
+    <title>
+        chore(release) v1.0.0-rc.6
+    </title>
+    <updated>2016-10-30T15:36:51+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;chore(release) v1.0.0-rc.6&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/319a22750203c95d056e0bddc2690e0f294cdef7</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/319a22750203c95d056e0bddc2690e0f294cdef7"/>
+    <title>
+        chore(release): v1.0.0-rc.5
+    </title>
+    <updated>2016-10-30T15:31:01+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;chore(release): v1.0.0-rc.5&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/044787d4bee84e720cee6962f8ddaa91f692bb9c</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/044787d4bee84e720cee6962f8ddaa91f692bb9c"/>
+    <title>
+        tests(cli): update tests to use --no-wrap switch
+    </title>
+    <updated>2016-10-30T15:29:45+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;tests(cli): update tests to use --no-wrap switch&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/eb8f84ad9869ba9141d73792afda3251473be7c7</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/eb8f84ad9869ba9141d73792afda3251473be7c7"/>
+    <title>
+        docs(man): document --no-wrap and --columns in the man page
+    </title>
+    <updated>2016-10-30T15:27:47+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;docs(man): document --no-wrap and --columns in the man page&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/a573ff323da0c04fd4bf6f7521e93eaaca85d721</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/a573ff323da0c04fd4bf6f7521e93eaaca85d721"/>
+    <title>
+        feat(cli): add --no-wrap and --columns to all commands displaying tables
+    </title>
+    <updated>2016-10-30T15:27:23+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;feat(cli): add --no-wrap and --columns to all commands displaying tables&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/3a62103e6f3dc42c10f83c12db22d69ffd4a57b9</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/3a62103e6f3dc42c10f83c12db22d69ffd4a57b9"/>
+    <title>
+        feat(cli): implement a no-wrap operator
+    </title>
+    <updated>2016-10-30T15:21:26+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;feat(cli): implement a no-wrap operator&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/01254feb6db88fc16b67ffd0879d8c54e31a8a9c</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/01254feb6db88fc16b67ffd0879d8c54e31a8a9c"/>
+    <title>
+        feat(cli): make the tables responsive
+    </title>
+    <updated>2016-10-30T15:14:13+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;feat(cli): make the tables responsive&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/898f50d280ff4c667451121dfda0f8ac02b4458d</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/898f50d280ff4c667451121dfda0f8ac02b4458d"/>
+    <title>
+        fix(server) startup signal sent to wront out
+    </title>
+    <updated>2016-10-30T13:55:01+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;fix(server) startup signal sent to wront out&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/83251a3ad63651e39e1dd9362a136484be9324b3</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/83251a3ad63651e39e1dd9362a136484be9324b3"/>
+    <title>
+        feat(*): improved error handling
+    </title>
+    <updated>2016-10-30T12:51:29+01:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;feat(*): improved error handling&lt;/pre&gt;
+    </content>
+  </entry>
+  <entry>
+    <id>tag:github.com,2008:Grit::Commit/7d71325d56557742019bd9a1f890203efbe2fbf7</id>
+    <link type="text/html" rel="alternate" href="https://github.com/Kriegslustig/rss-o-bot/commit/7d71325d56557742019bd9a1f890203efbe2fbf7"/>
+    <title>
+        feat(cli): error handling for add
+    </title>
+    <updated>2016-10-10T20:27:51+02:00</updated>
+    <media:thumbnail height="30" width="30" url="https://avatars2.githubusercontent.com/u/7280956?v=3&amp;s=30"/>
+    <author>
+      <name>Kriegslustig</name>
+      <uri>https://github.com/Kriegslustig</uri>
+    </author>
+    <content type="html">
+      &lt;pre style=&#39;white-space:pre-wrap;width:81ex&#39;&gt;feat(cli): error handling for add&lt;/pre&gt;
+    </content>
+  </entry>
+</feed>
+
