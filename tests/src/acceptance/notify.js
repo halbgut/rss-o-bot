@@ -60,8 +60,8 @@ test.cb('poll-feeds multiple new posts', t => {
   let latestItems
   let i = 0
   const notify = config => (blog, link, title) => {
-    t.is(link, latestItems[i].link)
-    if (++i === 1) t.end()
+    t.is(link, latestItems[(i - 1) * -1].link)
+    if (++i === 2) t.end()
     return O.of(true)
   }
   const url = 'https://lucaschmid.net/feed/rss.xml'

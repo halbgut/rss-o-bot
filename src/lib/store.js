@@ -57,12 +57,13 @@ module.exports = (H, E) => {
     )
   }
 
-  const genSetBlogTitle = Feed => (id, blogTitle) =>
-    debug(`Setting blog title: ${blogTitle}`) ||
-    O.fromPromise(Feed.update(
+  const genSetBlogTitle = Feed => (id, blogTitle) => {
+    debug(`Setting blog title: ${blogTitle}`)
+    return O.fromPromise(Feed.update(
       { blogTitle },
       { where: { id } }
     ))
+  }
 
   const genUpdateLatestLink = Feed => (id, latestLink) =>
     O.fromPromise(Feed.update(

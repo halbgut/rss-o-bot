@@ -26,11 +26,8 @@ module.exports = (H, E) => {
       )
     return (
       feed$
-        .switchMap(getNewLinks(feed))
-        .filter(({link}) =>
-          (link && link !== feed.get('latestLink')) || debug(`Old URL: ${link}`)
-        )
-        .switchMap(info =>
+        .concatMap(getNewLinks(feed))
+        .concatMap(info =>
           feed.get('blogTitle')
             ? O.of(info)
             : setBlogTitle(feed.get('id'), info.blogTitle).mapTo(info)
@@ -38,7 +35,6 @@ module.exports = (H, E) => {
         .switchMap(info =>
           updateLatestLink(feed.get('id'), info.link).mapTo(info)
         )
-        .filter(() => feed.get('latestLink'))
         .do(({link}) => debug(`New URL: ${link}`))
     )
   }
