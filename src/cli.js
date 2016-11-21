@@ -37,7 +37,7 @@ const commands = [
           store.insertFeed(url, filters.map(H.transformFilter))
             .switchMap(feed =>
               pollFeeds.queryFeed(store)(feed)
-                .defaultIfEmpty(feed.get('id'))
+                .mapTo(feed.get('id'))
                 .catch((err) =>
                   store.removeFeed(feed.get('id'))
                     .switchMap(() => O.throw(err))
