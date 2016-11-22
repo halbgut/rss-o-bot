@@ -61,8 +61,11 @@ module.exports = (H, E) => {
   const PollFeeds = callback => (store, force) =>
     store.getFeeds(force)
       .switchMap(feeds =>
-        O.merge(...feeds.map(queryFeed(store)))
-          .switchMap(callbackWrapper(callback))
+        O.merge(...feeds.map(feed =>
+          queryFeed(store)(feed)
+            .concatMap(callbackWrapper(callback))
+            .catch((err) => console.log(err) || O.empty())
+        ))
       )
   PollFeeds.queryFeed = queryFeed
   return PollFeeds
