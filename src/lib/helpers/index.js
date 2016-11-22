@@ -242,7 +242,7 @@ const Helpers = {
       .map(([raw, synopsis, {version}, man]) => ({
         raw,
         synopsis,
-        man: markedMan(raw, {version, section: 1})
+        man: markedMan(man, {version, section: 1})
       })),
 
   /* Prints all feed in a bare table */
