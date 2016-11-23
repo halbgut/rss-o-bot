@@ -2,7 +2,7 @@ const { spawn, execSync } = require('child_process')
 
 const Rx = require('rxjs/Rx')
 const Immutable = require('immutable')
-const uuid = require('node-uuid')
+const uuid = require('uuid')
 
 const runCLI = require('../../../../dist/cli.js')
 const H = require('../../../../dist/lib/helpers')
