@@ -164,7 +164,7 @@ test.cb('export', T.run(['export'], false)((t, o, config) =>
     ))
 ))
 
-const importFile = path.resolve(__dirname, '..', '..', 'data', 'export.xml')
+const importFile = path.join(T.fixturesDirectory, 'export.xml')
 test.cb('import', T.run(['import', importFile], 2)((t, o, config) =>
   o.switchMap(a => T.getStoreAndListFeeds(config).map(b => [a, b]))
     .do(([result, list]) => {

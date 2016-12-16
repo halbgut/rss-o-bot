@@ -1,5 +1,4 @@
 const { test } = require('ava')
-const nock = require('nock')
 
 const H = require('../../../dist/lib/helpers')
 const E = require('../../../dist/lib/errors')

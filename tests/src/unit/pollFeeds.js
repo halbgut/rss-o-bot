@@ -1,7 +1,6 @@
 const test = require('ava')
 const nock = require('nock')
 const fs = require('fs')
-const exampleFeed = fs.readFileSync('../../data/exampleFeed.xml')
 
 const H = require('../../../dist/lib/helpers')
 const E = require('../../../dist/lib/errors')
@@ -9,7 +8,7 @@ const poll = require('../../../dist/lib/pollFeeds/lib/poll')(H, E)
 
 nock('http://testfeed.com')
   .get('/feed.xml')
-  .reply(200, exampleFeed)
+  .replyWithFile(200, `${__dirname}/../../fixtures/exampleFeed.xml`)
 
 test('poll', (t) =>
   poll('http://testfeed.com/feed.xml', [])
