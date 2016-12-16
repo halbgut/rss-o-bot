@@ -1,10 +1,13 @@
 const { test } = require('ava')
+const nock = require('nock')
 
 const H = require('../../../dist/lib/helpers')
 const E = require('../../../dist/lib/errors')
 const T = require('./lib/helpers')
 
 const Poll = require('../../../dist/lib/pollFeeds/lib/poll.js')(H, E)
+
+T.mockLucaschmidNet()
 
 const isValidEntry = t => e => {
   t.true(typeof e.blogTitle === 'string')

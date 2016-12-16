@@ -9,6 +9,8 @@ const initStore = require('../../../dist/lib/store')(H)
 const Config = require('../../../dist/lib/config')(H)
 const T = require('./lib/helpers')
 
+T.mockLucaschmidNet()
+
 test.always.after('remove DB', T.removeDatabases)
 
 test.cb('version', T.run(['-v'])((t, o) =>

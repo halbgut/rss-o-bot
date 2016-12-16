@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en-GB" xmlns="http://www.w3.org/2005/Atom">
+    <title>Luca Nils Schmid - Blog</title>
+    <subtitle>My name is Luca Nils Schmid. This is my portfolio.</subtitle>
+    <id>https://lucaschmid.net/feed/atom.xml</id>
+    <updated>2016-12-01T00:00:31.422Z</updated>
+    <link href="https://lucaschmid.net/feed/atom.xml" rel="self">
+    </link>
+    <generator>Handmade by Luca Nils Schmid</generator>
+    <entry>
+        <id>https://lucaschmid.net/anotherblog/minimum-viable-modern-javascript</id>
+        <title>Minimum Viable Modern JavaScript</title>
+        <updated>2016-07-17T13:41:30.047Z</updated>
+        <author>
+            <name>Luca Nils Schmid</name>
+            <email>allspamhere@kriegslustig.me</email>
+            <uri>https://lucaschmid.net</uri>
+        </author>
+        <link href="https://lucaschmid.net/anotherblog/minimum-viable-modern-javascript" rel="self">
+        </link>
+        <summary>There are a lot of really exciting things happening with frontend development right now. So much in fact, that it&apos;s almost impossible to keep track with everything. That&apos;s makes those modern tools scary to get into.</summary>
+        <content type="html">&lt;h1 id=&quot;minimumviablemodernjavascript&quot;&gt;Minimum Viable Modern JavaScript&lt;/h1&gt;
+
+&lt;p&gt;There are a lot of really exciting things happening with frontend development right now. So much in fact, that it&apos;s almost impossible to keep track with everything. That&apos;s makes those modern tools scary to get into.&lt;/p&gt;
+
+&lt;p&gt;With this presentation I tried to create a gentle (and oppinionated) introduction into mimimum viable modern JavaScript development.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://lucaschmid.net/minimum-viable-modern-javascript/main.html&quot;&gt;The slides are available here&lt;/a&gt;.&lt;/p&gt;</content>
+    </entry>
+    <entry>
+        <id>https://lucaschmid.net/anotherblog/drupal</id>
+        <title>My experience working with Durpal – a rant</title>
+        <updated>2016-02-15T19:10:00.866Z</updated>
+        <author>
+            <name>Luca Nils Schmid</name>
+            <email>allspamhere@kriegslustig.me</email>
+            <uri>https://lucaschmid.net</uri>
+        </author>
+        <link href="https://lucaschmid.net/anotherblog/drupal" rel="self">
+        </link>
+        <summary>I don&apos;t like Drupal not 7 and not 8. I just don&apos;t like it. Here&apos;s why. Disclaimer: May contain inappropriate language.</summary>
+        <content type="html">&lt;h1 id=&quot;myexperienceworkingwithdurpal_arant_&quot;&gt;My experience working with Durpal &lt;em&gt;– a rant&lt;/em&gt;&lt;/h1&gt;
+
+&lt;p&gt;I don&apos;t like Drupal not 7 and not 8. I just don&apos;t like it. Here&apos;s why. &lt;strong&gt;Disclaimer&lt;/strong&gt;: &lt;em&gt;May contain inappropriate language&lt;/em&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;tldr&quot;&gt;TL;DR;&lt;/h2&gt;
+
+&lt;p&gt;Drupals documentation sucks. It&apos;s inconsistent, incomplete, unsearchable and horribly structured. The coding style guide is total over kill. If you have such strong guide-lines, why not have the same thing for docs? Patches for issues lie around for years without being taken in.&lt;/p&gt;
+
+&lt;h2 id=&quot;coredocumentation&quot;&gt;Core Documentation&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://api.drupal.org/api/drupal/7&quot;&gt;Drupals core docs&lt;/a&gt; are awful. Its UI is pitiful. You never know what version of the docs you are browsing. That thing on the right hand side, WTF!? That supposed to be a navigation of some sort. Then why can&apos;t I see where I am in the tree when browsing some lower level page. The URL schema is inconsistent and hard to grasp. Here are some examples:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;https://api.drupal.org/api/drupal/7/search/xyz
+https://api.drupal.org/api/drupal/modules!system!system.tar.inc/function/Archive_Tar%3A%3A_close/7
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Could someone please explain why the hell the &lt;code&gt;/7&lt;/code&gt; would be at the end for some pages and in front for others. Having it at the end is a stupid idea in the first place, but being inconsistent about it... that&apos;s a whole other league of idiocy. I&apos;m not a violent person, but someone should be beaten for this.&lt;/p&gt;
+
+&lt;p&gt;The &lt;strong&gt;search feature&lt;/strong&gt; on the page is probably the worst and most counter productive thing on the whole page. For one thing the GUI is bad, the auto-complete feature is slow and when you press enter to search without auto-completing your term you only cancel the auto-complete and then have to press it again to search. Leaving aside the fact that the results page is badly structured, my next big issue with the search feature is the search functionality itself. For example, when searching for &lt;em&gt;tar&lt;/em&gt; you&apos;ll get &lt;code&gt;stark.inc&lt;/code&gt;. I get it &lt;code&gt;tar&lt;/code&gt; is in &lt;code&gt;start&lt;/code&gt;, but seriously, it&apos;s not that hard to weigh in word boundaries when indexing. Also it doesn&apos;t even properly count occurrences of a string in a document. It doesn&apos;t even properly prioritize occurrences in things like document titles. It&apos;s simply horribly implemented and incredibly frustrating to work with. Search on the scale of the Drupal docs is a well researched area. There are good solutions for it. So why the hell do they make it seem so damn hard.&lt;/p&gt;
+
+&lt;h2 id=&quot;documentationofcontribmodules&quot;&gt;Documentation Of Contrib Modules&lt;/h2&gt;
+
+&lt;p&gt;Another big Problem is contrib module documentation. In my experience it&apos;s consistently poor. Again the URL scheme leaves a lot to be desired here. The documents lack consistency. Drupal has ridiculously strict coding style standards, so why is the only thing consistent about contrib module&apos;s documentation, their incompleteness. PHP people like to make fun of &lt;em&gt;poor coding style&lt;/em&gt; seen in JS. But seriously I have never seen an NPM module half as popular as the Drupal &lt;a href=&quot;https://www.drupal.org/project/devel&quot;&gt;devel module&lt;/a&gt; with such bad documentation.&lt;/p&gt;
+
+&lt;p&gt;In all seriousness how can anyone live with such horrible documentation. For example, the &lt;a href=&quot;https://www.drupal.org/documentation/modules/flag&quot;&gt;flag&lt;/a&gt; module.&lt;/p&gt;
+
+&lt;p&gt;Also the UI is horrible. Fist of all, why the fuck aren&apos;t the docs for a project hierachically underneath the project itself? So the docs are separate from the projects them-self, okay I could get over that. But only if the wasn&apos;t structured by a fifth grader! Seriously! How could anyone think hiding the docs for the flag module under &lt;em&gt;Organizing content with taxonomies&lt;/em&gt; &gt; &lt;em&gt;Contributed modules for taxonomy and tagging&lt;/em&gt; &gt; &lt;em&gt;Flag: Custom flags for nodes, users, comments, and more&lt;/em&gt; would be a good idea. Also not helpful; the navigation. &lt;strong&gt;Structure Guide&lt;/strong&gt; what kind of title is that!?&lt;/p&gt;
+
+&lt;h2 id=&quot;codingstyle&quot;&gt;Coding Style&lt;/h2&gt;
+
+&lt;p&gt;The Coding style the Drupal projects impose on contrib module authors is just short of oppression of free speech. It seems to me that the people that wrote these documents worry more about coding style than actual code quality and performance. This raises the question; why are they so strict about coding style and not about documentation. That&apos;s stupid. Having a comment &lt;code&gt;Implements hook_your_mum&lt;/code&gt; could easily be made redundant by a semi-intelligent documentation parser. People should rather leave that redundant comment away and write a sentence about what the hell their actually doing with the damn thing!&lt;/p&gt;
+
+&lt;h2 id=&quot;maintainance&quot;&gt;Maintainance&lt;/h2&gt;
+
+&lt;p&gt;The Drupal core has thousands of open issues in every version. No one is able to keep track of them. Bug fixes for core issues often lie around for &lt;strong&gt;years&lt;/strong&gt; in the state &lt;strong&gt;needs further testing&lt;/strong&gt;. How could anyone think that that&apos;s okay.&lt;/p&gt;
+
+&lt;h2 id=&quot;caching&quot;&gt;Caching&lt;/h2&gt;
+
+&lt;p&gt;The caching system is so complex that it often simply doesn&apos;t work. It&apos;s not uncommon, for sites to run faster without caching than with caching turned on.&lt;/p&gt;
+
+&lt;h2 id=&quot;scale&quot;&gt;Scale&lt;/h2&gt;
+
+&lt;p&gt;Drupal doesn&apos;t scale well.&lt;/p&gt;
+
+&lt;h2 id=&quot;_thedrupalway_&quot;&gt;&lt;em&gt;The Drupal Way&lt;/em&gt;&lt;/h2&gt;
+
+&lt;p&gt;What the fuck is going on with Drupal people and GUIs!? Has the thought ever come to you that, if someone can&apos;t use a command line and a text editor, they might not be qualified to mess around with complicated systems?&lt;/p&gt;
+
+&lt;h2 id=&quot;_notinventedhere_&quot;&gt;&lt;em&gt;Not Invented Here&lt;/em&gt;&lt;/h2&gt;
+
+&lt;p&gt;The Drupal Core has a serious &lt;em&gt;Not Invented Here&lt;/em&gt; problem. It might have gotten better in D8.&lt;/p&gt;</content>
+    </entry>
+    <entry>
+        <id>https://lucaschmid.net/anotherblog/letsencrypt-express</id>
+        <title>Let&apos;s encrypt Express</title>
+        <updated>2016-01-20T16:07:53.000Z</updated>
+        <author>
+            <name>Luca Nils Schmid</name>
+            <email>allspamhere@kriegslustig.me</email>
+            <uri>https://lucaschmid.net</uri>
+        </author>
+        <link href="https://lucaschmid.net/anotherblog/letsencrypt-express" rel="self">
+        </link>
+        <summary>Since Let&apos;s Encrypt will be coming out soon, I thought I&apos;d try it on my Site. Let&apos;s Encrypts infrastructure is actually fully operational already. They still label it as being in beta, because the client has some (around 400) bugs. My Site runs on Node.js using Express on Alpine Linux. The guide should work on pretty much any Linux system, since both Node.js and Let&apos;s Encrypt are made to be as cross-platform-compatible as possible.</summary>
+        <content type="html">&lt;h1 id=&quot;letsencryptexpress&quot;&gt;Let&apos;s encrypt Express&lt;/h1&gt;
+
+&lt;p&gt;Since &lt;a href=&quot;https://letsencrypt.org/&quot;&gt;&lt;em&gt;Let&apos;s Encrypt&lt;/em&gt;&lt;/a&gt; will be coming out &lt;a href=&quot;https://letsencrypt.org/2015/11/12/public-beta-timing.html&quot;&gt;soon&lt;/a&gt;, I thought I&apos;d try it on my Site. &lt;em&gt;Let&apos;s Encrypts&lt;/em&gt; infrastructure is actually fully operational already. They still label it as being in beta, because the client has some (&lt;a href=&quot;https://github.com/letsencrypt/letsencrypt/issues&quot;&gt;around 400&lt;/a&gt;) bugs. My Site runs on Node.js using Express on &lt;a href=&quot;https://alpinelinux.org/&quot;&gt;&lt;em&gt;Alpine Linux&lt;/em&gt;&lt;/a&gt;. The guide should work on pretty much any Linux system, since both &lt;em&gt;Node.js&lt;/em&gt; and &lt;em&gt;Let&apos;s Encrypt&lt;/em&gt; are made to be as cross-platform-compatible as possible.&lt;/p&gt;
+
+&lt;p&gt;I&apos;ll be covering three things in this guide. &lt;strong&gt;Requesting the certificate&lt;/strong&gt;, &lt;strong&gt;Installing it to the Express app&lt;/strong&gt; and &lt;strong&gt;A simple Express app running over TLS&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;requestingthecertificate&quot;&gt;Requesting the certificate&lt;/h2&gt;
+
+&lt;p&gt;First of all lets get our certificate. I basically just followed the &lt;a href=&quot;https://github.com/letsencrypt/letsencrypt/blob/master/README.rst&quot;&gt;README inside Let&apos;s Encrypt&apos;s Github repo&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;We&apos;ll need to install the utility. This will become easier once it&apos;s released as stable. You&apos;ll then be able to use your package-manager.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;bash language-bash&quot;&gt;git clone https://github.com/letsencrypt/letsencrypt
+cd letsencrypt
+./letsencrypt-auto --help
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we can request the certificate. Here&apos;s what I did for this site.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;bash language-bash&quot;&gt;./letsencrypt-auto certonly --standalone --email not_an_email_address@lucaschmid.net -d lucaschmid.net
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This threw an error on my server because I had IPv6 enabled. If &lt;a href=&quot;https://github.com/letsencrypt/boulder/issues/1046&quot;&gt;this issue&lt;/a&gt; hasn&apos;t been resolved yet, &lt;strong&gt;you might need to do deactivate IPv6&lt;/strong&gt;, before running the last command.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;bash language-bash&quot;&gt;sysctl -w net.ipv6.conf.all.disable_ipv6=1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When you now run the last command again, you should recieve the certificate. After that, you can enable IPv6 again.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;bash language-bash&quot;&gt;sysctl -w net.ipv6.conf.all.disable_ipv6=0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;installingthecertificatetotheexpressapp&quot;&gt;Installing the certificate to the Express app&lt;/h2&gt;
+
+&lt;p&gt;Inside my app&apos;s directory I created a directory called &lt;code&gt;tls&lt;/code&gt;. I then created some symlinks for the certificate and the key.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;bash language-bash&quot;&gt;mkdir tls
+cd tls
+ln -s /etc/letsencrypt/live/lucaschmid.net/fullchain.pem cert.pem
+ln -s /etc/letsencrypt/live/lucaschmid.net/privkey.pem key.pem
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;I&apos;m using Docker to run this site, so the symlinks won&apos;t work inside the container. To fix this, I had to make copies of the files instead of only symlinking them. This has the disadvantage of Let’s Encrypt not being able to manage them. The certificates have a pretty short lifetime (3 months), letsencrypt could renew them itself.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;asimpleexpressapprunningovertls&quot;&gt;A simple Express app running over TLS&lt;/h2&gt;
+
+&lt;p&gt;Now we can integrate the &lt;code&gt;https&lt;/code&gt; module into our Express server. Here&apos;s a simple example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;js language-js&quot;&gt;var express = require(&apos;express&apos;)
+var fs = require(&apos;fs&apos;)
+var https = require(&apos;https&apos;)
+
+var ports = process.env.NODE_ENV === &apos;production&apos;
+  ? [80, 443]
+  : [3442, 3443]
+
+var app = express()
+
+var server = https.createServer(
+  {
+    key: fs.readFileSync(&apos;./tls/key.pem&apos;),
+    cert: fs.readFileSync(&apos;./tls/cert.pem&apos;)
+  },
+  app
+)
+
+server.listen(ports[1])
+app.listen(ports[0])
+
+app.use(&apos;/&apos;, (req, res) =&amp;gt; {
+  res.end(&apos;Hi&apos;)
+})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This script simply serves &apos;Hi&apos; on all routes both over HTTP and HTTPS. It might be a good idea to redirect HTTP to HTTPS. I just wanted to keep it as simple as possible here.&lt;/p&gt;
+
+&lt;p&gt;When you run this and go to your Website via HTTPS, you should see something like this:
+&lt;img src=&quot;https://lucaschmid.net/img/certificate.png&quot; alt=&quot;Image of the certificate opened in Firefox&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Now go on!&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;ENCRYPT ALL THE THINGS!!&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;UPDATE&lt;/strong&gt; 21. July 2016:
+A while ago I noticed, that some browsers (i.e. IE) marked my certificate as unverified. That didn&apos;t make much sense to me, since Let&apos;s Encrypts intermediate certificates are cross-signed by IdenTrust and IdenTrust is a well known CA. So any browser that has whitelisted IdenTrusts root certificate should also trust any Let&apos;s Encrypt certificate. The certificate this post used to instruct you to use (&lt;code&gt;/etc/letsencrypt/live/[domain]/cert.pem&lt;/code&gt;) is of course only signed by the Let&apos;s Encrypt CA. For a browser to know that the certificate is indirectly cross-signed by IdenTrust we actually need to use &lt;code&gt;/etc/letsencrypt/live/[domain]/fullchain.pem&lt;/code&gt;, which as the name implies, contains the whole certificate chain. That includes the cross-signed Let&apos;s Encrypt intermediate certificates. You can view the changes I made to the post &lt;a href=&quot;https://github.com/Kriegslustig/lucaschmid.net/commits/master/common/data/blog/letsencrypt-express.md&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;</content>
+    </entry>
+</feed>

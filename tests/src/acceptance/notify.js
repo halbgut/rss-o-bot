@@ -11,6 +11,8 @@ const E = require('../../../dist/lib/errors')
 const Poll = require('../../../dist/lib/pollFeeds/lib/poll.js')(H, E)
 const T = require('./lib/helpers')
 
+T.mockLucaschmidNet()
+
 const createDummyEntryAndPoll = (config, url, offset = 2) =>
   T.createDummyEntry(url, [], config, true)
     .switchMap(([store, feed]) =>

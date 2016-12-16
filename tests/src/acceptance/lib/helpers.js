@@ -3,6 +3,7 @@ const { spawn, execSync } = require('child_process')
 const Rx = require('rxjs/Rx')
 const Immutable = require('immutable')
 const uuid = require('node-uuid')
+const nock = require('nock')
 
 const runCLI = require('../../../../dist/cli.js')
 const H = require('../../../../dist/lib/helpers')
@@ -24,6 +25,17 @@ const getConfig = ((id = 0) => (extend = {}) => {
     }
   }, extend)
 })()
+
+const mockLucaschmidNet = () => {
+  /* Setting up network mocks */
+  const lucaschmidNock = nock('https://lucaschmid.net/feed')
+  lucaschmidNock.get('/rss.xml')
+    .times(999)
+    .replyWithFile(200, `${__dirname}/../../../data/lucaschmidNetFeedRss.xml`)
+  lucaschmidNock.get('/atom.xml')
+    .times(999)
+    .replyWithFile(200, `${__dirname}/../../../data/lucaschmidNetFeedAtom.xml`)
+}
 
 const removeDatabases = t => {
   execSync(`rm ${__dirname}/../../../../data/test_feeds-*.sqlite`)
@@ -133,6 +145,7 @@ const startServer =
   }
 
 module.exports = {
+  mockLucaschmidNet,
   removeDatabases,
   getConfig,
   toConfig,
