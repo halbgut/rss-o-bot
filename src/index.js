@@ -7,12 +7,10 @@
 const { Observable: O } = require('rxjs/Rx')
 const debug = require('debug')('rss-o-bot')
 
-const Helpers = require('./lib/helpers')
-const Config = require('./lib/config')(Helpers)
-const initStore = require('./lib/store')(Helpers)
-const Errors = require('./lib/errors')
-const pollFeeds = require('./lib/pollFeeds')(Helpers, Errors)
-const Notify = require('./lib/notify')(Helpers)
+const Config = require('./lib/config')
+const initStore = require('./lib/store')
+const pollFeeds = require('./lib/poll-feeds')
+const Notify = require('./lib/notify')
 
 module.exports = function runRSSOBotDaemon (state) {
   const config = state.get('configuration')

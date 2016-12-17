@@ -4,9 +4,9 @@ const sax = require('sax')
 const { Observable: O } = require('rxjs/Rx')
 
 const runCLI = require('../../../dist/cli.js')
-const H = require('../../../dist/lib/helpers')
-const initStore = require('../../../dist/lib/store')(H)
-const Config = require('../../../dist/lib/config')(H)
+const H = require('../../../dist/lib/shared/helpers')
+const initStore = require('../../../dist/lib/store')
+const Config = require('../../../dist/lib/config')
 const T = require('./lib/helpers')
 
 T.mockLucaschmidNet()
@@ -188,4 +188,3 @@ test.cb('readConfig', t => {
       () => t.end()
     )
 })
-

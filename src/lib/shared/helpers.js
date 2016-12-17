@@ -15,7 +15,7 @@ const jwt = require('jsonwebtoken')
 const debug = require('debug')('rss-o-bot')
 const CliTable = require('cli-table2')
 
-const ObservableOperators = require('./lib/observable-operators')
+const ObservableOperators = require('./observable-operators')
 ObservableOperators(O)
 
 const domainRegex = '([\\w\\d-]+\\.)+\\w{2,}'
@@ -383,4 +383,3 @@ const Helpers = {
 }
 
 module.exports = Helpers
-

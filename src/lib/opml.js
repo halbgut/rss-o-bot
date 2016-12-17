@@ -11,7 +11,7 @@ const xml = require('xml')
 const moment = require('moment')
 const { Observable: O } = require('rxjs/Rx')
 
-module.exports = H => ({
+module.exports = {
   import (file) {
     return ({ insertFeed }) =>
       O.create(o => {
@@ -60,5 +60,4 @@ module.exports = H => ({
         }, {declaration: true}))
     )
   }
-})
-
+}

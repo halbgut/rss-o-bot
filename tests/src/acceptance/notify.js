@@ -6,9 +6,7 @@ const { test } = require('ava')
 const { Observable: O } = require('rxjs/Rx')
 
 const runCLI = require('../../../dist/cli.js')
-const H = require('../../../dist/lib/helpers')
-const E = require('../../../dist/lib/errors')
-const Poll = require('../../../dist/lib/pollFeeds/lib/poll.js')(H, E)
+const Poll = require('../../../dist/lib/shared/poll.js')
 const T = require('./lib/helpers')
 
 T.mockLucaschmidNet()

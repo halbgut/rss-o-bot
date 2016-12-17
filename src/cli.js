@@ -12,19 +12,19 @@ const Immutable = require('immutable')
 const debug = require('debug')('rss-o-bot')
 const chalk = require('chalk')
 
-const H = require('./lib/helpers')
-const Errors = require('./lib/errors')
+const H = require('./lib/shared/helpers')
+const Errors = require('./lib/shared/errors')
 const { throwO } = Errors
-const initStore = require('./lib/store')(H, Errors)
-const Notify = require('./lib/notify')(H)
-const opml = require('./lib/opml')(H)
-const remote = require('./lib/remote')(H)
-const pollFeeds = require('./lib/pollFeeds')(H, Errors)
-const Server = require('./lib/server')(H, Errors)
-const genKeys = require('./lib/gen-keys')(H, Errors)
+const initStore = require('./lib/store')
+const Notify = require('./lib/notify')
+const opml = require('./lib/opml')
+const remote = require('./lib/remote')
+const pollFeeds = require('./lib/poll-feeds')
+const Server = require('./lib/server')
+const genKeys = require('./lib/gen-keys')
 
 /* Pure modules */
-const Config = require('./lib/config')(H)
+const Config = require('./lib/config')
 const Argv = require('./lib/argv')
 
 const commands = [
@@ -220,7 +220,7 @@ const runCommand = state => {
     /* Ignore any command passed, since there's only
      * `run` on the server.
      */
-    return Server.run(commands)(state)
+    return Server(commands, state)
   } else {
     throw new Error(`Unexpected state mode is set to ${mode}`)
   }

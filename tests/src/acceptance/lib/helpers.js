@@ -6,10 +6,8 @@ const uuid = require('node-uuid')
 const nock = require('nock')
 
 const runCLI = require('../../../../dist/cli.js')
-const H = require('../../../../dist/lib/helpers')
-const Errors = require('../../../../dist/lib/errors')
-const initStore = require('../../../../dist/lib/store')(H, Errors)
-const Config = require('../../../../dist/lib/config')(H)
+const initStore = require('../../../../dist/lib/store')
+const Config = require('../../../../dist/lib/config')
 
 const DEBUG = process.env.DEBUG
 
@@ -164,4 +162,3 @@ module.exports = {
   createDummyEntry,
   startServer
 }
-

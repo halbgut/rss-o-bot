@@ -7,9 +7,8 @@ const Immutable = require('immutable')
 
 const T = require('./lib/helpers')
 
-const H = require('../../../dist/lib/helpers')
-const Errors = require('../../../dist/lib/errors')
-const genKeys = require('../../../dist/lib/gen-keys')(H, Errors)
+const H = require('../../../dist/lib/shared/helpers')
+const genKeys = require('../../../dist/lib/gen-keys')
 
 const config = { mode: 'remote', remote: 'localhost', port: 3646, location: `${__dirname}/../../config/server-remote` }
 

@@ -1,10 +1,7 @@
 const test = require('ava')
 const nock = require('nock')
-const fs = require('fs')
 
-const H = require('../../../dist/lib/helpers')
-const E = require('../../../dist/lib/errors')
-const poll = require('../../../dist/lib/pollFeeds/lib/poll')(H, E)
+const poll = require('../../../dist/lib/shared/poll')
 
 nock('http://testfeed.com')
   .get('/feed.xml')

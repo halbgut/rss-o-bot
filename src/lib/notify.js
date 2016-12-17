@@ -5,7 +5,9 @@
 const { Observable: O } = require('rxjs/Rx')
 const debug = require('debug')('rss-o-bot')
 
-module.exports = H => config => {
+const H = require('./shared/helpers')
+
+module.exports = config => {
   const setMethods = config.get('notification-methods') || []
   const notifierFunctions = getNotifierFunctions(H, config, setMethods)
 
@@ -42,4 +44,3 @@ const getNotifierFunctions = (H, config, setMethods) =>
         .map(f => f(config))
         .do(() => debug(`Successfully loaded notifier: ${module}`))
   )
-

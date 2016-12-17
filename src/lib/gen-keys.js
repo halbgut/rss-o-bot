@@ -1,12 +1,15 @@
 const debug = require('debug')('rss-o-bot')
 const { Observable: O } = require('rxjs/Rx')
 
+const { throwO } = require('./shared/errors')
+const H = require('./shared/helpers')
+
 /**
  * OS specific approach. Works on MacOS but probably not
  * on Windows. It probably also works on Linux. If this doesn't
  * work, the RSA keys must be generated manualy.
  */
-const genKeys = (H, { throwO }) => config => {
+const genKeys = config => {
   const privateKeyPath = H.privateKeyPath(config)
   const publicKeyPath = H.publicKeyPath(config)
   debug('Attempting to generate key pair.')
@@ -29,4 +32,3 @@ const genKeys = (H, { throwO }) => config => {
 }
 
 module.exports = genKeys
-
