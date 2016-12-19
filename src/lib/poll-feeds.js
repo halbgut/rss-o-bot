@@ -12,8 +12,8 @@ const callbackWrapper = callback => ({ blogTitle, link, title }) =>
 /* Takes a store and a feed entity and returns an observable of new links
  * found on that feed.
  */
-const queryFeed = ({updateLatestLink, setBlogTitle}) => feed => {
-  const feed$ = O.fromPromise(feed.getFilters())
+const queryFeed = ({updateLatestLink, setBlogTitle}) => feed =>
+  O.fromPromise(feed.getFilters())
     .do(() => debug(`Downloading ${feed.get('url')}`))
     .switchMap(filters =>
       Poll(
@@ -22,28 +22,20 @@ const queryFeed = ({updateLatestLink, setBlogTitle}) => feed => {
       )
         .retry(2)
     )
-  return (
-    feed$
-      .concatMap(getNewLinks(feed))
-      .concatMap(info =>
-        feed.get('blogTitle')
-          ? O.of(info)
-          : setBlogTitle(feed.get('id'), info.blogTitle).mapTo(info)
-      )
-      .switchMap(info =>
-        updateLatestLink(feed.get('id'), info.link).mapTo(info)
-      )
-      .do(({link}) => debug(`New URL: ${link}`))
-  )
-}
+    .concatMap(getNewLinks(feed.get('latestLink')))
+    .concatMap(info => O.forkJoin(
+        setBlogTitle(feed.get('id'), info.blogTitle),
+        updateLatestLink(feed.get('id'), info.link)
+    ).mapTo(info))
+    .do(({link}) => debug(`New URL: ${link}`))
 
 /* Takes a feed entity and a stream (curried) and checks exctracts all new
  * items from that stream. Then it returns an observable of those items.
  */
-const getNewLinks = feed => stream => {
-  if (feed.get('latestLink')) {
+const getNewLinks = latestLink => stream => {
+  if (latestLink) {
     const latestIndex = stream.findIndex(e =>
-      e.link === feed.get('latestLink')
+      e.link === latestLink
     )
     const newLinks = stream.slice(0, latestIndex).reverse()
     return O.of(...newLinks)
@@ -59,7 +51,7 @@ const getNewLinks = feed => stream => {
 const PollFeeds = callback => (store, force) =>
   store.getFeeds(force)
     .switchMap(feeds =>
-      O.merge(...feeds.map(feed =>
+      O.forkJoin(...feeds.map(feed =>
         queryFeed(store)(feed)
           .concatMap(callbackWrapper(callback))
           .catch((err) => console.log(err) || O.empty())
