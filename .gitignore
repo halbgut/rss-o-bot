@@ -10,4 +10,4 @@ npm-debug.log
 /tests/config/*/*.pem
 /tests/dist
 /dist
-
+/.tern-project
