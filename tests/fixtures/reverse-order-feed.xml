@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xml:lang="en-US">
+  <title>Yoloisma</title>
+  <entry>
+    <link type="text/html" rel="alternate" href="https://reverse-order.feed/asdf1"/>
+    <title>A sdf 1</title>
+    <updated>2016-11-02T21:41:40+01:00</updated>
+  </entry>
+  <entry>
+    <link type="text/html" rel="alternate" href="https://reverse-order.feed/asdf"/>
+    <title>A sdf</title>
+    <updated>2016-11-02T21:41:43+01:00</updated>
+  </entry>
+</feed>

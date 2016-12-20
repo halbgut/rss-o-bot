@@ -302,6 +302,9 @@ const Helpers = {
       })
   },
 
+  getItemDate: item => (new Date(item.pubdate || item.pubDate || item.date)).getTime(),
+  subtractItemDates: (a, b) => Helpers.getItemDate(b) - Helpers.getItemDate(a),
+
   longestLineLength: (feeds, columns) => {
     const lengths = R.map(
       R.pipe(

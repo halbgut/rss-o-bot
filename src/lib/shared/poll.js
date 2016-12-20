@@ -92,7 +92,7 @@ const applyFilters = filters => ({ title }) => {
     }).length === 0
 }
 
-module.exports = (url, filters) =>
+module.exports = (url, filters = []) =>
   get(url)
     .catch(error => throwO('FAILED_TO_DOWNLOAD_FEED', { error, feed: url }))
     .switchMap((body) =>
@@ -100,7 +100,9 @@ module.exports = (url, filters) =>
         .catch((err) => throwO('FAILED_TO_PARSE_FEED', { error: err, feed: url }))
     )
     .map(([stream, meta]) => [
-      stream.filter(applyFilters(filters)),
+      stream
+        .filter(applyFilters(filters))
+        .sort(H.subtractItemDates),
       meta
     ])
     .map(([stream, meta]) =>

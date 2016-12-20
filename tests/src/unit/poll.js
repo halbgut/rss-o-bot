@@ -1,10 +1,14 @@
 const { test } = require('ava')
+const nock = require('nock')
 
 const T = require('../helpers/helpers')
 
 const Poll = require('../../../dist/lib/shared/poll.js')
 
 T.mockLucaschmidNet()
+nock('https://reverse-order.feed')
+  .get('/')
+  .replyWithFile(200, `${__dirname}/../../fixtures/reverse-order-feed.xml`)
 
 const isValidEntry = t => e => {
   t.true(typeof e.blogTitle === 'string')
@@ -54,4 +58,20 @@ test.cb('poll case-sensitive positive rss filter', t => T.testObservable(
     )
     .do(entries => t.true(entries.length === 1))
 )(t))
+
+test('poll should order feeds by creation data', t =>
+  Poll('https://reverse-order.feed')
+    .do(arr => t.deepEqual(arr, [
+      {
+        blogTitle: 'Yoloisma',
+        link: 'https://reverse-order.feed/asdf',
+        title: 'A sdf'
+      },
+      {
+        blogTitle: 'Yoloisma',
+        link: 'https://reverse-order.feed/asdf1',
+        title: 'A sdf 1'
+      }
+    ]))
+)
 
