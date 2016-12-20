@@ -1,6 +1,6 @@
 const { test } = require('ava')
 
-const T = require('./lib/helpers')
+const T = require('../helpers/helpers')
 
 const Poll = require('../../../dist/lib/shared/poll.js')
 

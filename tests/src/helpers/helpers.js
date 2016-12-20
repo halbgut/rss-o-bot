@@ -5,14 +5,14 @@ const Immutable = require('immutable')
 const uuid = require('node-uuid')
 const nock = require('nock')
 
-const runCLI = require('../../../../dist/cli.js')
-const initStore = require('../../../../dist/lib/store')
-const Config = require('../../../../dist/lib/config')
+const runCLI = require('../../../dist/cli.js')
+const initStore = require('../../../dist/lib/store')
+const Config = require('../../../dist/lib/config')
 
 const DEBUG = process.env.DEBUG
 
-const fixturesDirectory = `${__dirname}/../../../fixtures/`
-const dataDirectory = `${__dirname}/../../../data/`
+const fixturesDirectory = `${__dirname}/../../fixtures/`
+const dataDirectory = `${__dirname}/../../data/`
 
 const getConfig = ((id = 0) => (extend = {}) => {
   const db = `${dataDirectory}/test_feeds-${uuid.v4()}.sqlite`

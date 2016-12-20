@@ -7,7 +7,7 @@ const { Observable: O } = require('rxjs/Rx')
 
 const runCLI = require('../../../dist/cli.js')
 const Poll = require('../../../dist/lib/shared/poll.js')
-const T = require('./lib/helpers')
+const T = require('../helpers/helpers')
 
 T.mockLucaschmidNet()
 
@@ -25,7 +25,7 @@ const createDummyEntryAndPoll = (config, url, offset = 2) =>
 test.cb('notifier injection', t => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
   const config = T.getConfigWithDefaults({
-    'notification-methods': [`${__dirname}/lib/notifier.js`]
+    'notification-methods': [`${__dirname}/../helpers/notifier.js`]
   })
   global.NOTIFIER_TEST_OBJECT = t
   createDummyEntryAndPoll(config, url)

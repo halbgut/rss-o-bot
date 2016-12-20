@@ -7,7 +7,7 @@ const runCLI = require('../../../dist/cli.js')
 const H = require('../../../dist/lib/shared/helpers')
 const initStore = require('../../../dist/lib/store')
 const Config = require('../../../dist/lib/config')
-const T = require('./lib/helpers')
+const T = require('../helpers/helpers')
 
 T.mockLucaschmidNet()
 

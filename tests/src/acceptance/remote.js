@@ -5,7 +5,7 @@ const R = require('ramda')
 const { Observable: O } = require('rxjs/Rx')
 const Immutable = require('immutable')
 
-const T = require('./lib/helpers')
+const T = require('../helpers/helpers')
 
 const H = require('../../../dist/lib/shared/helpers')
 const genKeys = require('../../../dist/lib/gen-keys')
