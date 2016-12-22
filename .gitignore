@@ -1,7 +1,6 @@
 node_modules
-/data/*.pem
-/data/*.sqlite
-/data/*.json
+/tests/data/*
+!/tests/data/PLACEHOLDER
 *.map
 /docker/data
 /tags
@@ -10,4 +9,4 @@ npm-debug.log
 /tests/config/*/*.pem
 /tests/dist
 /dist
-/.tern-project
+/.tern*
