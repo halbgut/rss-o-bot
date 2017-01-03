@@ -24,8 +24,8 @@ const queryFeed = ({updateLatestLink, setBlogTitle}) => feed =>
     )
     .concatMap(getNewLinks(feed.get('latestLink')))
     .concatMap(info => O.forkJoin(
-        setBlogTitle(feed.get('id'), info.blogTitle),
-        updateLatestLink(feed.get('id'), info.link)
+      setBlogTitle(feed.get('id'), info.blogTitle),
+      updateLatestLink(feed.get('id'), info.link)
     ).mapTo(info))
     .do(({link}) => debug(`New URL: ${link}`))
 

@@ -202,7 +202,9 @@ const runCommand = state => {
   const config = state.get('configuration')
   /* Execute the command locally */
   if (mode === 'local' || H.shouldRunOnRemote(state.get('scope'))) {
-    debug('Running command locally.')
+    debug(`Running command "${state.get('action')}" locally.`)
+    debug(`Passing arguments ${H.mapToJSON(state.get('arguments'))}`)
+    debug(`Passing switches ${H.mapToJSON(state.get('switches'))}`)
     return state.get('command')(state)
   /* Send to a server */
   } else if (mode === 'remote') {

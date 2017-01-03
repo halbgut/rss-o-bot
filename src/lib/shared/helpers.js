@@ -323,7 +323,6 @@ const Helpers = {
   getCommand: commands => state => {
     const command = Helpers.findCommand(commands, state.get('action'), state.get('arguments'))
     if (!command) return state
-    debug(`Running command ${command[0]}.`)
     return Helpers.setCommandState(state)(command)
   },
 
@@ -382,7 +381,8 @@ const Helpers = {
   /*
    * Others
    */
-  getNpmPrefix: () => Helpers.exec('npm config get prefix').map(l => `${l[0].trim()}/lib/node_modules/`)
+  getNpmPrefix: () => Helpers.exec('npm config get prefix').map(l => `${l[0].trim()}/lib/node_modules/`),
+  mapToJSON: (map) => JSON.stringify(map.toJS())
 }
 
 module.exports = Helpers
