@@ -56,7 +56,7 @@ const genGetFeeds = (Feed, interval) => force => {
       .then(() => Feed.findAll({
         where: { updaterId }
       }))
-  )
+  ).do(() => { debug(`Updated lastCheck.`) })
 }
 
 const genSetBlogTitle = Feed => (id, blogTitle) => {
