@@ -27,7 +27,7 @@ const Helpers = {
    * fs releated
    */
   readFile: O.bindNodeCallback(fs.readFile),
-  writeFile: (path, contents) => writeFileO(path.normalize(path), contents),
+  writeFile: (filePath, contents) => writeFileO(path.normalize(filePath), contents),
   exec: O.bindNodeCallback(cp.exec),
   stat: O.bindNodeCallback(fs.stat),
   isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')).mapTo(path),
@@ -37,7 +37,7 @@ const Helpers = {
     const dirPath = path.normalize(rawPath)
     return Helpers.isDirectory(dirPath)
       .catch(() =>
-        Helpers.mkdirDeep('${dirPath}/..')
+        Helpers.mkdirDeep(`${dirPath}/..`)
           .switchMap(() => Helpers.mkdir(dirPath))
       )
   },
