@@ -5,7 +5,7 @@
  * This allows users to use any DB they might want.
  */
 const path = require('path')
-const uuid = require('node-uuid')
+const uuid = require('uuid')
 const Rx = require('rxjs/Rx')
 const O = Rx.Observable
 const Sequelize = require('sequelize')
