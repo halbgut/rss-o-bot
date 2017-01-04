@@ -20,24 +20,27 @@ ObservableOperators(O)
 
 const domainRegex = '([\\w\\d-]+\\.)+\\w{2,}'
 const protoRegex = '\\w+:\\/\\/'
+const writeFileO = O.bindNodeCallback(fs.writeFile)
 
 const Helpers = {
   /*
    * fs releated
    */
   readFile: O.bindNodeCallback(fs.readFile),
-  writeFile: O.bindNodeCallback(fs.writeFile),
+  writeFile: (path, contents) => writeFileO(path.normalize(path), contents),
   exec: O.bindNodeCallback(cp.exec),
   stat: O.bindNodeCallback(fs.stat),
   isDirectory: path => Helpers.stat(path).map(Helpers.tryCall('isDirectory')).mapTo(path),
   isFile: path => Helpers.stat(path).map(Helpers.tryCall('isFile')).map(() => path),
   mkdir: O.bindNodeCallback(fs.mkdir),
-  mkdirDeep: dirPath =>
-    Helpers.isDirectory(dirPath)
+  mkdirDeep: rawPath => {
+    const dirPath = path.normalize(rawPath)
+    return Helpers.isDirectory(dirPath)
       .catch(() =>
-        Helpers.mkdirDeep(path.normalize(`${dirPath}/..`))
+        Helpers.mkdirDeep('${dirPath}/..')
           .switchMap(() => Helpers.mkdir(dirPath))
-      ),
+      )
+  },
 
   findExistingDirectory: loc =>
     O.onErrorResumeNextT(

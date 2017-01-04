@@ -31,7 +31,7 @@ const Config = {
       name: 'rss-o-bot',
       options: {
         dialect: 'sqlite',
-        storage: `${config.get('location')}/feeds.sqlite`
+        storage: path.join(config.get('location') || '', 'feeds.sqlite')
       }
     }
   }),
@@ -60,12 +60,12 @@ const Config = {
     H.findExistingDirectory(configLocations)
       .catch(() => O.throw(`No config file found! RTFM! Searched in ${configLocations.toString()}`))
       .switchMap(location =>
-        H.readFile(`${location}/${Config.filename}`)
+        H.readFile(path.join(location, Config.filename))
           .map(Config.parse(location))
           .map(Config.applyDefaults)
       ),
 
-  validate: (config) => jsonSchema(config, configSchema).valid
+  validate: config => jsonSchema(config, configSchema).valid
 }
 
 module.exports = Config

@@ -22,6 +22,7 @@ const remote = require('./lib/remote')
 const pollFeeds = require('./lib/poll-feeds')
 const Server = require('./lib/server')
 const genKeys = require('./lib/gen-keys')
+const packageInfo = require('../package.json')
 
 /* Pure modules */
 const Config = require('./lib/config')
@@ -127,7 +128,6 @@ const commands = [
     ['-v', '--version', 'version'],
     true,
     state => O.create(o => {
-      const packageInfo = require('../package.json')
       o.next(`RSS-o-Bot Version: ${packageInfo.version}`)
       o.complete()
     })

@@ -2,6 +2,8 @@
  * notifiy
  * This module notifies about new entries users.
  */
+const path = require('path')
+
 const { Observable: O } = require('rxjs/Rx')
 const debug = require('debug')('rss-o-bot')
 
@@ -31,8 +33,8 @@ const getNotifierFunctions = (H, config, setMethods) =>
         H.isDirectory(module).map(require),
         H.getNpmPrefix()
           .switchMap(prefix =>
-            H.isDirectory(`${prefix}/${module}`)
-              .catch(() => H.isDirectory(`${prefix}/rss-o-bot-${module}`))
+            H.isDirectory(path.join(prefix, module))
+              .catch(() => H.isDirectory(path.join(prefix, `rss-o-bot-${module}`)))
               .map(require)
           )
       )
