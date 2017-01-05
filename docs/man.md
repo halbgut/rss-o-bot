@@ -31,7 +31,7 @@ Don't wrap table views.
 Run the deamon process in the foreground.
 
 ### add _url_ [_filter_...]
-_$1_ a Feed-URL to the database. _url_ is a URL to an Atom or RSS feed. The URL must include the protocol. HTTP and HTTPS are supported. Post-titles inside a feed will be filtered by the words passed as _filter_ to `add`. _filter_ can be negated (to check that a title doesn't include a string) by pepending them with a bang (`!`). For example `rss-o-bot add <url> 'children' '!cooking'`. Be carefull to always wrap negated filters in quotes (`'`). Otherwise your shell will probably interpret the bang as a keyword. The filters are matched using "_smartcase_" (as in VIM smartcase). So if a filter includes no upper-case letters, it will be matched case-insensitively. When it contains an upper-case letter it will be matched case-sensitively.
+Adds a Feed-URL to the database. _url_ is a URL to an Atom or RSS feed. The URL must include the protocol. HTTP and HTTPS are supported. Post-titles inside a feed will be filtered by the words passed as _filter_ to `add`. _filter_ can be negated (to check that a title doesn't include a string) by pepending them with a bang (`!`). For example `rss-o-bot add <url> 'children' '!cooking'`. Be carefull to always wrap negated filters in quotes (`'`). Otherwise your shell will probably interpret the bang as a keyword. The filters are matched using "_smartcase_" (as in VIM smartcase). So if a filter includes no upper-case letters, it will be matched case-insensitively. When it contains an upper-case letter it will be matched case-sensitively.
 
 ### rm _id_
 Remove a Feed-URL from the database. _id_ is the key of a Feed-URL inside the database. `id`s are displayed in `rss-o-bot list`.
@@ -101,7 +101,7 @@ First, let's set up the remote (local installation). Simply install it using `NP
 
 Fill in the address of your server in the `remote`-field. It may contain a domain or an IP. You can also use a `port`-field to set the remote to communicate with something other than the default port (3645). If you have any questions regarding configuration, please checkout the JSON-Schema in docs/config.schema.json first.
 
-Then on your server, install `RSS-o-Bot`, the same way. Then configure it, as you would in the local-mode installation and add the following field:
+Then on your server, install RSS-o-Bot, the same way. Then configure it, as you would in the local-mode installation and add the following field:
 
 ```
 {
@@ -115,6 +115,14 @@ Then run the server as a daemon as described in the README.
 The communication between remote and server is simple HTTP. To secure it, all messages from remote to server is signed and verified using an asymetric cypher. These messages **are not encrypted** and communication from server to client is **not signed**. Only commands sent from remote to server are signed. That means, that anyone can listen in. So It's advisable to run an RSS-o-Bot server behind a TLS-enabled SSH proxy.
 
 For that asymetric signiture to work, a keypair needs to be generated and a public key communicated to the server. RSS-o-Bot provides an easy to use command for that. After configuring both server and remote and having started the server daemon, you can simply run `rss-o-bot gen-keys` on the remote. This command assumes that you are either using TLS (as described in the last paragraph) or are trusting the connection. If a MitM may intercept the public key and send his own along, defeating the signature/verification process insecure.
+
+## EXAMPLES
+
+Adding a feed with and ignore all items containing `release(`.
+
+```
+rss-o-bot add https://github.com/Kriegslustig/rss-o-bot/commits/master.atom '!release('
+```
 
 ## AUTHORS
 Kriegslustig <npm@ls7.ch>
