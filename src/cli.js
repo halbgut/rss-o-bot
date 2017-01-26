@@ -8,7 +8,6 @@
  */
 
 const { Observable: O } = require('rxjs/Rx')
-const Immutable = require('immutable')
 const debug = require('debug')('rss-o-bot')
 const chalk = require('chalk')
 
@@ -23,10 +22,8 @@ const pollFeeds = require('./lib/poll-feeds')
 const Server = require('./lib/server')
 const genKeys = require('./lib/gen-keys')
 const packageInfo = require('../package.json')
-
-/* Pure modules */
 const Config = require('./lib/config')
-const Argv = require('./lib/argv')
+const initialize = require('./lib/initialize')
 
 const commands = [
   [
@@ -239,30 +236,10 @@ const getKeys = state => {
 
 const runCLI = (
   argv = process.argv,
-  configLocations = Config.locations,
+  configLocations,
   config
 ) =>
-  O.of(argv)
-    /* Extract arguments */
-    .map(Argv.extractArguments)
-    /* Get config */
-    .switchMap(state =>
-      (config
-        ? O.of(Immutable.fromJS(config)).map(Config.applyDefaults)
-        : Config.readConfig(state.getIn(['switches', 'config']) || configLocations)
-      )
-        .map(Config.applyOverrides(state.get('switches')))
-        .map(c => state.set('configuration', c))
-    )
-    /* Define mode */
-    .map(state =>
-      state.set(
-        'mode',
-        state.getIn(['configuration', 'remote'])
-          ? 'remote'
-          : state.getIn(['configuration', 'mode'])
-      )
-    )
+  initialize(argv, configLocations, config)
     .map(H.getCommand(commands))
     .flatMap(state => state.get('command')
       ? O.of(state)

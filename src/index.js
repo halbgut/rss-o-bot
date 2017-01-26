@@ -11,15 +11,19 @@ const Config = require('./lib/config')
 const initStore = require('./lib/store')
 const pollFeeds = require('./lib/poll-feeds')
 const Notify = require('./lib/notify')
+const initialize = require('./lib/initialize')
 
-module.exports = function runRSSOBotDaemon (state) {
+const poller = state => {
   const config = state.get('configuration')
-  O.combineLatest(
+  return O.combineLatest(
     initStore(config),
     O.interval(config.get('interval') * 1000).startWith(0)
   )
     .map(([store]) => store)
     .switchMap(pollFeeds(Notify(config)))
+}
+module.exports = function runRSSOBotDaemon (state) {
+  poller(state)
     /* Restart on error */
     .catch(err => {
       debug(state)
@@ -32,6 +36,7 @@ module.exports = function runRSSOBotDaemon (state) {
     )
 }
 
+module.exports.poller = poller
 module.exports.pollFeeds = pollFeeds
 module.exports.getConfig = Config.readConfig
-
+module.exports.initialize = initialize
