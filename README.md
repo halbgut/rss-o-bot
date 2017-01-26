@@ -8,6 +8,10 @@
 
 A super simple command-line RSS and Atom reader/client. It's not made to read Feeds (like Newsbeuter), but to notify you when new items are posted. The Web is supposed to be decentralized. Most readers (like RSS Bot) are built through centralized services. RSS-o-Bot is not. It's build to be run on your own machine. Notifications are managed by services that are installed separately. Notification services are available for email, desktop notifications and Telegram.
 
+## Compatibility
+
+RSS-o-Bot should run on all platforms where Node.js runs. But it's developed on Mac OS and the tests are run on Linux. The goal is that it also runs on Windows. Sadly I don't regularly have a machine to test it on. Running RSS-o-Bot itself on different platforms is pretty unproblematic for the most part. What's not as easy though, is running the different notifiers. Especially the desktop notifier. So please check its [docs](https://github.com/kriegslustig/rss-o-bot-desktop) for more information on compatibility.
+
 ## Name
 
 The name RSS-o-Bot is a play on [RSS Bot](https://itunes.apple.com/us/app/rss-bot-news-notifier/id605732865?mt=12&ign-mpt=uo%3D4). The _o_ stands for open as in FOSS.
