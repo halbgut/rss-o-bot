@@ -64,7 +64,7 @@ module.exports = (commands, state) => {
                 ],
                 [R.T, () => respond(500)({ error: 'NO_DATA_IN_REQUEST' })]
               ]))
-              .catch((err) => errRespond('INVALID_JWT'))
+              .catch(() => errRespond('INVALID_JWT'))
           )
         }
       })
