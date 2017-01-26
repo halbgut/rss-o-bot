@@ -282,7 +282,7 @@ const Helpers = {
         const ttyWidth = process.stdout.columns
         const longestLine = Helpers.longestLineLength(feeds, columns)
         // Only wrap when tty width can be measured and is necessary
-        const wrap = (longestLine > ttyWidth || wrap) && ttyWidth > 0
+        const wrap = wrapInput && (longestLine > ttyWidth || wrap) && ttyWidth > 0
         const width = (w) => Math.round(ttyWidth / w) + 1
         const columnWidths = R.prepend(
           width(20),
