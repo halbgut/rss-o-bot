@@ -68,14 +68,12 @@ const commands = [
     state =>
       O.of(state).switchMap(H.setUpEnv(initStore))
         .switchMap(([store, config]) =>
-          require('.')
-            .pollFeeds(Notify(config))(
-              store,
-              true,
-              state.getIn(['switches', 'ids'])
-            )
+          pollFeeds(store, true, state.getIn(['switches', 'ids']))
+            .switchMap(({ blogTitle, link, title }) => Notify(config)(blogTitle, link, title).retry(2))
         )
-        .mapTo('Successfully polled all feeds in store.')
+        .defaultIfEmpty(false)
+        .last()
+        .map(x => x ? 'Successfully polled all feeds in store.' : 'No feeds to poll.')
   ],
   [
     'test-notification',

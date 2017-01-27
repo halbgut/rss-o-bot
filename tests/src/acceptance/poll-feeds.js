@@ -40,21 +40,22 @@ test('poll-feeds', t => {
     setBlogTitle: () => O.of(true)
   }
 
-  return pollFeeds((blogTitle, link, title) => {
-    if (index === 0) {
-      t.is(blogTitle, 'Recent Commits to rss-o-bot:master')
-      t.is(title, 'refactor(tests): move acceptance tests to acceptance tests')
-      t.is(link, 'https://github.com/Kriegslustig/rss-o-bot/commit/626404a9fe51b226b34224069fd4e21d10b0e1f3')
-    } else if (index === 1) {
-      t.is(blogTitle, 'Luca Nils Schmid - Blog')
-      t.is(title, 'My experience working with Durpal – a rant')
-      t.is(link, 'https://lucaschmid.net/anotherblog/drupal')
-    } else {
-      t.is(blogTitle, 'Luca Nils Schmid - Blog')
-      t.is(title, 'Minimum Viable Modern JavaScript')
-      t.is(link, 'https://lucaschmid.net/anotherblog/minimum-viable-modern-javascript')
-    }
-    ++index
-    return O.of(true)
-  })(storeMock)
+  return pollFeeds(storeMock)
+    .map(({ blogTitle, link, title }) => {
+      if (index === 0) {
+        t.is(blogTitle, 'Recent Commits to rss-o-bot:master')
+        t.is(title, 'refactor(tests): move acceptance tests to acceptance tests')
+        t.is(link, 'https://github.com/Kriegslustig/rss-o-bot/commit/626404a9fe51b226b34224069fd4e21d10b0e1f3')
+      } else if (index === 1) {
+        t.is(blogTitle, 'Luca Nils Schmid - Blog')
+        t.is(title, 'My experience working with Durpal – a rant')
+        t.is(link, 'https://lucaschmid.net/anotherblog/drupal')
+      } else {
+        t.is(blogTitle, 'Luca Nils Schmid - Blog')
+        t.is(title, 'Minimum Viable Modern JavaScript')
+        t.is(link, 'https://lucaschmid.net/anotherblog/minimum-viable-modern-javascript')
+      }
+      ++index
+      return O.of(true)
+    })
 })

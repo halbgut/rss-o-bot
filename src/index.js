@@ -20,10 +20,13 @@ const poller = state => {
     O.interval(config.get('interval') * 1000).startWith(0)
   )
     .map(([store]) => store)
-    .switchMap(pollFeeds(Notify(config)))
+    .switchMap(pollFeeds)
 }
 module.exports = function runRSSOBotDaemon (state) {
+  const notify = Notify(state.get('configuration'))
   poller(state)
+    .switchMap(({ blogTitle, link, title }) => notify(blogTitle, link, title).retry(2))
+    .do(() => debug('Sent notifications'))
     /* Restart on error */
     .catch(err => {
       debug(state)

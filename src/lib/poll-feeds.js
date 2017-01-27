@@ -4,12 +4,6 @@ const debug = require('debug')('rss-o-bot')
 
 const Poll = require('./shared/poll')
 
-/* Extracts blog, link and title from a feed-item */
-const callbackWrapper = callback => ({ blogTitle, link, title }) =>
-  callback(blogTitle, link, title)
-    .do(() => debug('Sent notifications'))
-    .retry(2)
-
 /* Takes a store and a feed entity and returns an observable of new links
  * found on that feed.
  */
@@ -54,13 +48,12 @@ const feedIsIn = (ids) => (f) => R.pipe(
   R.toString,
   R.contains(R.__, R.is(Array, ids) ? ids : [ids])
 )(f)
-const PollFeeds = callback => (store, force, ids) =>
+const PollFeeds = (store, force, ids) =>
   store.getFeeds(force)
     .map(ids ? R.filter(feedIsIn(ids)) : R.identity)
-    .switchMap(feeds =>
-      O.forkJoin(...feeds.map(feed =>
+    .concatMap(feeds =>
+      O.merge(...feeds.map(feed =>
         queryFeed(store)(feed)
-          .concatMap(callbackWrapper(callback))
           .catch((err) => console.log(err) || O.empty())
       ))
     )
