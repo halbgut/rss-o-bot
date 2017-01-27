@@ -1,4 +1,5 @@
 const { Observable: O } = require('rxjs/Rx')
+import R from 'ramda'
 const debug = require('debug')('rss-o-bot')
 
 const Poll = require('./shared/poll')
@@ -48,8 +49,14 @@ const getNewLinks = latestLink => stream => {
   }
 }
 
-const PollFeeds = callback => (store, force) =>
+const feedIsIn = (ids) => (f) => R.pipe(
+  R.invoker(1, 'get')('id'),
+  R.toString,
+  R.contains(R.__, R.is(Array, ids) ? ids : [ids])
+)(f)
+const PollFeeds = callback => (store, force, ids) =>
   store.getFeeds(force)
+    .map(ids ? R.filter(feedIsIn(ids)) : R.identity)
     .switchMap(feeds =>
       O.forkJoin(...feeds.map(feed =>
         queryFeed(store)(feed)

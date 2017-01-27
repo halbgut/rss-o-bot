@@ -249,8 +249,8 @@ const Helpers = {
       })),
 
   /* Prints all feed in a bare table */
-  printFeeds: (wrapInput = true, show = 'blogTitle,url,filters') => feeds => {
-    const columns = R.prepend('id', show.split(','))
+  printFeeds: (wrapInput = true, show = ['blogTitle', 'url', 'filters']) => feeds => {
+    const columns = R.prepend('id', show)
     const labels = {
       id: 'ID',
       blogTitle: 'Title',

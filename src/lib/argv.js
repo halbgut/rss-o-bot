@@ -12,11 +12,12 @@ const Argv = {
       )
     const switches = rawSwitches.reduce(
       (map, _switch) => {
-        const split = _switch.split('=')
-        return (split.length === 1
-          ? map.set(split[0], true)
-          : map.set(split[0], split[1])
-        )
+        const [ key, rawValue = '' ] = _switch.split('=')
+        const splitValue = rawValue.split(',')
+        const value = splitValue.length > 1
+          ? splitValue
+          : splitValue[0] || true
+        return map.set(key, value)
       },
       Immutable.Map({})
     )
