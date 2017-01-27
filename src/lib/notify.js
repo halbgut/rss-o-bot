@@ -47,8 +47,8 @@ const getNotifierFunctions = (H, config, setMethods) =>
       )
         .defaultIfEmpty()
         .filter(x => {
-          if (!x) throw new Error(`Failed to load notifier ${module}`)
-          return true
+          if (!x) process.stderr.write(`Failed to load notifier "${module}"\n`)
+          return !!x
         })
         .map(f => f(config))
         .do(() => debug(`Successfully loaded notifier: ${module}`))
