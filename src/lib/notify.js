@@ -34,7 +34,14 @@ const getNotifierFunctions = (H, config, setMethods) =>
         H.getNpmPrefix()
           .switchMap(prefix =>
             H.isDirectory(path.join(prefix, module))
+              .do(null, (path) => { debug(`Notifier not in ${path}`) })
               .catch(() => H.isDirectory(path.join(prefix, `rss-o-bot-${module}`)))
+              .do((path) => { debug(`Notifier found in ${path}`) })
+              .catch(() => {
+                debug(`Notifier not in ${path}`)
+                debug(`Continuing with normal operation without notifier ${module}`)
+                return O.empty()
+              })
               .map(require)
           )
       )
