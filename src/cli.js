@@ -73,7 +73,7 @@ const commands = [
         )
         .defaultIfEmpty(false)
         .last()
-        .map(x => x ? 'Successfully polled all feeds in store.' : 'No feeds to poll.')
+        .map('Successfully polled all feeds in store.')
   ],
   [
     'test-notification',
