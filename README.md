@@ -1,6 +1,6 @@
 ![alt text](https://i.imgur.com/reQMPMD.png "RSS-o-Bot Logo")
 
-# RSS-o-Bot 1.0.0-rc.18
+# RSS-o-Bot 1.0.0-rc.19
 
 [![Coverage Status](https://coveralls.io/repos/github/Kriegslustig/rss-o-bot/badge.svg?branch=master)](https://coveralls.io/github/Kriegslustig/rss-o-bot?branch=master)
 [![Build Status](https://travis-ci.org/Kriegslustig/rss-o-bot.svg?branch=master)](https://travis-ci.org/Kriegslustig/rss-o-bot)
@@ -131,6 +131,4 @@ Logo created by [mala23](https://github.com/mala23)
 
 ## TODO
 
-* test schema against config and cache result. (use hashing function to check if config has changed. store the hash inside a cache table. Also, add a test-config command)
 * Completions
-
