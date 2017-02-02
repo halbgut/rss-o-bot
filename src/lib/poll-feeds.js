@@ -3,6 +3,7 @@ import R from 'ramda'
 const debug = require('debug')('rss-o-bot')
 
 const Poll = require('./shared/poll')
+const H = require('./shared/helpers')
 
 /* Takes a store and a feed entity and returns an observable of new links
  * found on that feed.
@@ -54,7 +55,10 @@ const PollFeeds = (store, force, ids) =>
     .concatMap(feeds =>
       O.merge(...feeds.map(feed =>
         queryFeed(store)(feed)
-          .catch((err) => console.log(err) || O.empty())
+          .catch((err) => {
+            H.log(err)
+            return O.empty()
+          })
       ))
     )
 PollFeeds.queryFeed = queryFeed

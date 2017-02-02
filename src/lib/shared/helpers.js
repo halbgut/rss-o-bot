@@ -385,7 +385,18 @@ const Helpers = {
    * Others
    */
   getNpmPrefix: () => Helpers.exec('npm config get prefix').map(l => `${l[0].trim()}/lib/node_modules/`),
-  mapToJSON: (map) => JSON.stringify(map.toJS())
+  mapToJSON: (map) => JSON.stringify(map.toJS()),
+
+  /*
+   * Logging
+   */
+  formatLog: R.pipe(
+    R.split('\n'),
+    R.map((str) => `${(new Date()).toUTCString()}: ${str}`),
+    R.join('\n')
+  ),
+  log: (str) => console.log(Helpers.formatLog(str)),
+  logError: (str) => console.error(Helpers.formatLog(str))
 }
 
 module.exports = Helpers

@@ -12,6 +12,7 @@ const initStore = require('./lib/store')
 const pollFeeds = require('./lib/poll-feeds')
 const Notify = require('./lib/notify')
 const initialize = require('./lib/initialize')
+const H = require('./lib/shared/heleprs')
 
 const poller = state => {
   const config = state.get('configuration')
@@ -30,12 +31,12 @@ module.exports = function runRSSOBotDaemon (state) {
     /* Restart on error */
     .catch(err => {
       debug(state)
-      console.error(err)
+      H.logError(err)
       return runRSSOBotDaemon(state)
     })
     .subscribe(
       () => {},
-      console.error
+      H.logError
     )
 }
 
