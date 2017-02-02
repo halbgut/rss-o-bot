@@ -392,7 +392,7 @@ const Helpers = {
    */
   formatLog: R.pipe(
     R.split('\n'),
-    R.map((str) => `${(new Date()).toUTCString()}: ${str}`),
+    R.map((str) => `[${(new Date()).toISOString()}]: ${str}`),
     R.join('\n')
   ),
   log: (str) => console.log(Helpers.formatLog(str)),

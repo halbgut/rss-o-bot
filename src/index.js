@@ -26,6 +26,7 @@ const poller = state => {
 module.exports = function runRSSOBotDaemon (state) {
   const notify = Notify(state.get('configuration'))
   poller(state)
+    .do(({ blogTitle, link, title }) => { H.log(`New URL in "${blogTitle}": "${link}"`) })
     .switchMap(({ blogTitle, link, title }) => notify(blogTitle, link, title).retry(2))
     .do(() => debug('Sent notifications'))
     /* Restart on error */
