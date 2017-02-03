@@ -12,7 +12,7 @@ const initStore = require('./lib/store')
 const pollFeeds = require('./lib/poll-feeds')
 const Notify = require('./lib/notify')
 const initialize = require('./lib/initialize')
-const H = require('./lib/shared/heleprs')
+const H = require('./lib/shared/helpers')
 
 const poller = state => {
   const config = state.get('configuration')
