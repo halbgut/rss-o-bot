@@ -248,8 +248,14 @@ const Helpers = {
         man: markedMan(man, {version, section: 1})
       })),
 
+  uglyPrintFeeds: R.pipe(
+    R.map(R.values),
+    R.map(R.join(' | ')),
+    R.join('\n')
+  ),
+
   /* Prints all feed in a bare table */
-  printFeeds: (wrapInput = true, show = ['blogTitle', 'url', 'filters']) => feeds => {
+  printFeeds: (wrapInput = true, show = ['blogTitle', 'url', 'filters'], ugly) => feeds => {
     const columns = R.prepend('id', show)
     const labels = {
       id: 'ID',
@@ -279,6 +285,7 @@ const Helpers = {
       ))
     )
       .map(feeds => {
+        if (ugly) return Helpers.uglyPrintFeeds(feeds)
         const ttyWidth = process.stdout.columns
         const longestLine = Helpers.longestLineLength(feeds, columns)
         // Only wrap when tty width can be measured and is necessary
