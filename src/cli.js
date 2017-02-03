@@ -195,7 +195,11 @@ const commands = [
   [
     'test-config',
     true,
-    state => O.of(Config.validate(state.get('configuration').toJS())),
+    state => O.of(Config.validate(state.get('configuration').toJS()))
+      .map(x => x
+        ? 'Configuration file valid.'
+        : 'Invalid Config'
+      ),
     H.scope.LOCAL
   ]
 ]

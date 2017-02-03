@@ -51,11 +51,11 @@ test.cb('--config', T.run(['help', `--config=${__dirname}/../../config/failing`]
 ))
 
 test.cb('test-config true', T.run(['test-config', `--config=${__dirname}/../../config/succeeding`], 1, false)((t, o) =>
-  o.map(x => t.truthy(x))
+  o.map(x => t.is('Configuration file valid.', x))
 ))
 
 test.cb('test-config false', T.run(['test-config', `--config=${__dirname}/../../config/invalid`], 1, false)((t, o) =>
-  o.map(x => t.falsy(x))
+  o.map(x => t.is('Invalid Config', x))
 ))
 
 ; (() => {
