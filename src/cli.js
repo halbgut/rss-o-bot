@@ -70,7 +70,10 @@ const commands = [
         .switchMap(([store, config]) =>
           pollFeeds(store, true, state.getIn(['switches', 'ids']))
             .do(({ blogTitle, link, title }) => { H.log(`New URL in "${blogTitle}": "${link}"`) })
-            .switchMap(({ blogTitle, link, title }) => Notify(config)(blogTitle, link, title).retry(2))
+            .concatMap(({ blogTitle, link, title }) =>
+              Notify(config)(blogTitle, link, title)
+                .retry(2)
+            )
         )
         .defaultIfEmpty(false)
         .last()
