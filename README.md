@@ -1,6 +1,6 @@
 ![alt text](https://i.imgur.com/reQMPMD.png "RSS-o-Bot Logo")
 
-# RSS-o-Bot 1.0.0-rc.22
+# RSS-o-Bot 1.0.0-rc.23
 
 [![Coverage Status](https://coveralls.io/repos/github/Kriegslustig/rss-o-bot/badge.svg?branch=master)](https://coveralls.io/github/Kriegslustig/rss-o-bot?branch=master)
 [![Build Status](https://travis-ci.org/Kriegslustig/rss-o-bot.svg?branch=master)](https://travis-ci.org/Kriegslustig/rss-o-bot)
