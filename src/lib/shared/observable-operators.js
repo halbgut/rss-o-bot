@@ -14,7 +14,11 @@ module.exports = (Observable: typeof O) => {
         : O.throw()
       )
   Observable.prototype.log = function (str) {
-    return this.do(x => console.log(str || x))
+    return this.do(
+      x => console.log('next', str || x),
+      x => console.log('error', x),
+      () => console.log('complete')
+    )
   }
 }
 

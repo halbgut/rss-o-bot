@@ -2,15 +2,16 @@
  * Tests for helpers.js
  */
 const { test } = require('ava')
-const { findExistingDirectory } = require('../../../dist/lib/shared/helpers')
+const { findExistingDirectory, exec } = require('../../../dist/lib/shared/helpers')
 const { Observable: O } = require('rxjs/Rx')
 
-test('findExistingDirectory positive', t =>
-  findExistingDirectory(['./not/a/directory', '.'])
+test('findExistingDirectory positive', t => {
+  t.plan(1)
+  return findExistingDirectory(['./not/a/directory', '.'])
     .do(f => {
       t.is(f, '.')
     })
-)
+})
 
 test('findExistingDirectory negative', t =>
   findExistingDirectory(['./not/a/directory'])
@@ -20,3 +21,8 @@ test('findExistingDirectory negative', t =>
     })
 )
 
+test('exec', t => {
+  t.plan(1)
+  return exec('echo "test"')
+    .do(lines => t.deepEqual(['test\n', ''], lines))
+})

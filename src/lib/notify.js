@@ -3,53 +3,54 @@
  * This module notifies about new entries users.
  */
 const path = require('path')
+const R = require('ramda')
 
 const { Observable: O } = require('rxjs/Rx')
 const debug = require('debug')('rss-o-bot')
 
 const H = require('./shared/helpers')
+const { throwO } = require('./shared/errors')
 
 module.exports = config => {
   const setMethods = config.get('notification-methods') || []
-  const notifierFunctions = getNotifierFunctions(H, config, setMethods)
+  const notifierFunctions = getNotifierFunctions(config, setMethods)
 
   return (blog, link, title) =>
     /* Call all registered notifiers */
     O.merge(...notifierFunctions)
       .switchMap(f => f(blog, link, title))
       /* The results should be ignored here */
-      .last()
+      .toArray()
+      .concatMap(results =>
+        results.length < 1
+          ? throwO('NO_VALID_NOTIFIERS', { setMethods })
+          : O.of(true)
+      )
 }
 
-const getNotifierFunctions = (H, config, setMethods) =>
+const getNotifierFunctions = (config, setMethods) =>
   /* Map over all configured notification methods and check if there
    * are installed modules by that name. require and isDirectory both
    * throw errors if the directory or module doesn't exist.
    */
-  setMethods.map(module =>
-    typeof module === 'function'
-      ? O.of(module(config))
-      : O.onErrorResumeNext(
-        H.isDirectory(module).map(require),
-        H.getNpmPrefix()
-          .switchMap(prefix =>
-            H.isDirectory(path.join(prefix, module))
-              .do(null, (path) => { debug(`Notifier not in ${path}`) })
-              .catch(() => H.isDirectory(path.join(prefix, `rss-o-bot-${module}`)))
-              .do((path) => { debug(`Notifier found in ${path}`) })
-              .catch(() => {
-                debug(`Notifier not in ${path}`)
-                debug(`Continuing with normal operation without notifier ${module}`)
-                return O.empty()
-              })
-              .map(require)
-          )
+  setMethods.map(module => {
+    /* Notifiers may just be functions. */
+    if (R.is(Function, module)) return O.of(module(config))
+    return H.getNpmPrefix()
+      .switchMap(prefix =>
+        H.findExistingDirectory([
+          module,
+          path.join(prefix, 'lib', 'node_modules', `rss-o-bot-${module}`),
+          path.join(prefix, 'node_modules', `rss-o-bot-${module}`),
+          path.join(prefix, 'lib', 'node_modules', module),
+          path.join(prefix, 'node_modules', module)
+        ])
       )
-        .defaultIfEmpty()
-        .filter(x => {
-          if (!x) process.stderr.write(`Failed to load notifier "${module}"\n`)
-          return !!x
-        })
-        .map(f => f(config))
-        .do(() => debug(`Successfully loaded notifier: ${module}`))
-  )
+      .map(require)
+      .map(module => module(config))
+      .do(() => debug(`Successfully loaded notifier: ${module}`))
+      .catch(() => {
+        H.logError(`Failed to load notifier "${module}"`)
+        return O.empty()
+      })
+  })

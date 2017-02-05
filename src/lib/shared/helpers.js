@@ -43,10 +43,10 @@ const Helpers = {
   },
 
   findExistingDirectory: loc =>
-    O.onErrorResumeNextT(
-      ...(R.is(Array, loc) ? loc : [loc])
+    O.onErrorResumeNextT(...(
+      (R.is(Array, loc) ? loc : [loc])
         .map(Helpers.isDirectory)
-    )
+    ))
       .catch(() => O.throw(new Error('None of those directories exist'))),
 
   /*
@@ -391,7 +391,9 @@ const Helpers = {
   /*
    * Others
    */
-  getNpmPrefix: () => Helpers.exec('npm config get prefix').map(l => `${l[0].trim()}/lib/node_modules/`),
+  getNpmPrefix: () =>
+    Helpers.exec('npm config get prefix')
+      .map(l => `${l[0].trim()}/lib/node_modules/`),
   mapToJSON: (map) => JSON.stringify(map.toJS()),
 
   /*

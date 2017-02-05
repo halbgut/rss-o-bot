@@ -30,7 +30,8 @@ const Errors = {
   INVALID_JWT: () => 'Invalid token sent to server.',
   UNKNOWN: () => 'An unknown error occured. Run the command again with the `DEBUG=rss-o-bot` infront to get some more info.',
   FAILED_TO_DOWNLOAD_FEED: ({ error, feed }) => `Unable to download ${feed}. \nReason: ${chalk.italic(error)}`,
-  FAILED_TO_PARSE_FEED: ({ feed }) => `Unable to parse XML served by "${feed}".`
+  FAILED_TO_PARSE_FEED: ({ feed }) => `Unable to parse XML served by "${feed}".`,
+  NO_VALID_NOTIFIERS: ({ setMethods }) => `No vaild notifiers found for ${setMethods.map(x => `"${x}"`).join(', ')}.`
 }
 
 module.exports = Errors
