@@ -393,7 +393,7 @@ const Helpers = {
    */
   getNpmPrefix: () =>
     Helpers.exec('npm config get prefix')
-      .map(l => `${l[0].trim()}/lib/node_modules/`),
+      .map(l => l[0].trim()),
   mapToJSON: (map) => JSON.stringify(map.toJS()),
 
   /*
