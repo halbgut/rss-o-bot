@@ -6,13 +6,21 @@
 const http = require('http')
 const https = require('https')
 const urlUtil = require('url')
-const debug = require('debug')('rss-o-bot')
 
+const debug = require('debug')('rss-o-bot')
 const Feedparser = require('feedparser')
 const { Observable: O } = require('rxjs/Rx')
+const iconv = require('iconv-lite')
 
 const H = require('./helpers')
 const { throwO } = require('./errors')
+
+const decodeXml = (str) => {
+  const match = str.toString().match(/<\?xml[^>]+encoding="([\w-]+)"\?>/)
+  return match
+    ? iconv.decode(str, match[1])
+    : str
+}
 
 const get = (url, depth = 0) => O.create(o => {
   const {host, path, protocol} = urlUtil.parse(url)
@@ -26,8 +34,7 @@ const get = (url, depth = 0) => O.create(o => {
     path,
     headers: { 'User-Agent': 'RSS-o-Bot' }
   }, res => {
-    let body = ''
-    res.setEncoding('utf8')
+    let body = Buffer.from([])
     if (H.isResponseRedirect(res)) {
       if (depth > 10) { // maximum redirects
         return o.error(new Error('Maximum redirects reached'))
@@ -39,7 +46,7 @@ const get = (url, depth = 0) => O.create(o => {
           v => o.complete()
         )
     } else if (H.isResponseSuccessful(res)) {
-      res.on('data', chunk => { body += chunk })
+      res.on('data', chunk => { body = Buffer.concat([body, chunk]) })
       res.on('end', () => { o.next(body); o.complete() })
       res.on('error', err => o.error(err))
     } else {
@@ -95,6 +102,7 @@ const applyFilters = filters => ({ title }) => {
 module.exports = (url, filters = []) =>
   get(url)
     .catch(error => throwO('FAILED_TO_DOWNLOAD_FEED', { error, feed: url }))
+    .map(decodeXml)
     .switchMap((body) =>
       parse(body)
         .catch((err) => throwO('FAILED_TO_PARSE_FEED', { error: err, feed: url }))
