@@ -7,6 +7,7 @@ const http = require('http')
 const https = require('https')
 const urlUtil = require('url')
 
+const R = require('ramda')
 const debug = require('debug')('rss-o-bot')
 const Feedparser = require('feedparser')
 const { Observable: O } = require('rxjs/Rx')
@@ -79,24 +80,19 @@ function parse (xml) {
 const applyFilters = filters => ({ title }) => {
   /* If a filter has to use smartcase */
   const lowTitle = title.toLowerCase()
-  return filters
-    /* Filter for valid keywords */
-    .filter(([keyword]) => keyword)
+  const validFilters = R.filter(R.nth(0), filters)
+  if (validFilters.length === 0) return true
+  return validFilters
     /* Check if any filters match smartcase */
     .filter(([keyword, not]) => {
       const lowerCase = !H.includesUpperCase(keyword)
-      if (not && lowerCase) {
-        return lowTitle.indexOf(keyword) > -1
-      } else if (not && !lowerCase) {
-        return title.indexOf(keyword) > -1
-      } else if (!not && lowerCase) {
-        return lowTitle.indexOf(keyword) === -1
-      } else if (!not && !lowerCase) {
-        return title.indexOf(keyword) === -1
-      } else {
-        debug(`Unexpected case in filter ${not}, ${lowerCase}`)
-      }
-    }).length === 0
+      const hasMatch = lowerCase
+        ? R.contains(keyword, lowTitle)
+        : R.contains(keyword, title)
+      return not
+        ? !hasMatch
+        : hasMatch
+    }).length > 0
 }
 
 module.exports = (url, filters = []) =>

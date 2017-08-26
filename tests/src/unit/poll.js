@@ -39,18 +39,21 @@ test.cb('poll positive atom filter', t => T.testObservable(
 
 test.cb('poll negative rss filter', t => T.testObservable(
   /* Testing inverted filters */
-  Poll('https://lucaschmid.net/feed/rss.xml', [['a', true], ['e', true]])
+  Poll('https://lucaschmid.net/feed/rss.xml', [['e', true]])
     .do(entries => t.is(entries.length, 0))
 )(t))
 
 test.cb('poll positive rss filter', t => T.testObservable(
-  /* Testing inverted filters */
   Poll('https://lucaschmid.net/feed/rss.xml', [['a'], ['e']])
-    .do(entries => t.true(entries.length > -1))
+    .do(entries => t.true(entries.length > 0))
+)(t))
+
+test.cb('poll positive rss OR filter', t => T.testObservable(
+  Poll('https://lucaschmid.net/feed/rss.xml', [['alll'], ['e']])
+    .do(entries => t.true(entries.length > 0))
 )(t))
 
 test.cb('poll case-sensitive positive rss filter', t => T.testObservable(
-  /* Testing inverted filters */
   Poll('https://lucaschmid.net/feed/rss.xml', [])
     .switchMap(entries =>
       /* I'm assuming, that all entries have some upper-case letters in them */
