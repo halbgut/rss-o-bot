@@ -3,15 +3,14 @@
  * This module downloads XML feeds, parses them, filters them by
  * defined keywords and extracts relevant data from entries.
  */
-const http = require('http')
-const https = require('https')
-const urlUtil = require('url')
-
+const request = require('request')
 const R = require('ramda')
 const debug = require('debug')('rss-o-bot')
 const Feedparser = require('feedparser')
 const { Observable: O } = require('rxjs/Rx')
 const iconv = require('iconv-lite')
+
+const requestO = O.bindNodeCallback(request)
 
 const H = require('./helpers')
 const { throwO } = require('./errors')
@@ -23,40 +22,19 @@ const decodeXml = (str) => {
     : str
 }
 
-const get = (url, depth = 0) => O.create(o => {
-  const {host, path, protocol} = urlUtil.parse(url)
-  const request =
-    protocol === 'http:'
-      ? http.request
-      : https.request
-  debug(`${(protocol || 'http:').toUpperCase()} GET ${depth} ${url}`)
-  request({
-    host,
-    path,
+const get = (url, depth = 0) => {
+  debug(`GET ${depth} ${url}`)
+  return requestO({
+    url,
+    encoding: null,
     headers: { 'User-Agent': 'RSS-o-Bot' }
-  }, res => {
-    let body = Buffer.from([])
-    if (H.isResponseRedirect(res)) {
-      if (depth > 10) { // maximum redirects
-        return o.error(new Error('Maximum redirects reached'))
-      }
-      get(res.headers.location, ++depth)
-        .subscribe(
-          v => o.next(v),
-          err => o.error(err),
-          v => o.complete()
-        )
-    } else if (H.isResponseSuccessful(res)) {
-      res.on('data', chunk => { body = Buffer.concat([body, chunk]) })
-      res.on('end', () => { o.next(body); o.complete() })
-      res.on('error', err => o.error(err))
-    } else {
-      o.error(new Error(`Request failed: ${url} with ${res.statusCode}`))
-    }
   })
-    .on('error', err => o.error(err))
-    .end()
-})
+    .switchMap(([res]) =>
+      H.isResponseSuccessful(res)
+        ? O.of(res.body)
+        : O.throw(new Error(`Request failed: ${url} with ${res.statusCode}`))
+    )
+}
 
 function parse (xml) {
   return O.create(o => {
