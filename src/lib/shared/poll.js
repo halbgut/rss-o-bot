@@ -26,6 +26,7 @@ const get = (url, depth = 0) => {
   debug(`GET ${depth} ${url}`)
   return requestO({
     url,
+    gzip: true,
     encoding: null,
     headers: { 'User-Agent': 'RSS-o-Bot' }
   })
