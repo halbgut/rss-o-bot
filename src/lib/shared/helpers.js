@@ -90,8 +90,8 @@ const Helpers = {
   transformFilter (filter) {
     return (
       filter[0] === '!'
-        ? {keyword: filter.substr(1), kind: false}
-        : {keyword: filter, kind: true}
+        ? {keyword: filter.substr(1), kind: true}
+        : {keyword: filter, kind: false}
     )
   },
 
@@ -268,8 +268,8 @@ const Helpers = {
       filters: () =>
         filters.map(f =>
           f.get('kind')
-            ? f.get('keyword')
-            : `!${f.get('keyword')}`
+            ? `!${f.get('keyword')}`
+            : f.get('keyword')
         ).join(', '),
       lastCheck: t => Helpers.parseTime(t).toISOString()
     })
