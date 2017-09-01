@@ -60,7 +60,7 @@ test.cb('test-config false', T.run(['test-config', `--config=${__dirname}/../../
 
 ; (() => {
   const url = 'https://lucaschmid.net/feed/rss.xml'
-  const filter = 'somefilter'
+  const filter = 'javascript'
   test.cb('add', T.run(['add', url, filter, '--no-wrap'], 4)((t, o, config) =>
     o.map(feed => {
       t.truthy(feed.includes('Luca Nils Schmid - Blog'))
