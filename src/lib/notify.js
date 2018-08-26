@@ -18,7 +18,7 @@ module.exports = config => {
   return (blog, link, title) =>
     /* Call all registered notifiers */
     O.merge(...notifierFunctions)
-      .switchMap(f => f(blog, link, title))
+      .flatMap(f => f(blog, link, title))
       /* The results should be ignored here */
       .toArray()
       .concatMap(results =>
