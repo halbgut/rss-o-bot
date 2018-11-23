@@ -80,6 +80,7 @@ So now we get notified, whenever a commit message contains the string "notif". T
 * [`rss-o-bot-email`](https://github.com/kriegslustig/rss-o-bot-email)
 * [`rss-o-bot-desktop`](https://github.com/kriegslustig/rss-o-bot-desktop)
 * [`rss-o-bot-telegram`](https://github.com/kriegslustig/rss-o-bot-telegram)
+* [`rss-o-bot-messenger`](https://github.com/MitsuhideA/rss-o-bot-messenger)
 
 ## Daemonizing
 
